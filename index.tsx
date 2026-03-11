@@ -52,14 +52,14 @@ const STORAGE_KEYS = {
 
 const INITIAL_ROUTINES: RoutineState = {
   weekday: [
-    { id: 'wd-1', title: 'Wake Up', tags: [], startTime: '07:00', duration: 30, completed: false, isRoutine: true },
-    { id: 'wd-2', title: 'Deep Work', tags: ['important'], startTime: '09:00', duration: 180, completed: false, isRoutine: true },
-    { id: 'wd-3', title: 'Lunch', tags: [], startTime: '13:00', duration: 60, completed: false, isRoutine: true },
-    { id: 'wd-4', title: 'Admin Sprint', tags: ['urgent'], startTime: '15:00', duration: 60, completed: false, isRoutine: true },
+    { id: 'wd-1', title: '기상', tags: [], startTime: '07:00', duration: 30, completed: false, isRoutine: true },
+    { id: 'wd-2', title: '집중 작업', tags: ['important'], startTime: '09:00', duration: 180, completed: false, isRoutine: true },
+    { id: 'wd-3', title: '점심', tags: [], startTime: '13:00', duration: 60, completed: false, isRoutine: true },
+    { id: 'wd-4', title: '정리 업무', tags: ['urgent'], startTime: '15:00', duration: 60, completed: false, isRoutine: true },
   ],
   weekend: [
-    { id: 'we-1', title: 'Slow Morning', tags: [], startTime: '09:00', duration: 60, completed: false, isRoutine: true },
-    { id: 'we-2', title: 'Studio Time', tags: ['important'], startTime: '14:00', duration: 120, completed: false, isRoutine: true },
+    { id: 'we-1', title: '느린 아침', tags: [], startTime: '09:00', duration: 60, completed: false, isRoutine: true },
+    { id: 'we-2', title: '창작 시간', tags: ['important'], startTime: '14:00', duration: 120, completed: false, isRoutine: true },
   ],
 };
 
@@ -227,8 +227,8 @@ function generateRoutinesForDate(dateStr: string, routines: RoutineState) {
 
 const seedTasksForToday = (todayStr: string, routines: RoutineState) => ({
   [todayStr]: [
-    { id: 'seed-1', title: 'Morning Walk', tags: [], startTime: '06:30', duration: 30, completed: false, isRoutine: false },
-    { id: 'seed-2', title: 'Priority Block', tags: ['important'], startTime: '16:00', duration: 90, completed: false, isRoutine: false },
+    { id: 'seed-1', title: '아침 산책', tags: [], startTime: '06:30', duration: 30, completed: false, isRoutine: false },
+    { id: 'seed-2', title: '우선순위 블록', tags: ['important'], startTime: '16:00', duration: 90, completed: false, isRoutine: false },
     ...generateRoutinesForDate(todayStr, routines),
   ],
 });
@@ -297,12 +297,12 @@ const TaskCreationModal = ({
           <Clock size={14} />
           <span>{initialTimeRange.start} - {initialTimeRange.end}</span>
         </div>
-        <h2 className="font-hand text-3xl text-stone-800">Add Event</h2>
-        <p className="mb-6 mt-2 text-sm text-stone-500">Mark it with the Eisenhower tags that fit this block.</p>
+        <h2 className="font-hand text-3xl text-stone-800">일정 추가</h2>
+        <p className="mb-6 mt-2 text-sm text-stone-500">이 시간 블록에 맞는 아이젠하워 태그를 선택하세요.</p>
         <input
           autoFocus
           className="w-full border-b-2 border-stone-300 bg-transparent py-3 text-2xl text-stone-800 outline-none placeholder:text-stone-400 focus:border-stone-700"
-          placeholder="Task name"
+          placeholder="일정 이름"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           onKeyDown={(event) => {
@@ -318,9 +318,9 @@ const TaskCreationModal = ({
           >
             <div className="flex items-center gap-2 font-medium">
               <AlertCircle size={16} />
-              Urgent
+              긴급
             </div>
-            <div className="mt-1 text-xs opacity-80">Needs attention soon</div>
+            <div className="mt-1 text-xs opacity-80">빠르게 처리해야 해요</div>
           </button>
           <button
             onClick={() => toggleTag('important')}
@@ -328,21 +328,21 @@ const TaskCreationModal = ({
           >
             <div className="flex items-center gap-2 font-medium">
               <Star size={16} />
-              Important
+              중요
             </div>
-            <div className="mt-1 text-xs opacity-80">High-value time</div>
+            <div className="mt-1 text-xs opacity-80">가치가 큰 시간이에요</div>
           </button>
         </div>
         <div className="mt-6 flex gap-3">
           <button onClick={onClose} className="flex-1 rounded-2xl border border-stone-300 bg-white px-4 py-3 text-stone-700 transition-colors hover:bg-stone-50">
-            Cancel
+            취소
           </button>
           <button
             onClick={() => title.trim() && onSave(title.trim(), tags)}
             disabled={!title.trim()}
             className="flex-1 rounded-2xl bg-stone-900 px-4 py-3 text-white transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Save
+            저장
           </button>
         </div>
       </div>
@@ -375,36 +375,36 @@ const TaskActionSheet = ({
         <div className="mx-auto mb-4 h-1.5 w-14 rounded-full bg-stone-300 md:hidden" />
         <div className="mb-1 flex items-center gap-2 text-sm text-stone-500">
           {getTaskIcon(task)}
-          <span>{task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : 'No schedule yet'}</span>
+          <span>{task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '아직 배치되지 않음'}</span>
         </div>
         <h3 className="font-hand text-3xl text-stone-800">{task.title}</h3>
-        <p className="mt-1 text-sm text-stone-500">{task.isRoutine ? 'Routine block' : 'Tap an action for this time block'}</p>
+        <p className="mt-1 text-sm text-stone-500">{task.isRoutine ? '루틴 블록' : '이 시간 블록에 적용할 작업을 선택하세요'}</p>
         <div className="mt-5 space-y-3">
           <button onClick={() => onToggleComplete(task)} className="sheet-button">
             <Check size={18} />
-            {task.completed ? 'Mark as active' : 'Mark as done'}
+            {task.completed ? '진행 중으로 되돌리기' : '완료로 표시'}
           </button>
           {!task.isRoutine && (
             <button onClick={() => onEdit(task)} className="sheet-button">
               <Pencil size={18} />
-              Edit task
+              일정 수정
             </button>
           )}
           {!task.isRoutine && task.startTime && (
             <button onClick={() => onUnschedule(task)} className="sheet-button">
               <Clock size={18} />
-              Remove from circle
+              원형 시계에서 빼기
             </button>
           )}
           {!task.isRoutine && (
             <button onClick={() => onDelete(task)} className="sheet-button text-rose-700">
               <Trash2 size={18} />
-              Delete task
+              일정 삭제
             </button>
           )}
         </div>
         <button onClick={onClose} className="mt-4 w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-stone-700">
-          Close
+          닫기
         </button>
       </div>
     </div>
@@ -485,8 +485,8 @@ const RoutineSettingsModal = ({
         <div className="border-b border-stone-200 px-5 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-hand text-3xl text-stone-800">Routine Library</h2>
-              <p className="text-sm text-stone-500">Template your weekdays and weekends for offline use.</p>
+              <h2 className="font-hand text-3xl text-stone-800">루틴 보관함</h2>
+              <p className="text-sm text-stone-500">평일과 주말의 기본 루틴을 오프라인으로 저장합니다.</p>
             </div>
             <button onClick={onClose} className="rounded-full p-2 text-stone-500 transition-colors hover:bg-stone-100 hover:text-rose-500">
               <X size={20} />
@@ -497,13 +497,13 @@ const RoutineSettingsModal = ({
               onClick={() => setActiveTab('weekday')}
               className={`rounded-2xl px-4 py-2 text-sm font-medium ${activeTab === 'weekday' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500'}`}
             >
-              Weekday
+              평일
             </button>
             <button
               onClick={() => setActiveTab('weekend')}
               className={`rounded-2xl px-4 py-2 text-sm font-medium ${activeTab === 'weekend' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500'}`}
             >
-              Weekend
+              주말
             </button>
           </div>
         </div>
@@ -529,30 +529,30 @@ const RoutineSettingsModal = ({
             </div>
           </div>
           <div className="overflow-y-auto bg-stone-50/80 p-5">
-            <h3 className="font-hand text-2xl text-stone-700">Add Routine Block</h3>
+            <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
             <div className="mt-4 space-y-4">
               <input
                 className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
-                placeholder="Task name"
+                placeholder="일정 이름"
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
               />
               <div className="grid grid-cols-2 gap-3">
                 <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
-                  <div className="mb-1">Start</div>
+                  <div className="mb-1">시작</div>
                   <input type="time" className="w-full bg-transparent outline-none" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
                 </label>
                 <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
-                  <div className="mb-1">End</div>
+                  <div className="mb-1">종료</div>
                   <input type="time" className="w-full bg-transparent outline-none" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
                 </label>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <button onClick={() => toggleTag('urgent')} className={`rounded-2xl border px-4 py-3 text-left ${tags.includes('urgent') ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-                  Urgent
+                  긴급
                 </button>
                 <button onClick={() => toggleTag('important')} className={`rounded-2xl border px-4 py-3 text-left ${tags.includes('important') ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-                  Important
+                  중요
                 </button>
               </div>
               <button
@@ -560,14 +560,14 @@ const RoutineSettingsModal = ({
                 disabled={!title.trim() || !startTime || !endTime}
                 className="w-full rounded-2xl bg-stone-900 px-4 py-3 text-white disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Add Block
+                블록 추가
               </button>
             </div>
           </div>
         </div>
         <div className="flex justify-end gap-3 border-t border-stone-200 px-5 py-4">
           <button onClick={onClose} className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-stone-700">
-            Cancel
+            취소
           </button>
           <button
             onClick={() => {
@@ -576,7 +576,7 @@ const RoutineSettingsModal = ({
             }}
             className="rounded-2xl bg-amber-400 px-4 py-3 text-stone-900"
           >
-            Save Routines
+            루틴 저장
           </button>
         </div>
       </div>
@@ -882,13 +882,13 @@ const CircleScheduler = ({
                 {activeTask.title.length > 16 ? `${activeTask.title.slice(0, 16)}...` : activeTask.title}
               </text>
               <text x={CENTER} y={CENTER + 34} textAnchor="middle" className="fill-stone-500 text-[12px] uppercase tracking-[0.28em]">
-                live block
+                진행 중
               </text>
             </>
           ) : (
             <>
               <text x={CENTER} y={CENTER - 8} textAnchor="middle" className="fill-stone-400 text-[20px] uppercase tracking-[0.3em]">
-                free time
+                비어 있는 시간
               </text>
               <text x={CENTER} y={CENTER + 28} textAnchor="middle" className="fill-stone-900 text-[36px] font-semibold">
                 {now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -899,7 +899,7 @@ const CircleScheduler = ({
       </svg>
 
       <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-white/80 bg-white/70 px-4 py-2 text-center text-xs text-stone-500 shadow-sm backdrop-blur">
-        {anchorAngle === null ? 'Tap the ring to choose a start time, then tap again to finish the block.' : 'Tap the ring again to complete this schedule slice.'}
+        {anchorAngle === null ? '원형을 눌러 시작 시간을 정하고, 다시 눌러 시간 구간을 완성하세요.' : '원형을 한 번 더 눌러 이 일정 구간을 확정하세요.'}
       </div>
     </div>
   );
@@ -923,8 +923,8 @@ const CalendarView = ({
     <section className="flex h-full flex-col overflow-hidden bg-[linear-gradient(180deg,#fbf7f0_0%,#f0ebe1_100%)] p-4 md:p-8">
       <div className="mb-5 flex items-center justify-between gap-3">
         <div>
-          <h1 className="font-hand text-4xl text-stone-800 md:text-5xl">Calendar Atlas</h1>
-          <p className="text-sm text-stone-500">Tap any day to enter its 24-hour circle.</p>
+          <h1 className="font-hand text-4xl text-stone-800 md:text-5xl">달력 보기</h1>
+          <p className="text-sm text-stone-500">날짜를 누르면 그날의 24시간 원형 시계로 이동합니다.</p>
         </div>
         <button onClick={onOpenSettings} className="rounded-full border border-stone-300 bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
           <Settings size={22} />
@@ -965,7 +965,7 @@ const CalendarView = ({
             >
               <div className="flex items-start justify-between">
                 <span className={`text-base font-semibold md:text-lg ${isToday ? 'text-amber-700' : 'text-stone-800'}`}>{day}</span>
-                {isToday && <span className="rounded-full bg-amber-200 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-amber-800">Today</span>}
+                {isToday && <span className="rounded-full bg-amber-200 px-2 py-0.5 text-[10px] tracking-[0.18em] text-amber-800">오늘</span>}
               </div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {nonRoutine.slice(0, 6).map((task) => (
@@ -1117,11 +1117,11 @@ const DayScheduleView = ({
           )}
           <div>
             <h1 className="font-hand text-3xl text-stone-800 md:text-4xl">{formatDateLabel(date)}</h1>
-            <p className="text-sm text-stone-500">Your circle day, available offline on-device.</p>
+            <p className="text-sm text-stone-500">기기 안에서 오프라인으로 동작하는 오늘의 원형 일정입니다.</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={onCycleVisualMode} className="rounded-full border border-stone-300 bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50" title="Cycle visual mode">
+          <button onClick={onCycleVisualMode} className="rounded-full border border-stone-300 bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50" title="비주얼 모드 변경">
             <Sparkles size={18} />
           </button>
           <button onClick={onOpenSettings} className="rounded-full border border-stone-300 bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
@@ -1143,23 +1143,23 @@ const DayScheduleView = ({
         <div className="flex min-h-0 flex-col gap-4 overflow-hidden">
           <div className="rounded-[2rem] border border-white/75 bg-white/70 p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-hand text-3xl text-stone-800">{editingId ? 'Edit Task' : 'Quick Add'}</h2>
-              {editingId && <button onClick={resetForm} className="text-sm text-rose-600">Cancel</button>}
+              <h2 className="font-hand text-3xl text-stone-800">{editingId ? '일정 수정' : '빠른 추가'}</h2>
+              {editingId && <button onClick={resetForm} className="text-sm text-rose-600">취소</button>}
             </div>
             <form onSubmit={submitForm} className="space-y-3">
               <input
                 className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
-                placeholder="Task name"
+                placeholder="일정 이름"
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
               />
               <div className="grid grid-cols-2 gap-3">
                 <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
-                  <div className="mb-1">Start</div>
+                  <div className="mb-1">시작</div>
                   <input type="time" className="w-full bg-transparent outline-none" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
                 </label>
                 <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
-                  <div className="mb-1">End</div>
+                  <div className="mb-1">종료</div>
                   <input type="time" className="w-full bg-transparent outline-none" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
                 </label>
               </div>
@@ -1167,18 +1167,18 @@ const DayScheduleView = ({
                 <button type="button" onClick={() => toggleTag('urgent')} className={`rounded-2xl border px-4 py-3 text-left ${tags.includes('urgent') ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                   <div className="flex items-center gap-2">
                     <AlertCircle size={16} />
-                    Urgent
+                    긴급
                   </div>
                 </button>
                 <button type="button" onClick={() => toggleTag('important')} className={`rounded-2xl border px-4 py-3 text-left ${tags.includes('important') ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                   <div className="flex items-center gap-2">
                     <Star size={16} />
-                    Important
+                    중요
                   </div>
                 </button>
               </div>
               <button type="submit" disabled={!title.trim() || !startTime || !endTime} className="w-full rounded-2xl bg-stone-900 px-4 py-3 text-white disabled:cursor-not-allowed disabled:opacity-50">
-                {editingId ? 'Update Task' : 'Add to Day'}
+                {editingId ? '일정 업데이트' : '하루 일정에 추가'}
               </button>
             </form>
           </div>
@@ -1186,19 +1186,19 @@ const DayScheduleView = ({
           <div className="flex min-h-0 flex-1 flex-col rounded-[2rem] border border-white/75 bg-white/70 p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <h2 className="font-hand text-3xl text-stone-800">Task Stack</h2>
-                <p className="text-sm text-stone-500">Tap a card for mobile-friendly actions.</p>
+                <h2 className="font-hand text-3xl text-stone-800">일정 목록</h2>
+                <p className="text-sm text-stone-500">카드를 누르면 모바일에 맞는 작업 메뉴가 열립니다.</p>
               </div>
               <button onClick={() => setShowRoutines((current) => !current)} className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-3 py-2 text-sm text-stone-600 shadow-sm">
                 {showRoutines ? <Eye size={16} /> : <EyeOff size={16} />}
-                {showRoutines ? 'Show all' : 'Hide routines'}
+                {showRoutines ? '전체 보기' : '루틴 숨기기'}
               </button>
             </div>
 
             <div className="space-y-3 overflow-y-auto pb-safe pr-1">
               {sortedTasks.length === 0 && (
                 <div className="rounded-[1.6rem] border border-dashed border-stone-300 px-4 py-6 text-center text-stone-500">
-                  No tasks planned yet for this day.
+                  아직 이 날짜에 등록된 일정이 없습니다.
                 </div>
               )}
               {sortedTasks.map((task) => (
@@ -1211,7 +1211,7 @@ const DayScheduleView = ({
                       </div>
                       <div className="mt-1 flex items-center gap-2 text-xs text-stone-500">
                         <Clock size={12} />
-                        {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : 'Unscheduled'}
+                        {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -1318,7 +1318,7 @@ const App = () => {
           className={`flex w-full flex-col items-center gap-1 py-3 ${activeTab === 'home' ? 'text-amber-600' : 'text-stone-400'}`}
         >
           <Home size={22} />
-          <span className="text-xs uppercase tracking-[0.2em]">Today</span>
+          <span className="text-xs tracking-[0.2em]">오늘</span>
         </button>
         <button
           onClick={() => {
@@ -1330,7 +1330,7 @@ const App = () => {
           className={`flex w-full flex-col items-center gap-1 py-3 ${activeTab === 'calendar' ? 'text-amber-600' : 'text-stone-400'}`}
         >
           <CalendarIcon size={22} />
-          <span className="text-xs uppercase tracking-[0.2em]">Calendar</span>
+          <span className="text-xs tracking-[0.2em]">달력</span>
         </button>
       </nav>
     </div>

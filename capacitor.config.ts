@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.doughit.circleday',
-  appName: 'Circle Day',
+  appName: '도우 잇',
   webDir: 'dist',
   bundledWebRuntime: false,
   server: {

@@ -1,48 +1,48 @@
-# Circle Day
+# 도우 잇
 
-Offline-first time planning app built with React, Vite, Tailwind, and Capacitor.
+React, Vite, Tailwind, Capacitor로 만든 오프라인 중심 시간 관리 앱입니다.
 
-## What changed
+## 변경 내용
 
-- Removed runtime CDN dependencies so the UI can run without internet access.
-- Added local persistence for routines, tasks, and visual mode using `localStorage`.
-- Reworked desktop-only interactions into tap-first mobile actions.
-- Added Capacitor configuration and iOS scripts for packaging into an iPhone app.
-- Added a visual mode layer so the circular clock can evolve into a more media-art direction.
+- 인터넷 없이도 실행되도록 런타임 CDN 의존성을 제거했습니다.
+- `localStorage` 로 루틴, 일정, 비주얼 모드를 기기에 저장합니다.
+- 데스크톱 중심 조작을 탭 중심의 모바일 상호작용으로 바꿨습니다.
+- 아이폰 앱 패키징을 위해 Capacitor 설정과 iOS 스크립트를 추가했습니다.
+- 원형 시계 위에 미디어아트 확장이 가능한 비주얼 모드 레이어를 넣었습니다.
 
-## Development
+## 개발 실행
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Build for offline web bundle
+## 오프라인 웹 번들 빌드
 
 ```bash
 npm run build
 ```
 
-The generated bundle lands in `dist/` and does not depend on external CDNs.
+생성된 결과물은 `dist/` 에 들어가며 외부 CDN 없이 동작합니다.
 
-## Prepare iPhone app shell
+## 아이폰 앱 셸 준비
 
-1. Build and sync web assets:
+1. 웹 자산 빌드 및 동기화
 
 ```bash
 npm run ios:sync
 ```
 
-2. Open the iOS project in Xcode:
+2. Xcode에서 iOS 프로젝트 열기
 
 ```bash
 npm run ios:open
 ```
 
-3. In Xcode, choose a simulator or connected iPhone and run the app.
+3. Xcode에서 시뮬레이터 또는 연결된 아이폰을 선택해 실행
 
-## Notes
+## 참고
 
-- Data is stored locally on-device.
-- Routine edits affect newly opened dates; existing saved dates keep their own task data.
-- The visual layer is intentionally separate from scheduling logic so it can be extended later with richer SVG, Canvas, or shader-based treatments.
+- 데이터는 기기 내부에 저장됩니다.
+- 루틴 수정은 새로 여는 날짜에 반영되고, 이미 저장된 날짜는 기존 일정 상태를 유지합니다.
+- 비주얼 레이어는 일정 계산 로직과 분리되어 있어 이후 SVG, Canvas, 셰이더 기반 표현으로 확장하기 쉽습니다.
