@@ -587,75 +587,11 @@ const RoutineSettingsModal = ({
 const AmbientVisuals = ({ now }: { now: Date }) => {
   const minuteAngle = minutesToAngle(now.getHours() * 60 + now.getMinutes());
   const trailLayers = [88, 62, 40, 22];
-  const hourMarkers = Array.from({ length: 12 }, (_, index) => {
-    const angle = index * 30;
-    const point = polarToCartesian(CENTER, CENTER, RADIUS - 6, angle);
-    return { angle, point, index };
-  });
-  const heroNumbers = [
-    { value: '12', angle: 0, size: 88 },
-    { value: '03', angle: 90, size: 88 },
-    { value: '06', angle: 180, size: 88 },
-    { value: '09', angle: 270, size: 88 },
-    { value: '08', angle: 240, size: 52 },
-  ];
 
   return (
     <>
       <rect x="0" y="0" width="600" height="600" fill="#f4f4f4" />
       <circle cx={CENTER} cy={CENTER} r={RADIUS + 34} fill="#f3f3f3" opacity="0.98" />
-      {hourMarkers.map(({ point, angle, index }) => (
-        <g key={`marker-${angle}`}>
-          <ellipse
-            cx={point.x}
-            cy={point.y}
-            rx={index % 3 === 0 ? 22 : 16}
-            ry={index % 3 === 0 ? 28 : 22}
-            fill="#000000"
-            opacity={0.16}
-            transform={`rotate(${angle} ${point.x} ${point.y})`}
-            filter="url(#markerBlur)"
-          />
-          <ellipse
-            cx={point.x}
-            cy={point.y}
-            rx={index % 3 === 0 ? 15 : 10}
-            ry={index % 3 === 0 ? 22 : 16}
-            fill="#000000"
-            transform={`rotate(${angle} ${point.x} ${point.y})`}
-          />
-        </g>
-      ))}
-      {heroNumbers.map(({ value, angle, size }) => {
-        const point = polarToCartesian(CENTER, CENTER, RADIUS - (size > 60 ? 14 : 32), angle);
-        return (
-          <g key={value}>
-            <text
-              x={point.x}
-              y={point.y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              style={{ fontSize: `${size}px`, fontWeight: 300 }}
-              className="fill-black"
-              opacity="0.2"
-              filter="url(#numberBlur)"
-            >
-              {value}
-            </text>
-            <text
-              x={point.x}
-              y={point.y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              style={{ fontSize: `${size}px`, fontWeight: 300 }}
-              className="fill-black"
-              opacity={value === '08' ? 0.9 : 0.72}
-            >
-              {value}
-            </text>
-          </g>
-        );
-      })}
       {trailLayers.map((spread, index) => {
         const start = minuteAngle - 8 - index * 2.5;
         const end = minuteAngle + 8 + index * 2.5;
@@ -750,6 +686,148 @@ const CircleScheduler = ({
   const activeTask = tasks.find((task) => isCurrentMinuteInsideTask(task, now.getHours() * 60 + now.getMinutes()));
   const activeColor = activeTask?.tags.includes('urgent') ? '#d90429' : '#111111';
   const minuteAngle = minutesToAngle(now.getHours() * 60 + now.getMinutes());
+  const hourMarkers = Array.from({ length: 12 }, (_, index) => {
+    const angle = index * 30;
+    const point = polarToCartesian(CENTER, CENTER, RADIUS - 6, angle);
+    return { angle, point, index };
+  });
+  const heroNumbers = [
+    { value: '12', angle: 0, size: 88 },
+    { value: '03', angle: 90, size: 88 },
+    { value: '06', angle: 180, size: 88 },
+    { value: '09', angle: 270, size: 88 },
+    { value: '08', angle: 240, size: 52 },
+  ];
+  const renderClockSurface = (blurred: boolean) => (
+    <>
+      {hourMarkers.map(({ point, angle, index }) => (
+        <g key={`${blurred ? 'b' : 's'}-marker-${angle}`}>
+          <ellipse
+            cx={point.x}
+            cy={point.y}
+            rx={index % 3 === 0 ? 22 : 16}
+            ry={index % 3 === 0 ? 28 : 22}
+            fill="#000000"
+            opacity={blurred ? 0.24 : 0.16}
+            transform={`rotate(${angle} ${point.x} ${point.y})`}
+            filter={blurred ? 'url(#markerBlurHeavy)' : 'url(#markerBlur)'}
+          />
+          <ellipse
+            cx={point.x}
+            cy={point.y}
+            rx={index % 3 === 0 ? 15 : 10}
+            ry={index % 3 === 0 ? 22 : 16}
+            fill="#000000"
+            opacity={blurred ? 0.86 : 1}
+            transform={`rotate(${angle} ${point.x} ${point.y})`}
+            filter={blurred ? 'url(#markerBlurLight)' : undefined}
+          />
+        </g>
+      ))}
+      {heroNumbers.map(({ value, angle, size }) => {
+        const point = polarToCartesian(CENTER, CENTER, RADIUS - (size > 60 ? 14 : 32), angle);
+        return (
+          <g key={`${blurred ? 'b' : 's'}-${value}`}>
+            <text
+              x={point.x}
+              y={point.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              style={{ fontSize: `${size}px`, fontWeight: 300 }}
+              className="fill-black"
+              opacity={blurred ? 0.26 : 0.2}
+              filter={blurred ? 'url(#numberBlurHeavy)' : 'url(#numberBlur)'}
+            >
+              {value}
+            </text>
+            <text
+              x={point.x}
+              y={point.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              style={{ fontSize: `${size}px`, fontWeight: 300 }}
+              className="fill-black"
+              opacity={value === '08' ? 0.9 : 0.72}
+              filter={blurred ? 'url(#numberBlurLight)' : undefined}
+            >
+              {value}
+            </text>
+          </g>
+        );
+      })}
+      {Array.from({ length: 24 }, (_, hour) => {
+        const angle = hour * 15;
+        const lineStart = polarToCartesian(CENTER, CENTER, RADIUS - 12, angle);
+        const lineEnd = polarToCartesian(CENTER, CENTER, RADIUS + (hour % 6 === 0 ? 4 : 0), angle);
+        const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS + 28, angle);
+        return (
+          <g key={`${blurred ? 'b' : 's'}-tick-${hour}`} opacity={hour % 3 === 0 ? 0.14 : 0.08}>
+            <line
+              x1={lineStart.x}
+              y1={lineStart.y}
+              x2={lineEnd.x}
+              y2={lineEnd.y}
+              stroke="#111111"
+              strokeWidth={hour % 6 === 0 ? 1.4 : 0.8}
+              filter={blurred ? 'url(#tickBlur)' : undefined}
+            />
+            <text
+              x={labelPoint.x}
+              y={labelPoint.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="fill-black text-[11px] font-semibold md:text-sm"
+              filter={blurred ? 'url(#tickBlur)' : undefined}
+            >
+              {hour.toString().padStart(2, '0')}
+            </text>
+          </g>
+        );
+      })}
+      {tasks.filter((task) => task.startTime && task.duration).map((task) => {
+        const startAngle = minutesToAngle(timeToMinutes(task.startTime ?? '00:00'));
+        const endAngle = startAngle + minutesToAngle(task.duration ?? 0);
+        const taskColor = getClockTaskColor(task);
+        const labelAngle = startAngle + (endAngle - startAngle) / 2;
+        const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS * 0.7, labelAngle);
+        return (
+          <g key={`${blurred ? 'b' : 's'}-task-${task.id}`}>
+            <path
+              d={describeArc(CENTER, CENTER, RADIUS - 3, startAngle, endAngle)}
+              fill={taskColor}
+              stroke={task.tags.includes('urgent') ? '#d90429' : '#111111'}
+              strokeWidth="1.4"
+              opacity={task.completed ? 0.42 : 0.92}
+              filter={blurred ? 'url(#surfaceBlur)' : undefined}
+              className={blurred ? undefined : 'cursor-pointer transition-opacity hover:opacity-100'}
+              onClick={blurred ? undefined : (event) => {
+                event.stopPropagation();
+                onInspectTask(task);
+              }}
+            />
+            {(task.duration ?? 0) >= 40 && (
+              <text
+                x={labelPoint.x}
+                y={labelPoint.y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="pointer-events-none fill-black text-[12px] md:text-xs"
+                filter={blurred ? 'url(#surfaceBlur)' : undefined}
+                style={{
+                  transformBox: 'fill-box',
+                  transformOrigin: 'center',
+                  transform: `rotate(${labelAngle + 90}deg)`,
+                  opacity: task.completed ? 0.6 : 1,
+                }}
+              >
+                {task.title.slice(0, 14)}
+              </text>
+            )}
+          </g>
+        );
+      })}
+    </>
+  );
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[2rem] bg-[#efefef]">
@@ -796,8 +874,26 @@ const CircleScheduler = ({
           <filter id="markerBlur">
             <feGaussianBlur stdDeviation="8" />
           </filter>
+          <filter id="markerBlurLight">
+            <feGaussianBlur stdDeviation="4" />
+          </filter>
+          <filter id="markerBlurHeavy">
+            <feGaussianBlur stdDeviation="14" />
+          </filter>
           <filter id="numberBlur">
             <feGaussianBlur stdDeviation="12" />
+          </filter>
+          <filter id="numberBlurLight">
+            <feGaussianBlur stdDeviation="6" />
+          </filter>
+          <filter id="numberBlurHeavy">
+            <feGaussianBlur stdDeviation="20" />
+          </filter>
+          <filter id="tickBlur">
+            <feGaussianBlur stdDeviation="2.5" />
+          </filter>
+          <filter id="surfaceBlur">
+            <feGaussianBlur stdDeviation="5.5" />
           </filter>
           <filter id="handBlur1">
             <feGaussianBlur stdDeviation="4" />
@@ -811,72 +907,34 @@ const CircleScheduler = ({
           <filter id="handBlur4">
             <feGaussianBlur stdDeviation="22" />
           </filter>
+          <linearGradient id="blurGradient" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform={`rotate(${minuteAngle} 0.5 0.5)`}>
+            <stop offset="0%" stopColor="white" />
+            <stop offset="24%" stopColor="black" />
+            <stop offset="58%" stopColor="black" />
+            <stop offset="100%" stopColor="white" />
+          </linearGradient>
+          <linearGradient id="sharpGradient" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform={`rotate(${minuteAngle} 0.5 0.5)`}>
+            <stop offset="0%" stopColor="black" />
+            <stop offset="20%" stopColor="white" />
+            <stop offset="42%" stopColor="white" />
+            <stop offset="100%" stopColor="black" />
+          </linearGradient>
+          <mask id="blurMask">
+            <rect x="0" y="0" width="600" height="600" fill="url(#blurGradient)" />
+          </mask>
+          <mask id="sharpMask">
+            <rect x="0" y="0" width="600" height="600" fill="url(#sharpGradient)" />
+          </mask>
         </defs>
 
         <AmbientVisuals now={now} />
         <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="rgba(255,255,255,0.78)" stroke="#111111" strokeWidth="2.2" opacity="0.18" filter="url(#paperNoise)" />
-
-        {Array.from({ length: 24 }, (_, hour) => {
-          const angle = hour * 15;
-          const lineStart = polarToCartesian(CENTER, CENTER, RADIUS - 12, angle);
-          const lineEnd = polarToCartesian(CENTER, CENTER, RADIUS + (hour % 6 === 0 ? 4 : 0), angle);
-          const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS + 28, angle);
-          return (
-            <g key={hour} opacity={hour % 3 === 0 ? 0.14 : 0.08}>
-              <line x1={lineStart.x} y1={lineStart.y} x2={lineEnd.x} y2={lineEnd.y} stroke="#111111" strokeWidth={hour % 6 === 0 ? 1.4 : 0.8} />
-              <text x={labelPoint.x} y={labelPoint.y} textAnchor="middle" dominantBaseline="middle" className="fill-black text-[11px] font-semibold md:text-sm">
-                {hour.toString().padStart(2, '0')}
-              </text>
-              {Array.from({ length: 3 }, (_, index) => {
-                const subAngle = angle + (index + 1) * 3.75;
-                const subStart = polarToCartesian(CENTER, CENTER, RADIUS - 6, subAngle);
-                const subEnd = polarToCartesian(CENTER, CENTER, RADIUS, subAngle);
-                return <line key={`${hour}-${index}`} x1={subStart.x} y1={subStart.y} x2={subEnd.x} y2={subEnd.y} stroke="#111111" strokeWidth="0.5" opacity="0.12" />;
-              })}
-            </g>
-          );
-        })}
-
-        {tasks.filter((task) => task.startTime && task.duration).map((task) => {
-          const startAngle = minutesToAngle(timeToMinutes(task.startTime ?? '00:00'));
-          const endAngle = startAngle + minutesToAngle(task.duration ?? 0);
-          const taskColor = getClockTaskColor(task);
-          const labelAngle = startAngle + (endAngle - startAngle) / 2;
-          const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS * 0.7, labelAngle);
-          return (
-            <g key={task.id}>
-              <path
-                d={describeArc(CENTER, CENTER, RADIUS - 3, startAngle, endAngle)}
-                fill={taskColor}
-                stroke={task.tags.includes('urgent') ? '#d90429' : '#111111'}
-                strokeWidth="1.4"
-                opacity={task.completed ? 0.42 : 0.92}
-                className="cursor-pointer transition-opacity hover:opacity-100"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onInspectTask(task);
-                }}
-              />
-              {(task.duration ?? 0) >= 40 && (
-                <text
-                  x={labelPoint.x}
-                  y={labelPoint.y}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  className="pointer-events-none fill-black text-[12px] md:text-xs"
-                  style={{
-                    transformBox: 'fill-box',
-                    transformOrigin: 'center',
-                    transform: `rotate(${labelAngle + 90}deg)`,
-                    opacity: task.completed ? 0.6 : 1,
-                  }}
-                >
-                  {task.title.slice(0, 14)}
-                </text>
-              )}
-            </g>
-          );
-        })}
+        <g mask="url(#blurMask)">
+          {renderClockSurface(true)}
+        </g>
+        <g mask="url(#sharpMask)">
+          {renderClockSurface(false)}
+        </g>
 
         {anchorAngle !== null && (
           <>
