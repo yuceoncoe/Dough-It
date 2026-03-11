@@ -170,6 +170,19 @@ const getTaskColor = (tags: Tag[]) => {
   return '#d8d6cf';
 };
 
+const getClockTaskColor = (task: Task) => {
+  if (task.completed) {
+    return '#d4d4d4';
+  }
+  if (task.tags.includes('urgent')) {
+    return '#d90429';
+  }
+  if (task.tags.includes('important')) {
+    return '#9a9a9a';
+  }
+  return '#ececec';
+};
+
 const getTaskBorderClass = (tags: Tag[]) => {
   const urgent = tags.includes('urgent');
   const important = tags.includes('important');
@@ -586,33 +599,30 @@ const RoutineSettingsModal = ({
 
 const AmbientVisuals = ({ mode, now }: { mode: VisualMode; now: Date }) => {
   const minuteAngle = minutesToAngle(now.getHours() * 60 + now.getMinutes());
-
-  if (mode === 'paper') {
-    return (
-      <>
-        <circle cx={CENTER} cy={CENTER} r={RADIUS + 22} fill="url(#paperHalo)" opacity="0.85" />
-        <circle cx={CENTER} cy={CENTER} r={RADIUS + 2} fill="#fffdf8" opacity="0.96" />
-      </>
-    );
-  }
-
-  if (mode === 'halo') {
-    return (
-      <>
-        <circle cx={CENTER} cy={CENTER} r={RADIUS + 32} fill="url(#haloGradient)" opacity="0.75" />
-        <circle cx={CENTER} cy={CENTER} r={RADIUS + 10} fill="url(#innerMist)" opacity="0.5" />
-        <circle cx={polarToCartesian(CENTER, CENTER, RADIUS * 0.82, minuteAngle).x} cy={polarToCartesian(CENTER, CENTER, RADIUS * 0.82, minuteAngle).y} r={36} fill="url(#sparkGradient)" opacity="0.35" />
-      </>
-    );
-  }
+  const trailLayers = [88, 62, 40, 22];
 
   return (
     <>
-      <circle cx={CENTER} cy={CENTER} r={RADIUS + 30} fill="url(#pulseGradient)" opacity="0.72" />
-      <circle cx={CENTER} cy={CENTER} r={RADIUS - 10} fill="url(#pulseCore)" opacity="0.5" />
-      <circle cx={CENTER} cy={CENTER} r={RADIUS + 10} fill="none" stroke="url(#pulseStroke)" strokeWidth={2} opacity="0.55">
-        <animate attributeName="r" values={`${RADIUS - 4};${RADIUS + 18};${RADIUS - 4}`} dur="8s" repeatCount="indefinite" />
-      </circle>
+      <rect x="0" y="0" width="600" height="600" fill="#f4f4f4" />
+      <circle cx={CENTER} cy={CENTER} r={RADIUS + 34} fill="#ffffff" opacity="0.98" />
+      <circle cx={CENTER} cy={CENTER} r={RADIUS + 20} fill="none" stroke="#d90429" strokeWidth="1.2" opacity="0.28" />
+      {trailLayers.map((spread, index) => {
+        const start = minuteAngle - 8 - index * 2.5;
+        const end = minuteAngle + 8 + index * 2.5;
+        const opacity = 0.22 - index * 0.04;
+        return (
+          <path
+            key={spread}
+            d={describeArc(CENTER, CENTER, RADIUS + 8 + index * 8, start, end)}
+            fill="#d90429"
+            opacity={opacity}
+            filter={`url(#handBlur${index + 1})`}
+          />
+        );
+      })}
+      {(mode === 'halo' || mode === 'pulse') && (
+        <circle cx={polarToCartesian(CENTER, CENTER, RADIUS * 0.82, minuteAngle).x} cy={polarToCartesian(CENTER, CENTER, RADIUS * 0.82, minuteAngle).y} r={mode === 'pulse' ? 26 : 18} fill="#d90429" opacity={mode === 'pulse' ? 0.18 : 0.12} filter="url(#handBlur4)" />
+      )}
     </>
   );
 };
@@ -693,10 +703,11 @@ const CircleScheduler = ({
   };
 
   const activeTask = tasks.find((task) => isCurrentMinuteInsideTask(task, now.getHours() * 60 + now.getMinutes()));
-  const activeColor = activeTask ? getTaskColor(activeTask.tags) : '#c7bca8';
+  const activeColor = activeTask?.tags.includes('urgent') ? '#d90429' : '#111111';
+  const minuteAngle = minutesToAngle(now.getHours() * 60 + now.getMinutes());
 
   return (
-    <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_top,#fffdfa_0%,#f1ece1_100%)]">
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[2rem] bg-[#efefef]">
       <TaskCreationModal
         isOpen={showCreateModal}
         initialTimeRange={{
@@ -733,44 +744,27 @@ const CircleScheduler = ({
         onClick={handleRingClick}
       >
         <defs>
-          <radialGradient id="paperHalo">
-            <stop offset="0%" stopColor="#fffdf6" />
-            <stop offset="100%" stopColor="#efe7d8" />
-          </radialGradient>
-          <radialGradient id="haloGradient">
-            <stop offset="0%" stopColor="#f7e7bf" />
-            <stop offset="40%" stopColor="#ffb980" />
-            <stop offset="100%" stopColor="#f2ebe2" />
-          </radialGradient>
-          <radialGradient id="innerMist">
-            <stop offset="0%" stopColor="#fffef9" />
-            <stop offset="100%" stopColor="#ffd5bc" />
-          </radialGradient>
-          <radialGradient id="sparkGradient">
-            <stop offset="0%" stopColor="#fff7c2" />
-            <stop offset="100%" stopColor="#ff8b7a" />
-          </radialGradient>
-          <radialGradient id="pulseGradient">
-            <stop offset="0%" stopColor="#ffefc2" />
-            <stop offset="50%" stopColor="#ffb46e" />
-            <stop offset="100%" stopColor="#e5ded3" />
-          </radialGradient>
-          <radialGradient id="pulseCore">
-            <stop offset="0%" stopColor="#fffdfa" />
-            <stop offset="100%" stopColor="#ffd0a8" />
-          </radialGradient>
-          <linearGradient id="pulseStroke" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ffba66" />
-            <stop offset="100%" stopColor="#ff7f67" />
-          </linearGradient>
           <filter id="paperNoise">
             <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" />
+          </filter>
+          <filter id="handBlur1">
+            <feGaussianBlur stdDeviation="4" />
+          </filter>
+          <filter id="handBlur2">
+            <feGaussianBlur stdDeviation="8" />
+          </filter>
+          <filter id="handBlur3">
+            <feGaussianBlur stdDeviation="14" />
+          </filter>
+          <filter id="handBlur4">
+            <feGaussianBlur stdDeviation="22" />
           </filter>
         </defs>
 
         <AmbientVisuals mode={visualMode} now={now} />
-        <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="#fffdfa" stroke="#302a27" strokeWidth="4" filter="url(#paperNoise)" />
+        <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="#ffffff" stroke="#111111" strokeWidth="4" filter="url(#paperNoise)" />
+        <circle cx={CENTER} cy={CENTER} r={RADIUS - 18} fill="none" stroke="#111111" strokeWidth="0.8" opacity="0.16" />
 
         {Array.from({ length: 24 }, (_, hour) => {
           const angle = hour * 15;
@@ -779,15 +773,15 @@ const CircleScheduler = ({
           const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS + 28, angle);
           return (
             <g key={hour}>
-              <line x1={lineStart.x} y1={lineStart.y} x2={lineEnd.x} y2={lineEnd.y} stroke="#8b8177" strokeWidth={hour % 6 === 0 ? 2.6 : 1.5} opacity="0.8" />
-              <text x={labelPoint.x} y={labelPoint.y} textAnchor="middle" dominantBaseline="middle" className="fill-stone-500 text-[11px] font-semibold md:text-sm">
+              <line x1={lineStart.x} y1={lineStart.y} x2={lineEnd.x} y2={lineEnd.y} stroke="#111111" strokeWidth={hour % 6 === 0 ? 2.4 : 1.2} opacity={hour % 6 === 0 ? '0.85' : '0.42'} />
+              <text x={labelPoint.x} y={labelPoint.y} textAnchor="middle" dominantBaseline="middle" className="fill-black text-[11px] font-semibold md:text-sm" opacity={hour % 6 === 0 ? 0.85 : 0.55}>
                 {hour}
               </text>
               {Array.from({ length: 3 }, (_, index) => {
                 const subAngle = angle + (index + 1) * 3.75;
                 const subStart = polarToCartesian(CENTER, CENTER, RADIUS - 6, subAngle);
                 const subEnd = polarToCartesian(CENTER, CENTER, RADIUS, subAngle);
-                return <line key={`${hour}-${index}`} x1={subStart.x} y1={subStart.y} x2={subEnd.x} y2={subEnd.y} stroke="#c6beb4" strokeWidth="1" />;
+                return <line key={`${hour}-${index}`} x1={subStart.x} y1={subStart.y} x2={subEnd.x} y2={subEnd.y} stroke="#111111" strokeWidth="0.9" opacity="0.18" />;
               })}
             </g>
           );
@@ -796,7 +790,7 @@ const CircleScheduler = ({
         {tasks.filter((task) => task.startTime && task.duration).map((task) => {
           const startAngle = minutesToAngle(timeToMinutes(task.startTime ?? '00:00'));
           const endAngle = startAngle + minutesToAngle(task.duration ?? 0);
-          const taskColor = task.completed ? '#cfcfc8' : getTaskColor(task.tags);
+          const taskColor = getClockTaskColor(task);
           const labelAngle = startAngle + (endAngle - startAngle) / 2;
           const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS * 0.7, labelAngle);
           return (
@@ -804,9 +798,9 @@ const CircleScheduler = ({
               <path
                 d={describeArc(CENTER, CENTER, RADIUS - 3, startAngle, endAngle)}
                 fill={taskColor}
-                stroke={task.completed ? '#9f988f' : '#302a27'}
+                stroke={task.tags.includes('urgent') ? '#d90429' : '#111111'}
                 strokeWidth="1.4"
-                opacity={task.completed ? 0.55 : 0.9}
+                opacity={task.completed ? 0.42 : 0.92}
                 className="cursor-pointer transition-opacity hover:opacity-100"
                 onClick={(event) => {
                   event.stopPropagation();
@@ -819,7 +813,7 @@ const CircleScheduler = ({
                   y={labelPoint.y}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="pointer-events-none fill-stone-800 text-[12px] md:text-xs"
+                  className="pointer-events-none fill-black text-[12px] md:text-xs"
                   style={{
                     transformBox: 'fill-box',
                     transformOrigin: 'center',
@@ -841,19 +835,19 @@ const CircleScheduler = ({
               y1={CENTER}
               x2={polarToCartesian(CENTER, CENTER, RADIUS, anchorAngle).x}
               y2={polarToCartesian(CENTER, CENTER, RADIUS, anchorAngle).y}
-              stroke="#e9a824"
+              stroke="#d90429"
               strokeWidth="2"
               strokeDasharray="5 5"
             />
-            <circle cx={polarToCartesian(CENTER, CENTER, RADIUS, anchorAngle).x} cy={polarToCartesian(CENTER, CENTER, RADIUS, anchorAngle).y} r="5" fill="#e9a824" />
+            <circle cx={polarToCartesian(CENTER, CENTER, RADIUS, anchorAngle).x} cy={polarToCartesian(CENTER, CENTER, RADIUS, anchorAngle).y} r="5" fill="#d90429" />
           </>
         )}
 
         {anchorAngle !== null && hoverAngle !== null && hoverAngle !== anchorAngle && (
           <path
             d={describeArc(CENTER, CENTER, RADIUS, anchorAngle, clampArcEnd(anchorAngle, hoverAngle))}
-            fill="rgba(250, 204, 21, 0.28)"
-            stroke="#f59e0b"
+            fill="rgba(217, 4, 41, 0.12)"
+            stroke="#d90429"
             strokeWidth="2"
             strokeDasharray="5 5"
           />
@@ -862,35 +856,48 @@ const CircleScheduler = ({
         <line
           x1={CENTER}
           y1={CENTER}
-          x2={polarToCartesian(CENTER, CENTER, RADIUS - 16, minutesToAngle(now.getHours() * 60 + now.getMinutes())).x}
-          y2={polarToCartesian(CENTER, CENTER, RADIUS - 16, minutesToAngle(now.getHours() * 60 + now.getMinutes())).y}
-          stroke="#ff6b57"
-          strokeWidth="2.5"
+          x2={polarToCartesian(CENTER, CENTER, RADIUS - 54, minuteAngle).x}
+          y2={polarToCartesian(CENTER, CENTER, RADIUS - 54, minuteAngle).y}
+          stroke="#111111"
+          strokeWidth="5"
           strokeLinecap="round"
-          opacity="0.85"
+          opacity="0.22"
+          filter="url(#handBlur1)"
         />
+        <line
+          x1={CENTER}
+          y1={CENTER}
+          x2={polarToCartesian(CENTER, CENTER, RADIUS - 16, minuteAngle).x}
+          y2={polarToCartesian(CENTER, CENTER, RADIUS - 16, minuteAngle).y}
+          stroke="#d90429"
+          strokeWidth="2.8"
+          strokeLinecap="round"
+          opacity="0.96"
+        />
+        <circle cx={CENTER} cy={CENTER} r="6" fill="#111111" />
+        <circle cx={CENTER} cy={CENTER} r="3" fill="#d90429" />
 
         <g>
-          <circle cx={CENTER} cy={CENTER} r="104" fill="#fffefb" stroke={activeColor} strokeOpacity="0.38" strokeWidth="4" />
-          <circle cx={CENTER} cy={CENTER} r="84" fill="rgba(255,255,255,0.7)" />
+          <circle cx={CENTER} cy={CENTER} r="104" fill="#ffffff" stroke={activeColor} strokeOpacity="0.22" strokeWidth="3" />
+          <circle cx={CENTER} cy={CENTER} r="84" fill="rgba(255,255,255,0.95)" />
           {activeTask ? (
             <>
               <g transform={`translate(${CENTER - 15}, ${CENTER - 48})`}>
                 {getTaskIcon(activeTask)}
               </g>
-              <text x={CENTER} y={CENTER + 8} textAnchor="middle" className="fill-stone-900 text-[24px] font-medium">
+              <text x={CENTER} y={CENTER + 8} textAnchor="middle" className="fill-black text-[24px] font-medium">
                 {activeTask.title.length > 16 ? `${activeTask.title.slice(0, 16)}...` : activeTask.title}
               </text>
-              <text x={CENTER} y={CENTER + 34} textAnchor="middle" className="fill-stone-500 text-[12px] uppercase tracking-[0.28em]">
+              <text x={CENTER} y={CENTER + 34} textAnchor="middle" className="fill-[#d90429] text-[12px] tracking-[0.22em]">
                 진행 중
               </text>
             </>
           ) : (
             <>
-              <text x={CENTER} y={CENTER - 8} textAnchor="middle" className="fill-stone-400 text-[20px] uppercase tracking-[0.3em]">
+              <text x={CENTER} y={CENTER - 8} textAnchor="middle" className="fill-black text-[20px] tracking-[0.22em]" opacity="0.36">
                 비어 있는 시간
               </text>
-              <text x={CENTER} y={CENTER + 28} textAnchor="middle" className="fill-stone-900 text-[36px] font-semibold">
+              <text x={CENTER} y={CENTER + 28} textAnchor="middle" className="fill-black text-[36px] font-semibold">
                 {now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </text>
             </>
