@@ -25,8 +25,6 @@ import {
 } from 'lucide-react';
 
 type Tag = 'urgent' | 'important';
-type VisualMode = 'paper' | 'halo' | 'pulse';
-
 interface Task {
   id: string;
   title: string;
@@ -47,7 +45,6 @@ const RADIUS = 248;
 const STORAGE_KEYS = {
   routines: 'circle-day:routines',
   tasksByDate: 'circle-day:tasks-by-date',
-  visualMode: 'circle-day:visual-mode',
 };
 
 const INITIAL_ROUTINES: RoutineState = {
@@ -251,16 +248,6 @@ const addOrReplaceDateTasks = (tasksByDate: Record<string, Task[]>, date: string
     return tasksByDate;
   }
   return { ...tasksByDate, [date]: generateRoutinesForDate(date, routines) };
-};
-
-const cycleVisualMode = (mode: VisualMode): VisualMode => {
-  if (mode === 'paper') {
-    return 'halo';
-  }
-  if (mode === 'halo') {
-    return 'pulse';
-  }
-  return 'paper';
 };
 
 const formatDateLabel = (date: string) =>
@@ -597,15 +584,78 @@ const RoutineSettingsModal = ({
   );
 };
 
-const AmbientVisuals = ({ mode, now }: { mode: VisualMode; now: Date }) => {
+const AmbientVisuals = ({ now }: { now: Date }) => {
   const minuteAngle = minutesToAngle(now.getHours() * 60 + now.getMinutes());
   const trailLayers = [88, 62, 40, 22];
+  const hourMarkers = Array.from({ length: 12 }, (_, index) => {
+    const angle = index * 30;
+    const point = polarToCartesian(CENTER, CENTER, RADIUS - 6, angle);
+    return { angle, point, index };
+  });
+  const heroNumbers = [
+    { value: '12', angle: 0, size: 88 },
+    { value: '03', angle: 90, size: 88 },
+    { value: '06', angle: 180, size: 88 },
+    { value: '09', angle: 270, size: 88 },
+    { value: '08', angle: 240, size: 52 },
+  ];
 
   return (
     <>
       <rect x="0" y="0" width="600" height="600" fill="#f4f4f4" />
-      <circle cx={CENTER} cy={CENTER} r={RADIUS + 34} fill="#ffffff" opacity="0.98" />
-      <circle cx={CENTER} cy={CENTER} r={RADIUS + 20} fill="none" stroke="#d90429" strokeWidth="1.2" opacity="0.28" />
+      <circle cx={CENTER} cy={CENTER} r={RADIUS + 34} fill="#f3f3f3" opacity="0.98" />
+      {hourMarkers.map(({ point, angle, index }) => (
+        <g key={`marker-${angle}`}>
+          <ellipse
+            cx={point.x}
+            cy={point.y}
+            rx={index % 3 === 0 ? 22 : 16}
+            ry={index % 3 === 0 ? 28 : 22}
+            fill="#000000"
+            opacity={0.16}
+            transform={`rotate(${angle} ${point.x} ${point.y})`}
+            filter="url(#markerBlur)"
+          />
+          <ellipse
+            cx={point.x}
+            cy={point.y}
+            rx={index % 3 === 0 ? 15 : 10}
+            ry={index % 3 === 0 ? 22 : 16}
+            fill="#000000"
+            transform={`rotate(${angle} ${point.x} ${point.y})`}
+          />
+        </g>
+      ))}
+      {heroNumbers.map(({ value, angle, size }) => {
+        const point = polarToCartesian(CENTER, CENTER, RADIUS - (size > 60 ? 14 : 32), angle);
+        return (
+          <g key={value}>
+            <text
+              x={point.x}
+              y={point.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              style={{ fontSize: `${size}px`, fontWeight: 300 }}
+              className="fill-black"
+              opacity="0.2"
+              filter="url(#numberBlur)"
+            >
+              {value}
+            </text>
+            <text
+              x={point.x}
+              y={point.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              style={{ fontSize: `${size}px`, fontWeight: 300 }}
+              className="fill-black"
+              opacity={value === '08' ? 0.9 : 0.72}
+            >
+              {value}
+            </text>
+          </g>
+        );
+      })}
       {trailLayers.map((spread, index) => {
         const start = minuteAngle - 8 - index * 2.5;
         const end = minuteAngle + 8 + index * 2.5;
@@ -620,21 +670,16 @@ const AmbientVisuals = ({ mode, now }: { mode: VisualMode; now: Date }) => {
           />
         );
       })}
-      {(mode === 'halo' || mode === 'pulse') && (
-        <circle cx={polarToCartesian(CENTER, CENTER, RADIUS * 0.82, minuteAngle).x} cy={polarToCartesian(CENTER, CENTER, RADIUS * 0.82, minuteAngle).y} r={mode === 'pulse' ? 26 : 18} fill="#d90429" opacity={mode === 'pulse' ? 0.18 : 0.12} filter="url(#handBlur4)" />
-      )}
     </>
   );
 };
 
 const CircleScheduler = ({
   tasks,
-  visualMode,
   onAddTask,
   onInspectTask,
 }: {
   tasks: Task[];
-  visualMode: VisualMode;
   onAddTask: (title: string, tags: Tag[], startTime: string, duration: number) => void;
   onInspectTask: (task: Task) => void;
 }) => {
@@ -746,7 +791,13 @@ const CircleScheduler = ({
         <defs>
           <filter id="paperNoise">
             <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="0.8" />
+          </filter>
+          <filter id="markerBlur">
+            <feGaussianBlur stdDeviation="8" />
+          </filter>
+          <filter id="numberBlur">
+            <feGaussianBlur stdDeviation="12" />
           </filter>
           <filter id="handBlur1">
             <feGaussianBlur stdDeviation="4" />
@@ -762,9 +813,8 @@ const CircleScheduler = ({
           </filter>
         </defs>
 
-        <AmbientVisuals mode={visualMode} now={now} />
-        <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="#ffffff" stroke="#111111" strokeWidth="4" filter="url(#paperNoise)" />
-        <circle cx={CENTER} cy={CENTER} r={RADIUS - 18} fill="none" stroke="#111111" strokeWidth="0.8" opacity="0.16" />
+        <AmbientVisuals now={now} />
+        <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="rgba(255,255,255,0.78)" stroke="#111111" strokeWidth="2.2" opacity="0.18" filter="url(#paperNoise)" />
 
         {Array.from({ length: 24 }, (_, hour) => {
           const angle = hour * 15;
@@ -772,16 +822,16 @@ const CircleScheduler = ({
           const lineEnd = polarToCartesian(CENTER, CENTER, RADIUS + (hour % 6 === 0 ? 4 : 0), angle);
           const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS + 28, angle);
           return (
-            <g key={hour}>
-              <line x1={lineStart.x} y1={lineStart.y} x2={lineEnd.x} y2={lineEnd.y} stroke="#111111" strokeWidth={hour % 6 === 0 ? 2.4 : 1.2} opacity={hour % 6 === 0 ? '0.85' : '0.42'} />
-              <text x={labelPoint.x} y={labelPoint.y} textAnchor="middle" dominantBaseline="middle" className="fill-black text-[11px] font-semibold md:text-sm" opacity={hour % 6 === 0 ? 0.85 : 0.55}>
-                {hour}
+            <g key={hour} opacity={hour % 3 === 0 ? 0.14 : 0.08}>
+              <line x1={lineStart.x} y1={lineStart.y} x2={lineEnd.x} y2={lineEnd.y} stroke="#111111" strokeWidth={hour % 6 === 0 ? 1.4 : 0.8} />
+              <text x={labelPoint.x} y={labelPoint.y} textAnchor="middle" dominantBaseline="middle" className="fill-black text-[11px] font-semibold md:text-sm">
+                {hour.toString().padStart(2, '0')}
               </text>
               {Array.from({ length: 3 }, (_, index) => {
                 const subAngle = angle + (index + 1) * 3.75;
                 const subStart = polarToCartesian(CENTER, CENTER, RADIUS - 6, subAngle);
                 const subEnd = polarToCartesian(CENTER, CENTER, RADIUS, subAngle);
-                return <line key={`${hour}-${index}`} x1={subStart.x} y1={subStart.y} x2={subEnd.x} y2={subEnd.y} stroke="#111111" strokeWidth="0.9" opacity="0.18" />;
+                return <line key={`${hour}-${index}`} x1={subStart.x} y1={subStart.y} x2={subEnd.x} y2={subEnd.y} stroke="#111111" strokeWidth="0.5" opacity="0.12" />;
               })}
             </g>
           );
@@ -878,8 +928,8 @@ const CircleScheduler = ({
         <circle cx={CENTER} cy={CENTER} r="3" fill="#d90429" />
 
         <g>
-          <circle cx={CENTER} cy={CENTER} r="104" fill="#ffffff" stroke={activeColor} strokeOpacity="0.22" strokeWidth="3" />
-          <circle cx={CENTER} cy={CENTER} r="84" fill="rgba(255,255,255,0.95)" />
+          <circle cx={CENTER} cy={CENTER} r="104" fill="#f4f4f4" stroke={activeColor} strokeOpacity="0.18" strokeWidth="2" />
+          <circle cx={CENTER} cy={CENTER} r="84" fill="rgba(244,244,244,0.92)" />
           {activeTask ? (
             <>
               <g transform={`translate(${CENTER - 15}, ${CENTER - 48})`}>
@@ -990,18 +1040,14 @@ const CalendarView = ({
 const DayScheduleView = ({
   date,
   tasks,
-  visualMode,
   onBack,
   onOpenSettings,
-  onCycleVisualMode,
   onTasksChange,
 }: {
   date: string;
   tasks: Task[];
-  visualMode: VisualMode;
   onBack?: () => void;
   onOpenSettings: () => void;
-  onCycleVisualMode: () => void;
   onTasksChange: (tasks: Task[]) => void;
 }) => {
   const [title, setTitle] = useState('');
@@ -1128,9 +1174,6 @@ const DayScheduleView = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={onCycleVisualMode} className="rounded-full border border-stone-300 bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50" title="비주얼 모드 변경">
-            <Sparkles size={18} />
-          </button>
           <button onClick={onOpenSettings} className="rounded-full border border-stone-300 bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
             <Settings size={18} />
           </button>
@@ -1141,7 +1184,6 @@ const DayScheduleView = ({
         <div className="min-h-[45vh] overflow-hidden rounded-[2rem] border border-white/75 bg-white/40 p-3 shadow-[0_20px_70px_rgba(130,108,77,0.12)] backdrop-blur">
           <CircleScheduler
             tasks={tasks}
-            visualMode={visualMode}
             onAddTask={addTask}
             onInspectTask={(task) => setSheetTask(task)}
           />
@@ -1243,7 +1285,6 @@ const App = () => {
     const storedRoutines = loadStoredJson(STORAGE_KEYS.routines, INITIAL_ROUTINES);
     return loadStoredJson(STORAGE_KEYS.tasksByDate, seedTasksForToday(todayStr, storedRoutines));
   });
-  const [visualMode, setVisualMode] = useState<VisualMode>(() => loadStoredJson(STORAGE_KEYS.visualMode, 'paper'));
   const [activeTab, setActiveTab] = useState<'home' | 'calendar'>('home');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -1255,10 +1296,6 @@ const App = () => {
   useEffect(() => {
     persistJson(STORAGE_KEYS.tasksByDate, tasksByDate);
   }, [tasksByDate]);
-
-  useEffect(() => {
-    persistJson(STORAGE_KEYS.visualMode, visualMode);
-  }, [visualMode]);
 
   useEffect(() => {
     setTasksByDate((current) => addOrReplaceDateTasks(current, todayStr, routines));
@@ -1288,9 +1325,7 @@ const App = () => {
           <DayScheduleView
             date={todayStr}
             tasks={tasksByDate[todayStr] ?? []}
-            visualMode={visualMode}
             onOpenSettings={() => setSettingsOpen(true)}
-            onCycleVisualMode={() => setVisualMode((current) => cycleVisualMode(current))}
             onTasksChange={(nextTasks) => updateTasksForDate(todayStr, nextTasks)}
           />
         )}
@@ -1299,10 +1334,8 @@ const App = () => {
           <DayScheduleView
             date={selectedDate}
             tasks={tasksByDate[selectedDate] ?? []}
-            visualMode={visualMode}
             onBack={() => setSelectedDate(null)}
             onOpenSettings={() => setSettingsOpen(true)}
-            onCycleVisualMode={() => setVisualMode((current) => cycleVisualMode(current))}
             onTasksChange={(nextTasks) => updateTasksForDate(selectedDate, nextTasks)}
           />
         ) : null}
