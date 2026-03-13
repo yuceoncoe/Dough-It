@@ -232,7 +232,17 @@ const getBlurProgress = (point: { x: number; y: number }, minuteAngle: number) =
   const normalizedX = axisX / axisLength;
   const normalizedY = axisY / axisLength;
   const projection = Math.max(0, (point.x - focusPoint.x) * normalizedX + (point.y - focusPoint.y) * normalizedY);
-  return Math.min(1, projection / 240);
+  const projected = Math.min(1, projection / 140);
+
+  let pointAngle = Math.atan2(point.y - CENTER, point.x - CENTER) * (180 / Math.PI) + 90;
+  if (pointAngle < 0) {
+    pointAngle += 360;
+  }
+  const angleDelta = Math.abs(((pointAngle - minuteAngle + 540) % 360) - 180);
+  const directional = Math.min(1, angleDelta / 180);
+  const easedDirectional = directional * directional;
+
+  return Math.min(1, easedDirectional * 0.72 + projected * 0.28);
 };
 
 const beginRingArcPath = (ctx: CanvasRenderingContext2D, innerRadius: number, outerRadius: number, startAngle: number, endAngle: number) => {
@@ -303,14 +313,14 @@ const CanvasClockSurface = ({
 
       hourMarkers.forEach(({ angle, point, index }) => {
         const progress = getBlurProgress(point, minuteAngle);
-        const rx = index % 3 === 0 ? 15 : 10;
-        const ry = index % 3 === 0 ? 22 : 16;
+        const rx = index % 3 === 0 ? 5.5 : 3.5;
+        const ry = index % 3 === 0 ? 11 : 7;
         ctx.save();
         ctx.translate(point.x, point.y);
         ctx.rotate(angle * Math.PI / 180);
-        ctx.filter = `blur(${3 + progress * 18}px)`;
+        ctx.filter = `blur(${1.2 + progress * 12}px)`;
         ctx.fillStyle = '#000000';
-        ctx.globalAlpha = 0.92;
+        ctx.globalAlpha = index % 3 === 0 ? 0.86 : 0.5;
         ctx.beginPath();
         ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
         ctx.fill();
@@ -321,8 +331,8 @@ const CanvasClockSurface = ({
         const point = polarToCartesian(CENTER, CENTER, RADIUS - (size > 60 ? 14 : 32), angle);
         const progress = getBlurProgress(point, minuteAngle);
         ctx.save();
-        ctx.filter = `blur(${1.5 + progress * 22}px)`;
-        ctx.globalAlpha = value === '08' ? 0.92 : 0.76;
+        ctx.filter = `blur(${2.8 + progress * 28}px)`;
+        ctx.globalAlpha = value === '08' ? 0.96 : 0.82;
         ctx.fillStyle = '#111111';
         ctx.font = `300 ${size}px ui-sans-serif, system-ui, sans-serif`;
         ctx.textAlign = 'center';
@@ -333,30 +343,19 @@ const CanvasClockSurface = ({
 
       Array.from({ length: 24 }, (_, hour) => hour).forEach((hour) => {
         const angle = hour * 15;
-        const lineStart = polarToCartesian(CENTER, CENTER, RADIUS - 12, angle);
-        const lineEnd = polarToCartesian(CENTER, CENTER, RADIUS + (hour % 6 === 0 ? 4 : 0), angle);
-        const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS + 28, angle);
-        const progress = getBlurProgress(labelPoint, minuteAngle);
+        const lineStart = polarToCartesian(CENTER, CENTER, RADIUS - (hour % 6 === 0 ? 13 : 10), angle);
+        const lineEnd = polarToCartesian(CENTER, CENTER, RADIUS - (hour % 6 === 0 ? 4 : 2), angle);
+        const progress = getBlurProgress(lineEnd, minuteAngle);
 
         ctx.save();
-        ctx.filter = `blur(${0.6 + progress * 5}px)`;
-        ctx.globalAlpha = hour % 3 === 0 ? 0.14 : 0.08;
+        ctx.filter = `blur(${0.5 + progress * 3.8}px)`;
+        ctx.globalAlpha = hour % 6 === 0 ? 0.22 : 0.12;
         ctx.strokeStyle = '#111111';
-        ctx.lineWidth = hour % 6 === 0 ? 1.4 : 0.8;
+        ctx.lineWidth = hour % 6 === 0 ? 1 : 0.55;
         ctx.beginPath();
         ctx.moveTo(lineStart.x, lineStart.y);
         ctx.lineTo(lineEnd.x, lineEnd.y);
         ctx.stroke();
-        ctx.restore();
-
-        ctx.save();
-        ctx.filter = `blur(${0.4 + progress * 4}px)`;
-        ctx.globalAlpha = 0.22;
-        ctx.fillStyle = '#111111';
-        ctx.font = '600 11px ui-sans-serif, system-ui, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(hour.toString().padStart(2, '0'), labelPoint.x, labelPoint.y);
         ctx.restore();
       });
 
@@ -370,7 +369,7 @@ const CanvasClockSurface = ({
           const progress = getBlurProgress(labelPoint, minuteAngle);
 
           ctx.save();
-          ctx.filter = `blur(${0.8 + progress * 8}px)`;
+          ctx.filter = `blur(${1.8 + progress * 11}px)`;
           ctx.globalAlpha = task.completed ? 0.42 : 0.92;
           ctx.fillStyle = getClockTaskColor(task);
           ctx.strokeStyle = task.tags.includes('urgent') ? '#d90429' : '#111111';
@@ -384,7 +383,7 @@ const CanvasClockSurface = ({
             ctx.save();
             ctx.translate(labelPoint.x, labelPoint.y);
             ctx.rotate((midAngle + 90) * Math.PI / 180);
-            ctx.filter = `blur(${0.3 + progress * 5}px)`;
+            ctx.filter = `blur(${0.8 + progress * 7}px)`;
             ctx.fillStyle = '#111111';
             ctx.globalAlpha = task.completed ? 0.6 : 0.92;
             ctx.font = '400 12px ui-sans-serif, system-ui, sans-serif';
@@ -894,20 +893,10 @@ const CircleScheduler = ({
           <ellipse
             cx={point.x}
             cy={point.y}
-            rx={index % 3 === 0 ? 22 : 16}
-            ry={index % 3 === 0 ? 28 : 22}
+            rx={index % 3 === 0 ? 7 : 4}
+            ry={index % 3 === 0 ? 13 : 8}
             fill="#000000"
-            opacity={blurred ? 0.24 : 0.16}
-            transform={`rotate(${angle} ${point.x} ${point.y})`}
-            filter={blurred ? 'url(#markerBlurHeavy)' : 'url(#markerBlur)'}
-          />
-          <ellipse
-            cx={point.x}
-            cy={point.y}
-            rx={index % 3 === 0 ? 15 : 10}
-            ry={index % 3 === 0 ? 22 : 16}
-            fill="#000000"
-            opacity={blurred ? 0.86 : 1}
+            opacity={blurred ? 0.16 : index % 3 === 0 ? 0.44 : 0.2}
             transform={`rotate(${angle} ${point.x} ${point.y})`}
             filter={blurred ? 'url(#markerBlurLight)' : undefined}
           />
@@ -946,30 +935,19 @@ const CircleScheduler = ({
       })}
       {Array.from({ length: 24 }, (_, hour) => {
         const angle = hour * 15;
-        const lineStart = polarToCartesian(CENTER, CENTER, RADIUS - 12, angle);
-        const lineEnd = polarToCartesian(CENTER, CENTER, RADIUS + (hour % 6 === 0 ? 4 : 0), angle);
-        const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS + 28, angle);
+        const lineStart = polarToCartesian(CENTER, CENTER, RADIUS - (hour % 6 === 0 ? 13 : 10), angle);
+        const lineEnd = polarToCartesian(CENTER, CENTER, RADIUS - (hour % 6 === 0 ? 4 : 2), angle);
         return (
-          <g key={`${blurred ? 'b' : 's'}-tick-${hour}`} opacity={hour % 3 === 0 ? 0.14 : 0.08}>
+          <g key={`${blurred ? 'b' : 's'}-tick-${hour}`} opacity={hour % 6 === 0 ? 0.18 : 0.08}>
             <line
               x1={lineStart.x}
               y1={lineStart.y}
               x2={lineEnd.x}
               y2={lineEnd.y}
               stroke="#111111"
-              strokeWidth={hour % 6 === 0 ? 1.4 : 0.8}
+              strokeWidth={hour % 6 === 0 ? 1 : 0.55}
               filter={blurred ? 'url(#tickBlur)' : undefined}
             />
-            <text
-              x={labelPoint.x}
-              y={labelPoint.y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              className="fill-black text-[11px] font-semibold md:text-sm"
-              filter={blurred ? 'url(#tickBlur)' : undefined}
-            >
-              {hour.toString().padStart(2, '0')}
-            </text>
           </g>
         );
       })}
@@ -1059,7 +1037,7 @@ const CircleScheduler = ({
         </button>
       </div>
 
-      <div className="relative h-full w-full max-h-[68vh] min-h-[340px] max-w-[680px]">
+      <div className="relative aspect-square w-full max-w-[680px]">
         {renderMode === 'canvas' && <CanvasClockSurface tasks={tasks} minuteAngle={minuteAngle} />}
 
         <svg
