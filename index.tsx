@@ -223,6 +223,194 @@ const getTodayString = () => {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 };
 
+const getBlurProgress = (point: { x: number; y: number }, minuteAngle: number) => {
+  const focusPoint = polarToCartesian(CENTER, CENTER, RADIUS - 18, minuteAngle);
+  const axisPoint = polarToCartesian(CENTER, CENTER, RADIUS + 160, minuteAngle);
+  const axisX = axisPoint.x - focusPoint.x;
+  const axisY = axisPoint.y - focusPoint.y;
+  const axisLength = Math.hypot(axisX, axisY) || 1;
+  const normalizedX = axisX / axisLength;
+  const normalizedY = axisY / axisLength;
+  const projection = Math.max(0, (point.x - focusPoint.x) * normalizedX + (point.y - focusPoint.y) * normalizedY);
+  return Math.min(1, projection / 240);
+};
+
+const beginRingArcPath = (ctx: CanvasRenderingContext2D, innerRadius: number, outerRadius: number, startAngle: number, endAngle: number) => {
+  const startRadians = (startAngle - 90) * Math.PI / 180;
+  const endRadians = (endAngle - 90) * Math.PI / 180;
+  ctx.beginPath();
+  ctx.arc(CENTER, CENTER, outerRadius, startRadians, endRadians, false);
+  ctx.arc(CENTER, CENTER, innerRadius, endRadians, startRadians, true);
+  ctx.closePath();
+};
+
+const CanvasClockSurface = ({
+  tasks,
+  minuteAngle,
+}: {
+  tasks: Task[];
+  minuteAngle: number;
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
+
+    const draw = () => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) {
+        return;
+      }
+
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.round(rect.width * ratio);
+      canvas.height = Math.round(rect.height * ratio);
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        return;
+      }
+
+      ctx.setTransform((rect.width / 600) * ratio, 0, 0, (rect.height / 600) * ratio, 0, 0);
+      ctx.clearRect(0, 0, 600, 600);
+
+      ctx.fillStyle = '#f4f4f4';
+      ctx.fillRect(0, 0, 600, 600);
+
+      ctx.save();
+      ctx.globalAlpha = 0.98;
+      ctx.beginPath();
+      ctx.arc(CENTER, CENTER, RADIUS + 34, 0, Math.PI * 2);
+      ctx.fillStyle = '#f3f3f3';
+      ctx.fill();
+      ctx.restore();
+
+      const hourMarkers = Array.from({ length: 12 }, (_, index) => {
+        const angle = index * 30;
+        const point = polarToCartesian(CENTER, CENTER, RADIUS - 6, angle);
+        return { angle, point, index };
+      });
+      const heroNumbers = [
+        { value: '12', angle: 0, size: 88 },
+        { value: '03', angle: 90, size: 88 },
+        { value: '06', angle: 180, size: 88 },
+        { value: '09', angle: 270, size: 88 },
+        { value: '08', angle: 240, size: 52 },
+      ];
+
+      hourMarkers.forEach(({ angle, point, index }) => {
+        const progress = getBlurProgress(point, minuteAngle);
+        const rx = index % 3 === 0 ? 15 : 10;
+        const ry = index % 3 === 0 ? 22 : 16;
+        ctx.save();
+        ctx.translate(point.x, point.y);
+        ctx.rotate(angle * Math.PI / 180);
+        ctx.filter = `blur(${3 + progress * 18}px)`;
+        ctx.fillStyle = '#000000';
+        ctx.globalAlpha = 0.92;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      heroNumbers.forEach(({ value, angle, size }) => {
+        const point = polarToCartesian(CENTER, CENTER, RADIUS - (size > 60 ? 14 : 32), angle);
+        const progress = getBlurProgress(point, minuteAngle);
+        ctx.save();
+        ctx.filter = `blur(${1.5 + progress * 22}px)`;
+        ctx.globalAlpha = value === '08' ? 0.92 : 0.76;
+        ctx.fillStyle = '#111111';
+        ctx.font = `300 ${size}px ui-sans-serif, system-ui, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(value, point.x, point.y);
+        ctx.restore();
+      });
+
+      Array.from({ length: 24 }, (_, hour) => hour).forEach((hour) => {
+        const angle = hour * 15;
+        const lineStart = polarToCartesian(CENTER, CENTER, RADIUS - 12, angle);
+        const lineEnd = polarToCartesian(CENTER, CENTER, RADIUS + (hour % 6 === 0 ? 4 : 0), angle);
+        const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS + 28, angle);
+        const progress = getBlurProgress(labelPoint, minuteAngle);
+
+        ctx.save();
+        ctx.filter = `blur(${0.6 + progress * 5}px)`;
+        ctx.globalAlpha = hour % 3 === 0 ? 0.14 : 0.08;
+        ctx.strokeStyle = '#111111';
+        ctx.lineWidth = hour % 6 === 0 ? 1.4 : 0.8;
+        ctx.beginPath();
+        ctx.moveTo(lineStart.x, lineStart.y);
+        ctx.lineTo(lineEnd.x, lineEnd.y);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.filter = `blur(${0.4 + progress * 4}px)`;
+        ctx.globalAlpha = 0.22;
+        ctx.fillStyle = '#111111';
+        ctx.font = '600 11px ui-sans-serif, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(hour.toString().padStart(2, '0'), labelPoint.x, labelPoint.y);
+        ctx.restore();
+      });
+
+      tasks
+        .filter((task) => task.startTime && task.duration)
+        .forEach((task) => {
+          const startAngle = minutesToAngle(timeToMinutes(task.startTime ?? '00:00'));
+          const endAngle = startAngle + minutesToAngle(task.duration ?? 0);
+          const midAngle = startAngle + (endAngle - startAngle) / 2;
+          const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS * 0.7, midAngle);
+          const progress = getBlurProgress(labelPoint, minuteAngle);
+
+          ctx.save();
+          ctx.filter = `blur(${0.8 + progress * 8}px)`;
+          ctx.globalAlpha = task.completed ? 0.42 : 0.92;
+          ctx.fillStyle = getClockTaskColor(task);
+          ctx.strokeStyle = task.tags.includes('urgent') ? '#d90429' : '#111111';
+          ctx.lineWidth = 1.4;
+          beginRingArcPath(ctx, 118, RADIUS - 3, startAngle, endAngle);
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+
+          if ((task.duration ?? 0) >= 40) {
+            ctx.save();
+            ctx.translate(labelPoint.x, labelPoint.y);
+            ctx.rotate((midAngle + 90) * Math.PI / 180);
+            ctx.filter = `blur(${0.3 + progress * 5}px)`;
+            ctx.fillStyle = '#111111';
+            ctx.globalAlpha = task.completed ? 0.6 : 0.92;
+            ctx.font = '400 12px ui-sans-serif, system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(task.title.slice(0, 14), 0, 0);
+            ctx.restore();
+          }
+        });
+    };
+
+    draw();
+
+    const resizeObserver = new ResizeObserver(() => draw());
+    resizeObserver.observe(canvas);
+    window.addEventListener('resize', draw);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', draw);
+    };
+  }, [tasks, minuteAngle]);
+
+  return <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true" />;
+};
+
 function generateRoutinesForDate(dateStr: string, routines: RoutineState) {
   const date = new Date(`${dateStr}T00:00:00`);
   const isWeekend = date.getDay() === 0 || date.getDay() === 6;
@@ -625,6 +813,7 @@ const CircleScheduler = ({
   const [pendingArc, setPendingArc] = useState<{ startAngle: number; endAngle: number } | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [now, setNow] = useState(new Date());
+  const [renderMode, setRenderMode] = useState<'canvas' | 'svg'>('canvas');
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
@@ -853,19 +1042,39 @@ const CircleScheduler = ({
         }}
       />
 
-      <svg
-        ref={svgRef}
-        viewBox="0 0 600 600"
-        className="h-full w-full max-h-[68vh] min-h-[340px] max-w-[680px] select-none md:max-h-none"
-        style={{ touchAction: 'none' }}
-        onMouseMove={(event) => {
-          const angle = getPointerAngle(event.clientX, event.clientY);
-          if (angle !== null) {
-            setHoverAngle(angle);
-          }
-        }}
-        onClick={handleRingClick}
-      >
+      <div className="absolute left-4 top-4 z-20 inline-flex rounded-full border border-black/10 bg-white/75 p-1 text-xs text-stone-700 shadow-sm backdrop-blur">
+        <button
+          type="button"
+          onClick={() => setRenderMode('canvas')}
+          className={`rounded-full px-3 py-1.5 transition ${renderMode === 'canvas' ? 'bg-black text-white' : 'text-stone-600'}`}
+        >
+          Canvas 실험
+        </button>
+        <button
+          type="button"
+          onClick={() => setRenderMode('svg')}
+          className={`rounded-full px-3 py-1.5 transition ${renderMode === 'svg' ? 'bg-black text-white' : 'text-stone-600'}`}
+        >
+          SVG 기준
+        </button>
+      </div>
+
+      <div className="relative h-full w-full max-h-[68vh] min-h-[340px] max-w-[680px]">
+        {renderMode === 'canvas' && <CanvasClockSurface tasks={tasks} minuteAngle={minuteAngle} />}
+
+        <svg
+          ref={svgRef}
+          viewBox="0 0 600 600"
+          className="absolute inset-0 h-full w-full select-none"
+          style={{ touchAction: 'none' }}
+          onMouseMove={(event) => {
+            const angle = getPointerAngle(event.clientX, event.clientY);
+            if (angle !== null) {
+              setHoverAngle(angle);
+            }
+          }}
+          onClick={handleRingClick}
+        >
         <defs>
           <filter id="paperNoise">
             <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" result="noise" />
@@ -927,14 +1136,20 @@ const CircleScheduler = ({
           </mask>
         </defs>
 
-        <AmbientVisuals now={now} />
-        <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="rgba(255,255,255,0.78)" stroke="#111111" strokeWidth="2.2" opacity="0.18" filter="url(#paperNoise)" />
-        <g mask="url(#blurMask)">
-          {renderClockSurface(true)}
-        </g>
-        <g mask="url(#sharpMask)">
-          {renderClockSurface(false)}
-        </g>
+        {renderMode === 'svg' ? (
+          <>
+            <AmbientVisuals now={now} />
+            <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="rgba(255,255,255,0.78)" stroke="#111111" strokeWidth="2.2" opacity="0.18" filter="url(#paperNoise)" />
+            <g mask="url(#blurMask)">
+              {renderClockSurface(true)}
+            </g>
+            <g mask="url(#sharpMask)">
+              {renderClockSurface(false)}
+            </g>
+          </>
+        ) : (
+          <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="transparent" />
+        )}
 
         {anchorAngle !== null && (
           <>
@@ -1011,7 +1226,8 @@ const CircleScheduler = ({
             </>
           )}
         </g>
-      </svg>
+        </svg>
+      </div>
 
       <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-white/80 bg-white/70 px-4 py-2 text-center text-xs text-stone-500 shadow-sm backdrop-blur">
         {anchorAngle === null ? '원형을 눌러 시작 시간을 정하고, 다시 눌러 시간 구간을 완성하세요.' : '원형을 한 번 더 눌러 이 일정 구간을 확정하세요.'}
