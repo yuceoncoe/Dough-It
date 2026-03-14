@@ -137,6 +137,28 @@ const clampArcEnd = (startAngle: number, endAngle: number) => {
   return safeEnd;
 };
 
+const getAngularDistance = (fromAngle: number, toAngle: number) => Math.abs(((fromAngle - toAngle + 540) % 360) - 180);
+
+const OUTER_RING_SEGMENTS = Array.from({ length: 48 }, (_, index) => {
+  const angle = index * 7.5;
+  const isCardinal = index % 12 === 0;
+  const end = polarToCartesian(CENTER, CENTER, RADIUS + 31, angle);
+  const start = polarToCartesian(CENTER, CENTER, RADIUS + (isCardinal ? 17 : 20), angle);
+  return { angle, isCardinal, start, end };
+});
+const OUTER_BOUNDARY_RADIUS = RADIUS + 45;
+const OUTER_HOUR_LABEL_RADIUS = OUTER_BOUNDARY_RADIUS + 34;
+const OUTER_BACKGROUND_RADIUS = OUTER_BOUNDARY_RADIUS + 4;
+const OUTER_HOUR_LABELS = Array.from({ length: 12 }, (_, index) => {
+  const value = index === 0 ? '12' : String(index);
+  const angle = index * 30;
+  const point = polarToCartesian(CENTER, CENTER, OUTER_HOUR_LABEL_RADIUS, angle);
+  return { value, angle, point };
+});
+const SVG_VIEWBOX_PADDING = 72;
+const SVG_VIEWBOX_MIN = -SVG_VIEWBOX_PADDING;
+const SVG_VIEWBOX_SIZE = 600 + SVG_VIEWBOX_PADDING * 2;
+
 const isCurrentMinuteInsideTask = (task: Task, currentMinutes: number) => {
   if (!task.startTime || !task.duration) {
     return false;
@@ -284,77 +306,32 @@ const CanvasClockSurface = ({
         return;
       }
 
-      ctx.setTransform((rect.width / 600) * ratio, 0, 0, (rect.height / 600) * ratio, 0, 0);
-      ctx.clearRect(0, 0, 600, 600);
+      const scale = (rect.width / SVG_VIEWBOX_SIZE) * ratio;
+      ctx.setTransform(scale, 0, 0, scale, -SVG_VIEWBOX_MIN * scale, -SVG_VIEWBOX_MIN * scale);
+      ctx.clearRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
 
-      ctx.fillStyle = '#f4f4f4';
-      ctx.fillRect(0, 0, 600, 600);
+      ctx.fillStyle = '#f6f6f8';
+      ctx.fillRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
 
       ctx.save();
-      ctx.globalAlpha = 0.98;
+      ctx.globalAlpha = 1;
       ctx.beginPath();
-      ctx.arc(CENTER, CENTER, RADIUS + 34, 0, Math.PI * 2);
-      ctx.fillStyle = '#f3f3f3';
+      ctx.arc(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
       ctx.fill();
       ctx.restore();
 
-      const hourMarkers = Array.from({ length: 12 }, (_, index) => {
-        const angle = index * 30;
-        const point = polarToCartesian(CENTER, CENTER, RADIUS - 6, angle);
-        return { angle, point, index };
-      });
-      const heroNumbers = [
-        { value: '12', angle: 0, size: 88 },
-        { value: '03', angle: 90, size: 88 },
-        { value: '06', angle: 180, size: 88 },
-        { value: '09', angle: 270, size: 88 },
-        { value: '08', angle: 240, size: 52 },
-      ];
+      OUTER_RING_SEGMENTS.forEach(({ start, end, isCardinal }) => {
+        const progress = getBlurProgress(end, minuteAngle);
 
-      hourMarkers.forEach(({ angle, point, index }) => {
-        const progress = getBlurProgress(point, minuteAngle);
-        const rx = index % 3 === 0 ? 5.5 : 3.5;
-        const ry = index % 3 === 0 ? 11 : 7;
         ctx.save();
-        ctx.translate(point.x, point.y);
-        ctx.rotate(angle * Math.PI / 180);
-        ctx.filter = `blur(${1.2 + progress * 12}px)`;
-        ctx.fillStyle = '#000000';
-        ctx.globalAlpha = index % 3 === 0 ? 0.86 : 0.5;
+        ctx.filter = `blur(${0.4 + progress * 1.6}px)`;
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = '#aaa';
+        ctx.lineWidth = isCardinal ? 1 : 0.8;
         ctx.beginPath();
-        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      });
-
-      heroNumbers.forEach(({ value, angle, size }) => {
-        const point = polarToCartesian(CENTER, CENTER, RADIUS - (size > 60 ? 14 : 32), angle);
-        const progress = getBlurProgress(point, minuteAngle);
-        ctx.save();
-        ctx.filter = `blur(${2.8 + progress * 28}px)`;
-        ctx.globalAlpha = value === '08' ? 0.96 : 0.82;
-        ctx.fillStyle = '#111111';
-        ctx.font = `300 ${size}px ui-sans-serif, system-ui, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(value, point.x, point.y);
-        ctx.restore();
-      });
-
-      Array.from({ length: 24 }, (_, hour) => hour).forEach((hour) => {
-        const angle = hour * 15;
-        const lineStart = polarToCartesian(CENTER, CENTER, RADIUS - (hour % 6 === 0 ? 13 : 10), angle);
-        const lineEnd = polarToCartesian(CENTER, CENTER, RADIUS - (hour % 6 === 0 ? 4 : 2), angle);
-        const progress = getBlurProgress(lineEnd, minuteAngle);
-
-        ctx.save();
-        ctx.filter = `blur(${0.5 + progress * 3.8}px)`;
-        ctx.globalAlpha = hour % 6 === 0 ? 0.22 : 0.12;
-        ctx.strokeStyle = '#111111';
-        ctx.lineWidth = hour % 6 === 0 ? 1 : 0.55;
-        ctx.beginPath();
-        ctx.moveTo(lineStart.x, lineStart.y);
-        ctx.lineTo(lineEnd.x, lineEnd.y);
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
         ctx.stroke();
         ctx.restore();
       });
@@ -812,7 +789,6 @@ const CircleScheduler = ({
   const [pendingArc, setPendingArc] = useState<{ startAngle: number; endAngle: number } | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [now, setNow] = useState(new Date());
-  const [renderMode, setRenderMode] = useState<'canvas' | 'svg'>('canvas');
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
@@ -824,11 +800,11 @@ const CircleScheduler = ({
     if (!rect || !rect.width || !rect.height) {
       return null;
     }
-    const scale = Math.min(rect.width / 600, rect.height / 600);
-    const offsetX = (rect.width - 600 * scale) / 2;
-    const offsetY = (rect.height - 600 * scale) / 2;
-    const x = (clientX - rect.left - offsetX) / scale;
-    const y = (clientY - rect.top - offsetY) / scale;
+    const scale = Math.min(rect.width / SVG_VIEWBOX_SIZE, rect.height / SVG_VIEWBOX_SIZE);
+    const offsetX = (rect.width - SVG_VIEWBOX_SIZE * scale) / 2;
+    const offsetY = (rect.height - SVG_VIEWBOX_SIZE * scale) / 2;
+    const x = SVG_VIEWBOX_MIN + (clientX - rect.left - offsetX) / scale;
+    const y = SVG_VIEWBOX_MIN + (clientY - rect.top - offsetY) / scale;
     const dx = x - CENTER;
     const dy = y - CENTER;
     const distance = Math.sqrt(dx * dx + dy * dy);
@@ -874,83 +850,24 @@ const CircleScheduler = ({
   const activeTask = tasks.find((task) => isCurrentMinuteInsideTask(task, now.getHours() * 60 + now.getMinutes()));
   const activeColor = activeTask?.tags.includes('urgent') ? '#d90429' : '#111111';
   const minuteAngle = minutesToAngle(now.getHours() * 60 + now.getMinutes());
-  const hourMarkers = Array.from({ length: 12 }, (_, index) => {
-    const angle = index * 30;
-    const point = polarToCartesian(CENTER, CENTER, RADIUS - 6, angle);
-    return { angle, point, index };
-  });
-  const heroNumbers = [
-    { value: '12', angle: 0, size: 88 },
-    { value: '03', angle: 90, size: 88 },
-    { value: '06', angle: 180, size: 88 },
-    { value: '09', angle: 270, size: 88 },
-    { value: '08', angle: 240, size: 52 },
-  ];
   const renderClockSurface = (blurred: boolean) => (
     <>
-      {hourMarkers.map(({ point, angle, index }) => (
-        <g key={`${blurred ? 'b' : 's'}-marker-${angle}`}>
-          <ellipse
-            cx={point.x}
-            cy={point.y}
-            rx={index % 3 === 0 ? 7 : 4}
-            ry={index % 3 === 0 ? 13 : 8}
-            fill="#000000"
-            opacity={blurred ? 0.16 : index % 3 === 0 ? 0.44 : 0.2}
-            transform={`rotate(${angle} ${point.x} ${point.y})`}
-            filter={blurred ? 'url(#markerBlurLight)' : undefined}
+      {OUTER_RING_SEGMENTS.map(({ angle, start, end, isCardinal }) => (
+        !blurred ? null : (
+        <g key={`${blurred ? 'b' : 's'}-outer-tick-${angle}`}>
+          <line
+            x1={start.x}
+            y1={start.y}
+            x2={end.x}
+            y2={end.y}
+            stroke="#aaa"
+            strokeWidth={isCardinal ? 1 : 0.8}
+            strokeLinecap="round"
+            filter={blurred ? 'url(#tickBlur)' : undefined}
           />
         </g>
+        )
       ))}
-      {heroNumbers.map(({ value, angle, size }) => {
-        const point = polarToCartesian(CENTER, CENTER, RADIUS - (size > 60 ? 14 : 32), angle);
-        return (
-          <g key={`${blurred ? 'b' : 's'}-${value}`}>
-            <text
-              x={point.x}
-              y={point.y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              style={{ fontSize: `${size}px`, fontWeight: 300 }}
-              className="fill-black"
-              opacity={blurred ? 0.26 : 0.2}
-              filter={blurred ? 'url(#numberBlurHeavy)' : 'url(#numberBlur)'}
-            >
-              {value}
-            </text>
-            <text
-              x={point.x}
-              y={point.y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              style={{ fontSize: `${size}px`, fontWeight: 300 }}
-              className="fill-black"
-              opacity={value === '08' ? 0.9 : 0.72}
-              filter={blurred ? 'url(#numberBlurLight)' : undefined}
-            >
-              {value}
-            </text>
-          </g>
-        );
-      })}
-      {Array.from({ length: 24 }, (_, hour) => {
-        const angle = hour * 15;
-        const lineStart = polarToCartesian(CENTER, CENTER, RADIUS - (hour % 6 === 0 ? 13 : 10), angle);
-        const lineEnd = polarToCartesian(CENTER, CENTER, RADIUS - (hour % 6 === 0 ? 4 : 2), angle);
-        return (
-          <g key={`${blurred ? 'b' : 's'}-tick-${hour}`} opacity={hour % 6 === 0 ? 0.18 : 0.08}>
-            <line
-              x1={lineStart.x}
-              y1={lineStart.y}
-              x2={lineEnd.x}
-              y2={lineEnd.y}
-              stroke="#111111"
-              strokeWidth={hour % 6 === 0 ? 1 : 0.55}
-              filter={blurred ? 'url(#tickBlur)' : undefined}
-            />
-          </g>
-        );
-      })}
       {tasks.filter((task) => task.startTime && task.duration).map((task) => {
         const startAngle = minutesToAngle(timeToMinutes(task.startTime ?? '00:00'));
         const endAngle = startAngle + minutesToAngle(task.duration ?? 0);
@@ -997,7 +914,7 @@ const CircleScheduler = ({
   );
 
   return (
-    <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[2rem] bg-[#efefef]">
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[2rem] bg-[#f6f6f8]">
       <TaskCreationModal
         isOpen={showCreateModal}
         initialTimeRange={{
@@ -1020,29 +937,12 @@ const CircleScheduler = ({
         }}
       />
 
-      <div className="absolute left-4 top-4 z-20 inline-flex rounded-full border border-black/10 bg-white/75 p-1 text-xs text-stone-700 shadow-sm backdrop-blur">
-        <button
-          type="button"
-          onClick={() => setRenderMode('canvas')}
-          className={`rounded-full px-3 py-1.5 transition ${renderMode === 'canvas' ? 'bg-black text-white' : 'text-stone-600'}`}
-        >
-          Canvas 실험
-        </button>
-        <button
-          type="button"
-          onClick={() => setRenderMode('svg')}
-          className={`rounded-full px-3 py-1.5 transition ${renderMode === 'svg' ? 'bg-black text-white' : 'text-stone-600'}`}
-        >
-          SVG 기준
-        </button>
-      </div>
-
       <div className="relative aspect-square w-full max-w-[680px]">
-        {renderMode === 'canvas' && <CanvasClockSurface tasks={tasks} minuteAngle={minuteAngle} />}
+        <CanvasClockSurface tasks={tasks} minuteAngle={minuteAngle} />
 
         <svg
           ref={svgRef}
-          viewBox="0 0 600 600"
+          viewBox={`${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_SIZE} ${SVG_VIEWBOX_SIZE}`}
           className="absolute inset-0 h-full w-full select-none"
           style={{ touchAction: 'none' }}
           onMouseMove={(event) => {
@@ -1114,20 +1014,35 @@ const CircleScheduler = ({
           </mask>
         </defs>
 
-        {renderMode === 'svg' ? (
-          <>
-            <AmbientVisuals now={now} />
-            <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="rgba(255,255,255,0.78)" stroke="#111111" strokeWidth="2.2" opacity="0.18" filter="url(#paperNoise)" />
-            <g mask="url(#blurMask)">
-              {renderClockSurface(true)}
-            </g>
-            <g mask="url(#sharpMask)">
-              {renderClockSurface(false)}
-            </g>
-          </>
-        ) : (
-          <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="transparent" />
-        )}
+        <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="transparent" />
+        <g mask="url(#blurMask)">
+          {renderClockSurface(true)}
+        </g>
+        <g>
+          {OUTER_HOUR_LABELS.map(({ value, angle, point }) => (
+            (() => {
+              const distance = getAngularDistance(angle, minuteAngle);
+              const progress = distance / 180;
+              const blur = progress * 3.2;
+              const opacity = 0.82 - progress * 0.34;
+
+              return (
+                <text
+                  key={`hour-label-${value}-${angle}`}
+                  x={point.x}
+                  y={point.y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className="fill-black text-[16px] font-medium"
+                  opacity={opacity}
+                  style={{ filter: `blur(${blur}px)` }}
+                >
+                  {value}
+                </text>
+              );
+            })()
+          ))}
+        </g>
 
         {anchorAngle !== null && (
           <>
@@ -1168,8 +1083,8 @@ const CircleScheduler = ({
         <line
           x1={CENTER}
           y1={CENTER}
-          x2={polarToCartesian(CENTER, CENTER, RADIUS - 16, minuteAngle).x}
-          y2={polarToCartesian(CENTER, CENTER, RADIUS - 16, minuteAngle).y}
+          x2={polarToCartesian(CENTER, CENTER, OUTER_BOUNDARY_RADIUS - 8, minuteAngle).x}
+          y2={polarToCartesian(CENTER, CENTER, OUTER_BOUNDARY_RADIUS - 8, minuteAngle).y}
           stroke="#d90429"
           strokeWidth="2.8"
           strokeLinecap="round"
@@ -1179,8 +1094,8 @@ const CircleScheduler = ({
         <circle cx={CENTER} cy={CENTER} r="3" fill="#d90429" />
 
         <g>
-          <circle cx={CENTER} cy={CENTER} r="104" fill="#f4f4f4" stroke={activeColor} strokeOpacity="0.18" strokeWidth="2" />
-          <circle cx={CENTER} cy={CENTER} r="84" fill="rgba(244,244,244,0.92)" />
+          <circle cx={CENTER} cy={CENTER} r="104" fill="#ffffff" stroke={activeColor} strokeOpacity="0.18" strokeWidth="2" />
+          <circle cx={CENTER} cy={CENTER} r="84" fill="rgba(255,255,255,0.92)" />
           {activeTask ? (
             <>
               <g transform={`translate(${CENTER - 15}, ${CENTER - 48})`}>
