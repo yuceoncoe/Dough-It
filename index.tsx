@@ -149,6 +149,7 @@ const OUTER_RING_SEGMENTS = Array.from({ length: 48 }, (_, index) => {
 const OUTER_BOUNDARY_RADIUS = RADIUS + 45;
 const OUTER_HOUR_LABEL_RADIUS = OUTER_BOUNDARY_RADIUS + 34;
 const OUTER_BACKGROUND_RADIUS = OUTER_BOUNDARY_RADIUS + 4;
+const CENTER_LENS_RADIUS = 96;
 const OUTER_HOUR_LABELS = Array.from({ length: 12 }, (_, index) => {
   const value = index === 0 ? '12' : String(index);
   const angle = index * 30;
@@ -276,6 +277,70 @@ const beginRingArcPath = (ctx: CanvasRenderingContext2D, innerRadius: number, ou
   ctx.closePath();
 };
 
+const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAngle: number) => {
+  ctx.clearRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
+
+  ctx.fillStyle = '#f6f6f8';
+  ctx.fillRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+  ctx.restore();
+
+  OUTER_RING_SEGMENTS.forEach(({ start, end, isCardinal }) => {
+    const progress = getBlurProgress(end, minuteAngle);
+
+    ctx.save();
+    ctx.filter = `blur(${0.4 + progress * 1.6}px)`;
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = '#aaa';
+    ctx.lineWidth = isCardinal ? 1 : 0.8;
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  tasks
+    .filter((task) => task.startTime && task.duration)
+    .forEach((task) => {
+      const startAngle = minutesToAngle(timeToMinutes(task.startTime ?? '00:00'));
+      const endAngle = startAngle + minutesToAngle(task.duration ?? 0);
+      const midAngle = startAngle + (endAngle - startAngle) / 2;
+      const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS * 0.7, midAngle);
+      const progress = getBlurProgress(labelPoint, minuteAngle);
+
+      ctx.save();
+      ctx.filter = `blur(${1.8 + progress * 11}px)`;
+      ctx.globalAlpha = task.completed ? 0.42 : 0.92;
+      ctx.fillStyle = getClockTaskColor(task);
+      ctx.strokeStyle = task.tags.includes('urgent') ? '#d90429' : '#111111';
+      ctx.lineWidth = 1.4;
+      beginRingArcPath(ctx, 118, RADIUS - 3, startAngle, endAngle);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      if ((task.duration ?? 0) >= 40) {
+        ctx.save();
+        ctx.translate(labelPoint.x, labelPoint.y);
+        ctx.rotate((midAngle + 90) * Math.PI / 180);
+        ctx.filter = `blur(${0.8 + progress * 7}px)`;
+        ctx.fillStyle = '#111111';
+        ctx.globalAlpha = task.completed ? 0.6 : 0.92;
+        ctx.font = '400 12px ui-sans-serif, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(task.title.slice(0, 14), 0, 0);
+        ctx.restore();
+      }
+    });
+};
+
 const CanvasClockSurface = ({
   tasks,
   minuteAngle,
@@ -307,69 +372,30 @@ const CanvasClockSurface = ({
       }
 
       const scale = (rect.width / SVG_VIEWBOX_SIZE) * ratio;
-      ctx.setTransform(scale, 0, 0, scale, -SVG_VIEWBOX_MIN * scale, -SVG_VIEWBOX_MIN * scale);
-      ctx.clearRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
+      const offset = -SVG_VIEWBOX_MIN * scale;
+      const offscreen = document.createElement('canvas');
+      offscreen.width = canvas.width;
+      offscreen.height = canvas.height;
+      const offscreenCtx = offscreen.getContext('2d');
+      if (!offscreenCtx) {
+        return;
+      }
 
-      ctx.fillStyle = '#f6f6f8';
-      ctx.fillRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
+      offscreenCtx.setTransform(scale, 0, 0, scale, offset, offset);
+      renderClockScene(offscreenCtx, tasks, minuteAngle);
 
-      ctx.save();
-      ctx.globalAlpha = 1;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(offscreen, 0, 0);
+
+      const centerX = (CENTER - SVG_VIEWBOX_MIN) * scale;
+      const centerY = (CENTER - SVG_VIEWBOX_MIN) * scale;
+      const lensRadius = CENTER_LENS_RADIUS * scale;
+
+      ctx.fillStyle = '#f0f0f0';
       ctx.beginPath();
-      ctx.arc(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, 0, Math.PI * 2);
-      ctx.fillStyle = '#ffffff';
+      ctx.arc(centerX, centerY, lensRadius, 0, Math.PI * 2);
       ctx.fill();
-      ctx.restore();
-
-      OUTER_RING_SEGMENTS.forEach(({ start, end, isCardinal }) => {
-        const progress = getBlurProgress(end, minuteAngle);
-
-        ctx.save();
-        ctx.filter = `blur(${0.4 + progress * 1.6}px)`;
-        ctx.globalAlpha = 1;
-        ctx.strokeStyle = '#aaa';
-        ctx.lineWidth = isCardinal ? 1 : 0.8;
-        ctx.beginPath();
-        ctx.moveTo(start.x, start.y);
-        ctx.lineTo(end.x, end.y);
-        ctx.stroke();
-        ctx.restore();
-      });
-
-      tasks
-        .filter((task) => task.startTime && task.duration)
-        .forEach((task) => {
-          const startAngle = minutesToAngle(timeToMinutes(task.startTime ?? '00:00'));
-          const endAngle = startAngle + minutesToAngle(task.duration ?? 0);
-          const midAngle = startAngle + (endAngle - startAngle) / 2;
-          const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS * 0.7, midAngle);
-          const progress = getBlurProgress(labelPoint, minuteAngle);
-
-          ctx.save();
-          ctx.filter = `blur(${1.8 + progress * 11}px)`;
-          ctx.globalAlpha = task.completed ? 0.42 : 0.92;
-          ctx.fillStyle = getClockTaskColor(task);
-          ctx.strokeStyle = task.tags.includes('urgent') ? '#d90429' : '#111111';
-          ctx.lineWidth = 1.4;
-          beginRingArcPath(ctx, 118, RADIUS - 3, startAngle, endAngle);
-          ctx.fill();
-          ctx.stroke();
-          ctx.restore();
-
-          if ((task.duration ?? 0) >= 40) {
-            ctx.save();
-            ctx.translate(labelPoint.x, labelPoint.y);
-            ctx.rotate((midAngle + 90) * Math.PI / 180);
-            ctx.filter = `blur(${0.8 + progress * 7}px)`;
-            ctx.fillStyle = '#111111';
-            ctx.globalAlpha = task.completed ? 0.6 : 0.92;
-            ctx.font = '400 12px ui-sans-serif, system-ui, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(task.title.slice(0, 14), 0, 0);
-            ctx.restore();
-          }
-        });
     };
 
     draw();
@@ -847,8 +873,6 @@ const CircleScheduler = ({
     commitSelection(angle);
   };
 
-  const activeTask = tasks.find((task) => isCurrentMinuteInsideTask(task, now.getHours() * 60 + now.getMinutes()));
-  const activeColor = activeTask?.tags.includes('urgent') ? '#d90429' : '#111111';
   const minuteAngle = minutesToAngle(now.getHours() * 60 + now.getMinutes());
   const renderClockSurface = (blurred: boolean) => (
     <>
@@ -1072,17 +1096,6 @@ const CircleScheduler = ({
         <line
           x1={CENTER}
           y1={CENTER}
-          x2={polarToCartesian(CENTER, CENTER, RADIUS - 54, minuteAngle).x}
-          y2={polarToCartesian(CENTER, CENTER, RADIUS - 54, minuteAngle).y}
-          stroke="#111111"
-          strokeWidth="5"
-          strokeLinecap="round"
-          opacity="0.22"
-          filter="url(#handBlur1)"
-        />
-        <line
-          x1={CENTER}
-          y1={CENTER}
           x2={polarToCartesian(CENTER, CENTER, OUTER_BOUNDARY_RADIUS - 8, minuteAngle).x}
           y2={polarToCartesian(CENTER, CENTER, OUTER_BOUNDARY_RADIUS - 8, minuteAngle).y}
           stroke="#d90429"
@@ -1092,33 +1105,6 @@ const CircleScheduler = ({
         />
         <circle cx={CENTER} cy={CENTER} r="6" fill="#111111" />
         <circle cx={CENTER} cy={CENTER} r="3" fill="#d90429" />
-
-        <g>
-          <circle cx={CENTER} cy={CENTER} r="104" fill="#ffffff" stroke={activeColor} strokeOpacity="0.18" strokeWidth="2" />
-          <circle cx={CENTER} cy={CENTER} r="84" fill="rgba(255,255,255,0.92)" />
-          {activeTask ? (
-            <>
-              <g transform={`translate(${CENTER - 15}, ${CENTER - 48})`}>
-                {getTaskIcon(activeTask)}
-              </g>
-              <text x={CENTER} y={CENTER + 8} textAnchor="middle" className="fill-black text-[24px] font-medium">
-                {activeTask.title.length > 16 ? `${activeTask.title.slice(0, 16)}...` : activeTask.title}
-              </text>
-              <text x={CENTER} y={CENTER + 34} textAnchor="middle" className="fill-[#d90429] text-[12px] tracking-[0.22em]">
-                진행 중
-              </text>
-            </>
-          ) : (
-            <>
-              <text x={CENTER} y={CENTER - 8} textAnchor="middle" className="fill-black text-[20px] tracking-[0.22em]" opacity="0.36">
-                비어 있는 시간
-              </text>
-              <text x={CENTER} y={CENTER + 28} textAnchor="middle" className="fill-black text-[36px] font-semibold">
-                {now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </text>
-            </>
-          )}
-        </g>
         </svg>
       </div>
 
