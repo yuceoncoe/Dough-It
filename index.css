@@ -89,11 +89,22 @@ textarea {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.25rem);
 }
 
-.center-lens {
+.center-stack {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: clamp(8.6rem, 30%, 12.8rem);
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.center-lens {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: clamp(11.8rem, 40.5%, 16.8rem);
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%);
   border-radius: 9999px;
@@ -104,7 +115,6 @@ textarea {
   backdrop-filter: blur(4px) saturate(1.04);
   -webkit-backdrop-filter: blur(4px) saturate(1.04);
   pointer-events: none;
-  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,7 +133,7 @@ textarea {
   font-size: clamp(0.72rem, 1.2vw, 0.86rem);
   font-weight: 700;
   line-height: 1.15;
-  color: rgba(31, 30, 30, 0.78);
+  color: rgba(255, 122, 145, 0.92);
   word-break: keep-all;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -131,9 +141,9 @@ textarea {
 
 .center-progress-shell {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: clamp(6.8rem, 24%, 9.6rem);
+  left: 0;
+  top: 0;
+  width: clamp(9.3rem, 32.5%, 12.6rem);
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%);
   border-radius: 9999px;
@@ -141,9 +151,8 @@ textarea {
   background: rgba(255, 255, 255, 0.78);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 8px 18px rgba(0, 0, 0, 0.15);
+    0 10px 22px rgba(0, 0, 0, 0.2);
   pointer-events: none;
-  z-index: 9;
 }
 
 .center-progress-fill {

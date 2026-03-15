@@ -1108,12 +1108,16 @@ const CircleScheduler = ({
           opacity="0.96"
         />
         </svg>
-        <div className="center-progress-shell" aria-hidden="true">
-          <div className="center-progress-fill" style={{ transform: `scaleY(${activeTaskProgress})` }} />
-        </div>
-        <div className="center-lens" aria-hidden="true">
-          <div className="center-lens__title">
-            {activeTask ? (activeTask.title.length > 12 ? `${activeTask.title.slice(0, 12)}…` : activeTask.title) : '비어 있음'}
+        <div
+          className="center-stack"
+        >
+          <div className="center-progress-shell" aria-hidden="true">
+            <div className="center-progress-fill" style={{ transform: `scaleY(${activeTaskProgress})` }} />
+          </div>
+          <div className="center-lens" aria-hidden="true">
+            <div className="center-lens__title">
+              {activeTask ? (activeTask.title.length > 12 ? `${activeTask.title.slice(0, 12)}…` : activeTask.title) : '비어 있음'}
+            </div>
           </div>
         </div>
       </div>
