@@ -175,6 +175,15 @@ const isCurrentMinuteInsideTask = (task: Task, currentMinutes: number) => {
   return currentMinutes >= start || currentMinutes < end;
 };
 
+const getTaskProgress = (task: Task, currentMinutes: number) => {
+  if (!task.startTime || !task.duration || task.duration <= 0) {
+    return 0;
+  }
+  const start = timeToMinutes(task.startTime);
+  const elapsed = ((currentMinutes - start) % 1440 + 1440) % 1440;
+  return Math.max(0, Math.min(1, elapsed / task.duration));
+};
+
 const getTaskColor = (tags: Tag[]) => {
   const urgent = tags.includes('urgent');
   const important = tags.includes('important');
@@ -388,14 +397,6 @@ const CanvasClockSurface = ({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(offscreen, 0, 0);
 
-      const centerX = (CENTER - SVG_VIEWBOX_MIN) * scale;
-      const centerY = (CENTER - SVG_VIEWBOX_MIN) * scale;
-      const lensRadius = CENTER_LENS_RADIUS * scale;
-
-      ctx.fillStyle = '#f0f0f0';
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, lensRadius, 0, Math.PI * 2);
-      ctx.fill();
     };
 
     draw();
@@ -873,7 +874,10 @@ const CircleScheduler = ({
     commitSelection(angle);
   };
 
-  const minuteAngle = minutesToAngle(now.getHours() * 60 + now.getMinutes());
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const minuteAngle = minutesToAngle(currentMinutes);
+  const activeTask = tasks.find((task) => isCurrentMinuteInsideTask(task, currentMinutes));
+  const activeTaskProgress = activeTask ? getTaskProgress(activeTask, currentMinutes) : 0;
   const renderClockSurface = (blurred: boolean) => (
     <>
       {OUTER_RING_SEGMENTS.map(({ angle, start, end, isCardinal }) => (
@@ -1103,9 +1107,15 @@ const CircleScheduler = ({
           strokeLinecap="round"
           opacity="0.96"
         />
-        <circle cx={CENTER} cy={CENTER} r="6" fill="#111111" />
-        <circle cx={CENTER} cy={CENTER} r="3" fill="#d90429" />
         </svg>
+        <div className="center-progress-shell" aria-hidden="true">
+          <div className="center-progress-fill" style={{ transform: `scaleY(${activeTaskProgress})` }} />
+        </div>
+        <div className="center-lens" aria-hidden="true">
+          <div className="center-lens__title">
+            {activeTask ? (activeTask.title.length > 12 ? `${activeTask.title.slice(0, 12)}…` : activeTask.title) : '비어 있음'}
+          </div>
+        </div>
       </div>
 
       <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-white/80 bg-white/70 px-4 py-2 text-center text-xs text-stone-500 shadow-sm backdrop-blur">
