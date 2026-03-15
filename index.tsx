@@ -111,6 +111,33 @@ const describeArc = (x: number, y: number, radius: number, startAngle: number, e
   ].join(' ');
 };
 
+const describeOpenArc = (
+  x: number,
+  y: number,
+  radius: number,
+  startAngle: number,
+  endAngle: number,
+) => {
+  let start = startAngle % 360;
+  let end = endAngle % 360;
+
+  if (end <= start) {
+    end += 360;
+  }
+  if (end - start >= 360) {
+    end = start + 359.99;
+  }
+
+  const startPoint = polarToCartesian(x, y, radius, end);
+  const endPoint = polarToCartesian(x, y, radius, start);
+  const largeArcFlag = end - start <= 180 ? '0' : '1';
+
+  return [
+    'M', startPoint.x, startPoint.y,
+    'A', radius, radius, 0, largeArcFlag, 0, endPoint.x, endPoint.y,
+  ].join(' ');
+};
+
 const timeToMinutes = (time: string) => {
   const [hours, minutes] = time.split(':').map(Number);
   return hours * 60 + minutes;
@@ -139,20 +166,25 @@ const clampArcEnd = (startAngle: number, endAngle: number) => {
 
 const getAngularDistance = (fromAngle: number, toAngle: number) => Math.abs(((fromAngle - toAngle + 540) % 360) - 180);
 
-const OUTER_RING_SEGMENTS = Array.from({ length: 48 }, (_, index) => {
-  const angle = index * 7.5;
-  const isCardinal = index % 12 === 0;
-  const end = polarToCartesian(CENTER, CENTER, RADIUS + 31, angle);
-  const start = polarToCartesian(CENTER, CENTER, RADIUS + (isCardinal ? 17 : 20), angle);
-  return { angle, isCardinal, start, end };
-});
+const TRACK_LANE_COUNT = 4;
+const TRACK_INNER_RADIUS = 118;
+const TRACK_OUTER_RADIUS = RADIUS + 10;
+const TRACK_LANE_GAP = 10;
+const TRACK_LANE_WIDTH = (TRACK_OUTER_RADIUS - TRACK_INNER_RADIUS - TRACK_LANE_GAP * (TRACK_LANE_COUNT - 1)) / TRACK_LANE_COUNT;
 const OUTER_BOUNDARY_RADIUS = RADIUS + 45;
 const OUTER_HOUR_LABEL_RADIUS = OUTER_BOUNDARY_RADIUS + 34;
 const OUTER_BACKGROUND_RADIUS = OUTER_BOUNDARY_RADIUS + 4;
 const CENTER_LENS_RADIUS = 96;
-const OUTER_HOUR_LABELS = Array.from({ length: 12 }, (_, index) => {
-  const value = index === 0 ? '12' : String(index);
-  const angle = index * 30;
+const OUTER_RING_SEGMENTS = Array.from({ length: 144 }, (_, index) => {
+  const angle = index * 2.5;
+  const isCardinal = index % 6 === 0;
+  const end = polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS - 6, angle);
+  const start = polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS - (isCardinal ? 26 : 16), angle);
+  return { angle, isCardinal, start, end };
+});
+const OUTER_HOUR_LABELS = Array.from({ length: 24 }, (_, index) => {
+  const value = String(index);
+  const angle = index * 15;
   const point = polarToCartesian(CENTER, CENTER, OUTER_HOUR_LABEL_RADIUS, angle);
   return { value, angle, point };
 });
@@ -182,6 +214,82 @@ const getTaskProgress = (task: Task, currentMinutes: number) => {
   const start = timeToMinutes(task.startTime);
   const elapsed = ((currentMinutes - start) % 1440 + 1440) % 1440;
   return Math.max(0, Math.min(1, elapsed / task.duration));
+};
+
+const getTrackLaneRadii = (laneIndex: number) => {
+  const outerRadius = TRACK_OUTER_RADIUS - laneIndex * (TRACK_LANE_WIDTH + TRACK_LANE_GAP);
+  const innerRadius = outerRadius - TRACK_LANE_WIDTH;
+  return { innerRadius, outerRadius };
+};
+
+const getTrackLaneFillRadii = (laneIndex: number) => {
+  const outerRadius = laneIndex === 0 ? TRACK_OUTER_RADIUS : getTrackSeparatorRadius(laneIndex - 1);
+  const innerRadius = laneIndex === TRACK_LANE_COUNT - 1 ? TRACK_INNER_RADIUS : getTrackSeparatorRadius(laneIndex);
+  return { innerRadius, outerRadius };
+};
+
+const getTrackLaneCenterRadius = (laneIndex: number) => {
+  const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex);
+  return (innerRadius + outerRadius) / 2;
+};
+
+const getTrackSeparatorRadius = (laneIndex: number) => {
+  const { innerRadius } = getTrackLaneRadii(laneIndex);
+  return innerRadius - TRACK_LANE_GAP / 2;
+};
+
+const getRoundedArcAngles = (
+  centerRadius: number,
+  strokeWidth: number,
+  startAngle: number,
+  endAngle: number,
+) => {
+  const safeEnd = clampArcEnd(startAngle, endAngle);
+  const angleSpan = safeEnd - startAngle;
+  const capOffset = (strokeWidth / 2 / centerRadius) * (180 / Math.PI);
+  const clampedOffset = Math.min(capOffset, Math.max(0, angleSpan / 2 - 0.1));
+
+  return {
+    startAngle: startAngle + clampedOffset,
+    endAngle: safeEnd - clampedOffset,
+  };
+};
+
+const getTaskIntervals = (tasks: Task[]) => tasks
+  .filter((task) => task.startTime && task.duration)
+  .map((task) => {
+    const startMinute = timeToMinutes(task.startTime ?? '00:00');
+    const duration = task.duration ?? 0;
+    const endMinute = startMinute + duration;
+    return {
+      task,
+      startMinute,
+      endMinute,
+      startAngle: minutesToAngle(startMinute),
+      endAngle: minutesToAngle(endMinute),
+    };
+  })
+  .sort((left, right) => left.startMinute - right.startMinute || left.endMinute - right.endMinute);
+
+const assignTasksToTrackLanes = (tasks: Task[]) => {
+  const laneEndMinutes = Array.from({ length: TRACK_LANE_COUNT }, () => -1);
+
+  return getTaskIntervals(tasks).map((entry) => {
+    let laneIndex = laneEndMinutes.findIndex((laneEndMinute) => laneEndMinute <= entry.startMinute);
+    if (laneIndex === -1) {
+      laneIndex = 0;
+      let earliestEndMinute = laneEndMinutes[0];
+      for (let index = 1; index < laneEndMinutes.length; index += 1) {
+        if (laneEndMinutes[index] < earliestEndMinute) {
+          earliestEndMinute = laneEndMinutes[index];
+          laneIndex = index;
+        }
+      }
+    }
+
+    laneEndMinutes[laneIndex] = entry.endMinute;
+    return { ...entry, laneIndex };
+  });
 };
 
 const getTaskColor = (tags: Tag[]) => {
@@ -314,23 +422,41 @@ const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAn
     ctx.restore();
   });
 
-  tasks
-    .filter((task) => task.startTime && task.duration)
-    .forEach((task) => {
-      const startAngle = minutesToAngle(timeToMinutes(task.startTime ?? '00:00'));
-      const endAngle = startAngle + minutesToAngle(task.duration ?? 0);
+  Array.from({ length: TRACK_LANE_COUNT - 1 }, (_, laneIndex) => laneIndex).forEach((laneIndex) => {
+    const separatorRadius = getTrackSeparatorRadius(laneIndex);
+    ctx.save();
+    ctx.strokeStyle = 'rgba(20, 20, 20, 0.06)';
+    ctx.lineWidth = 0.9;
+    ctx.beginPath();
+    ctx.arc(CENTER, CENTER, separatorRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  assignTasksToTrackLanes(tasks).forEach(({ task, startAngle, endAngle, laneIndex }) => {
+      const laneCenterRadius = getTrackLaneCenterRadius(laneIndex);
+      const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex);
+      const laneStrokeWidth = outerRadius - innerRadius;
+      const roundedAngles = getRoundedArcAngles(laneCenterRadius, laneStrokeWidth, startAngle, endAngle);
       const midAngle = startAngle + (endAngle - startAngle) / 2;
-      const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS * 0.7, midAngle);
+      const labelPoint = polarToCartesian(CENTER, CENTER, laneCenterRadius, midAngle);
       const progress = getBlurProgress(labelPoint, minuteAngle);
 
       ctx.save();
       ctx.filter = `blur(${1.8 + progress * 11}px)`;
       ctx.globalAlpha = task.completed ? 0.42 : 0.92;
-      ctx.fillStyle = getClockTaskColor(task);
-      ctx.strokeStyle = task.tags.includes('urgent') ? '#d90429' : '#111111';
-      ctx.lineWidth = 1.4;
-      beginRingArcPath(ctx, 118, RADIUS - 3, startAngle, endAngle);
-      ctx.fill();
+      ctx.strokeStyle = getClockTaskColor(task);
+      ctx.lineWidth = laneStrokeWidth;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(
+        CENTER,
+        CENTER,
+        laneCenterRadius,
+        (roundedAngles.startAngle - 90) * Math.PI / 180,
+        (roundedAngles.endAngle - 90) * Math.PI / 180,
+        false,
+      );
       ctx.stroke();
       ctx.restore();
 
@@ -878,6 +1004,7 @@ const CircleScheduler = ({
   const minuteAngle = minutesToAngle(currentMinutes);
   const activeTask = tasks.find((task) => isCurrentMinuteInsideTask(task, currentMinutes));
   const activeTaskProgress = activeTask ? getTaskProgress(activeTask, currentMinutes) : 0;
+  const trackTasks = assignTasksToTrackLanes(tasks);
   const renderClockSurface = (blurred: boolean) => (
     <>
       {OUTER_RING_SEGMENTS.map(({ angle, start, end, isCardinal }) => (
@@ -888,27 +1015,30 @@ const CircleScheduler = ({
             y1={start.y}
             x2={end.x}
             y2={end.y}
-            stroke="#aaa"
-            strokeWidth={isCardinal ? 1 : 0.8}
+            stroke={isCardinal ? 'rgba(20,20,20,0.06)' : 'rgba(20,20,20,0.025)'}
+            strokeWidth={isCardinal ? 0.9 : 0.6}
             strokeLinecap="round"
             filter={blurred ? 'url(#tickBlur)' : undefined}
           />
         </g>
         )
       ))}
-      {tasks.filter((task) => task.startTime && task.duration).map((task) => {
-        const startAngle = minutesToAngle(timeToMinutes(task.startTime ?? '00:00'));
-        const endAngle = startAngle + minutesToAngle(task.duration ?? 0);
+      {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
         const taskColor = getClockTaskColor(task);
+        const laneCenterRadius = getTrackLaneCenterRadius(laneIndex);
+        const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex);
+        const laneStrokeWidth = outerRadius - innerRadius;
+        const roundedAngles = getRoundedArcAngles(laneCenterRadius, laneStrokeWidth, startAngle, endAngle);
         const labelAngle = startAngle + (endAngle - startAngle) / 2;
-        const labelPoint = polarToCartesian(CENTER, CENTER, RADIUS * 0.7, labelAngle);
+        const labelPoint = polarToCartesian(CENTER, CENTER, laneCenterRadius, labelAngle);
         return (
           <g key={`${blurred ? 'b' : 's'}-task-${task.id}`}>
             <path
-              d={describeArc(CENTER, CENTER, RADIUS - 3, startAngle, endAngle)}
-              fill={taskColor}
-              stroke={task.tags.includes('urgent') ? '#d90429' : '#111111'}
-              strokeWidth="1.4"
+              d={describeOpenArc(CENTER, CENTER, laneCenterRadius, roundedAngles.startAngle, roundedAngles.endAngle)}
+              fill="none"
+              stroke={taskColor}
+              strokeWidth={laneStrokeWidth}
+              strokeLinecap="round"
               opacity={task.completed ? 0.42 : 0.92}
               filter={blurred ? 'url(#surfaceBlur)' : undefined}
               className={blurred ? undefined : 'cursor-pointer transition-opacity hover:opacity-100'}
@@ -1061,7 +1191,7 @@ const CircleScheduler = ({
                   y={point.y}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="fill-black text-[16px] font-medium"
+                  className="fill-black text-[11px] font-medium"
                   opacity={opacity}
                   style={{ filter: `blur(${blur}px)` }}
                 >
