@@ -135,6 +135,42 @@ textarea {
   z-index: 10;
 }
 
+.center-carousel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 14;
+  width: clamp(12.6rem, 43%, 17.8rem);
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  pointer-events: auto;
+  touch-action: pan-x;
+}
+
+.center-carousel__pager {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 2rem);
+  z-index: 15;
+  display: flex;
+  gap: 0.32rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.center-carousel__dot {
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 9999px;
+  background: rgba(20, 20, 20, 0.22);
+  mix-blend-mode: multiply;
+}
+
+.center-carousel__dot.is-active {
+  background: rgba(20, 20, 20, 0.52);
+}
+
 
 .center-lens {
   position: absolute;
@@ -208,11 +244,50 @@ textarea {
   pointer-events: none;
 }
 
+.center-progress-shell.is-transitioning,
+.center-lens__title.is-transitioning {
+  animation-duration: 240ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+.center-progress-shell.is-transitioning.from-left,
+.center-lens__title.is-transitioning.from-left {
+  animation-name: center-slide-left;
+}
+
+.center-progress-shell.is-transitioning.from-right,
+.center-lens__title.is-transitioning.from-right {
+  animation-name: center-slide-right;
+}
+
 .center-progress-fill {
   position: absolute;
   inset: 0;
   transform-origin: bottom center;
   background: linear-gradient(180deg, rgba(255, 122, 145, 0.8) 0%, rgba(255, 122, 145, 0.12) 100%);
+}
+
+@keyframes center-slide-left {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateX(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateX(0);
+  }
+}
+
+@keyframes center-slide-right {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateX(0);
+  }
 }
 
 @media (min-width: 768px) {

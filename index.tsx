@@ -230,6 +230,22 @@ const getTaskProgress = (task: Task, currentMinutes: number) => {
   return Math.max(0, Math.min(1, elapsed / task.duration));
 };
 
+const getCenterTaskProgress = (task: Task | null, currentMinutes: number) => {
+  if (!task) {
+    return 0;
+  }
+  if (task.completed) {
+    return 1;
+  }
+  if (!task.startTime || !task.duration || task.duration <= 0) {
+    return 0;
+  }
+  if (!isCurrentMinuteInsideTask(task, currentMinutes)) {
+    return 0;
+  }
+  return getTaskProgress(task, currentMinutes);
+};
+
 const getTrackLaneRadii = (laneIndex: number) => {
   const outerRadius = TRACK_OUTER_RADIUS - laneIndex * (TRACK_LANE_WIDTH + TRACK_LANE_GAP);
   const innerRadius = outerRadius - TRACK_LANE_WIDTH;
@@ -1025,22 +1041,30 @@ const AmbientVisuals = ({ now }: { now: Date }) => {
 const CircleScheduler = ({
   tasks,
   onAddTask,
-  onInspectTask,
 }: {
   tasks: Task[];
   onAddTask: (title: string, tags: Tag[], startTime: string, duration: number) => void;
-  onInspectTask: (task: Task) => void;
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const sliderDragStartRef = useRef<number | null>(null);
+  const transitionResetRef = useRef<number | null>(null);
   const [anchorAngle, setAnchorAngle] = useState<number | null>(null);
   const [hoverAngle, setHoverAngle] = useState<number | null>(null);
   const [pendingArc, setPendingArc] = useState<{ startAngle: number; endAngle: number } | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [now, setNow] = useState(new Date());
+  const [overlapIndex, setOverlapIndex] = useState(0);
+  const [sliderTransitionDirection, setSliderTransitionDirection] = useState<'from-left' | 'from-right' | null>(null);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => () => {
+    if (transitionResetRef.current !== null) {
+      window.clearTimeout(transitionResetRef.current);
+    }
   }, []);
 
   const getPointerAngle = (clientX: number, clientY: number) => {
@@ -1097,10 +1121,41 @@ const CircleScheduler = ({
 
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const minuteAngle = minutesToAngle(currentMinutes);
-  const activeTask = tasks.find((task) => isCurrentMinuteInsideTask(task, currentMinutes));
-  const activeTaskProgress = activeTask ? getTaskProgress(activeTask, currentMinutes) : 0;
-  const activeTaskColor = activeTask ? getClockTaskColor(activeTask) : '#ff7a91';
+  const overlappingActiveTasks = tasks.filter((task) => isCurrentMinuteInsideTask(task, currentMinutes));
+  const activeTask = overlappingActiveTasks[0] ?? null;
+  const hasOverlapSlider = overlappingActiveTasks.length > 1;
+  const safeOverlapIndex = hasOverlapSlider ? overlapIndex % overlappingActiveTasks.length : 0;
+  const displayTask = hasOverlapSlider ? overlappingActiveTasks[safeOverlapIndex] : activeTask;
+  const activeTaskProgress = getCenterTaskProgress(displayTask, currentMinutes);
+  const activeTaskColor = displayTask ? getClockTaskColor(displayTask) : '#ff7a91';
   const trackTasks = assignTasksToTrackLanes(tasks);
+
+  useEffect(() => {
+    if (!overlappingActiveTasks.length) {
+      setOverlapIndex(0);
+      return;
+    }
+    setOverlapIndex((current) => current % overlappingActiveTasks.length);
+  }, [overlappingActiveTasks.length]);
+
+  const moveOverlapSlider = (direction: 1 | -1) => {
+    if (overlappingActiveTasks.length <= 1) {
+      return;
+    }
+    setSliderTransitionDirection(direction === 1 ? 'from-left' : 'from-right');
+    if (transitionResetRef.current !== null) {
+      window.clearTimeout(transitionResetRef.current);
+    }
+    transitionResetRef.current = window.setTimeout(() => {
+      setSliderTransitionDirection(null);
+      transitionResetRef.current = null;
+    }, 260);
+    setOverlapIndex((current) => {
+      const next = current + direction;
+      const count = overlappingActiveTasks.length;
+      return (next + count) % count;
+    });
+  };
   const renderClockSurface = (blurred: boolean) => (
     <>
       {OUTER_RING_SEGMENTS.map(({ angle, start, end, isCardinal }) => (
@@ -1134,11 +1189,7 @@ const CircleScheduler = ({
               strokeLinecap="butt"
               opacity={task.completed ? 0.42 : 0.92}
               filter={blurred ? 'url(#surfaceBlur)' : undefined}
-              className={blurred ? undefined : 'cursor-pointer transition-opacity hover:opacity-100'}
-              onClick={blurred ? undefined : (event) => {
-                event.stopPropagation();
-                onInspectTask(task);
-              }}
+              className={blurred ? undefined : 'transition-opacity'}
             />
           </g>
         );
@@ -1351,7 +1402,39 @@ const CircleScheduler = ({
         <div
           className="center-stack"
         >
-          <div className="center-progress-shell" aria-hidden="true">
+          {hasOverlapSlider && (
+            <div
+              className="center-carousel"
+              onPointerDown={(event) => {
+                sliderDragStartRef.current = event.clientX;
+                event.currentTarget.setPointerCapture(event.pointerId);
+              }}
+              onPointerUp={(event) => {
+                if (sliderDragStartRef.current === null) {
+                  return;
+                }
+                const delta = event.clientX - sliderDragStartRef.current;
+                sliderDragStartRef.current = null;
+                if (Math.abs(delta) < 28) {
+                  return;
+                }
+                moveOverlapSlider(delta < 0 ? 1 : -1);
+              }}
+              onPointerCancel={() => {
+                sliderDragStartRef.current = null;
+              }}
+              onPointerLeave={() => {
+                sliderDragStartRef.current = null;
+              }}
+            >
+              <div className="center-carousel__pager" aria-hidden="true">
+                {overlappingActiveTasks.map((task, index) => (
+                  <span key={task.id} className={`center-carousel__dot ${index === safeOverlapIndex ? 'is-active' : ''}`} />
+                ))}
+              </div>
+            </div>
+          )}
+          <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`} aria-hidden="true">
             <div
               className="center-progress-fill"
               style={{
@@ -1361,8 +1444,11 @@ const CircleScheduler = ({
             />
           </div>
           <div className="center-lens" aria-hidden="true">
-            <div className="center-lens__title">
-              {activeTask ? (activeTask.title.length > 12 ? `${activeTask.title.slice(0, 12)}…` : activeTask.title) : '비어 있음'}
+            <div
+              className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
+              style={{ color: displayTask ? activeTaskColor : 'rgba(214, 211, 209, 0.92)' }}
+            >
+              {displayTask ? (displayTask.title.length > 12 ? `${displayTask.title.slice(0, 12)}…` : displayTask.title) : '비어 있음'}
             </div>
           </div>
         </div>
@@ -1598,7 +1684,6 @@ const DayScheduleView = ({
           <CircleScheduler
             tasks={tasks}
             onAddTask={addTask}
-            onInspectTask={(task) => setSheetTask(task)}
           />
         </div>
 
