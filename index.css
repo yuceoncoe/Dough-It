@@ -1,8 +1,40 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color-scheme: light;
-  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
   background:
     radial-gradient(circle at top, rgba(255, 244, 216, 0.85), transparent 32%),
     linear-gradient(180deg, #f8f4ec 0%, #ece4d8 100%);
@@ -21,6 +53,7 @@ body {
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
 }
 
 button,
@@ -31,7 +64,9 @@ textarea {
 }
 
 .font-hand {
-  font-family: "Snell Roundhand", "Marker Felt", "Noteworthy", "Bradley Hand", cursive;
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 .modal-backdrop {
@@ -99,6 +134,7 @@ textarea {
   pointer-events: none;
   z-index: 10;
 }
+
 
 .center-lens {
   position: absolute;

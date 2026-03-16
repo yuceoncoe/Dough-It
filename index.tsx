@@ -138,6 +138,20 @@ const describeOpenArc = (
   ].join(' ');
 };
 
+const describeOpenArcDirectional = (
+  x: number,
+  y: number,
+  radius: number,
+  startAngle: number,
+  endAngle: number,
+  reverse: boolean,
+) => {
+  if (!reverse) {
+    return describeOpenArc(x, y, radius, startAngle, endAngle);
+  }
+  return describeOpenArc(x, y, radius, endAngle, startAngle + 360);
+};
+
 const timeToMinutes = (time: string) => {
   const [hours, minutes] = time.split(':').map(Number);
   return hours * 60 + minutes;
@@ -255,6 +269,85 @@ const getRoundedArcAngles = (
   };
 };
 
+const shouldReverseLabelPath = (angle: number) => angle > 90 && angle < 270;
+
+const drawTextOnArc = (
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  radius: number,
+  startAngle: number,
+  endAngle: number,
+) => {
+  const fontSize = 11;
+  ctx.font = `${fontSize}px Pretendard, ui-sans-serif, system-ui, sans-serif`;
+  const glyphs = buildArcGlyphLayout(text, radius, startAngle, endAngle, (char) => ctx.measureText(char).width);
+
+  glyphs.forEach(({ char, x, y, rotation }) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation * Math.PI / 180);
+    ctx.fillText(char, 0, 0);
+    ctx.restore();
+  });
+};
+
+const buildArcGlyphLayout = (
+  text: string,
+  radius: number,
+  startAngle: number,
+  endAngle: number,
+  measureText: (char: string) => number,
+) => {
+  const content = text.trim().slice(0, 14);
+  if (!content) {
+    return [];
+  }
+
+  const safeEnd = clampArcEnd(startAngle, endAngle);
+  const midAngle = startAngle + (safeEnd - startAngle) / 2;
+  const reverse = shouldReverseLabelPath(midAngle % 360);
+  const fromAngle = reverse ? safeEnd : startAngle;
+  const toAngle = reverse ? startAngle : safeEnd;
+  const direction = reverse ? -1 : 1;
+  const span = Math.abs(toAngle - fromAngle);
+  const spacing = 0.6;
+  if (span <= 0) {
+    return [];
+  }
+
+  let fittedChars = content.split('');
+  let widths = fittedChars.map((char) => measureText(char) + spacing);
+  let totalArcWidth = widths.reduce((sum, width) => sum + width, 0);
+  let totalAngle = (totalArcWidth / radius) * (180 / Math.PI);
+
+  while (fittedChars.length > 1 && totalAngle > span) {
+    fittedChars = fittedChars.slice(0, -1);
+    widths = fittedChars.map((char) => measureText(char) + spacing);
+    totalArcWidth = widths.reduce((sum, width) => sum + width, 0);
+    totalAngle = (totalArcWidth / radius) * (180 / Math.PI);
+  }
+
+  if (totalAngle > span) {
+    return [];
+  }
+
+  let cursor = fromAngle + direction * ((span - totalAngle) / 2);
+
+  return fittedChars.map((char, index) => {
+    const charWidth = widths[index];
+    const charAngle = cursor + direction * (((charWidth / 2) / radius) * (180 / Math.PI));
+    const point = polarToCartesian(CENTER, CENTER, radius, charAngle);
+    cursor += direction * ((charWidth / radius) * (180 / Math.PI));
+
+    return {
+      char,
+      x: point.x,
+      y: point.y,
+      rotation: charAngle + (reverse ? 180 : 0),
+    };
+  });
+};
+
 const getTaskIntervals = (tasks: Task[]) => tasks
   .filter((task) => task.startTime && task.duration)
   .map((task) => {
@@ -318,6 +411,23 @@ const getClockTaskColor = (task: Task) => {
     return '#9a9a9a';
   }
   return '#ececec';
+};
+
+const hexToRgba = (hex: string, alpha: number) => {
+  const normalized = hex.replace('#', '');
+  const safe = normalized.length === 3
+    ? normalized.split('').map((char) => `${char}${char}`).join('')
+    : normalized;
+
+  if (safe.length !== 6) {
+    return `rgba(255, 122, 145, ${alpha})`;
+  }
+
+  const red = parseInt(safe.slice(0, 2), 16);
+  const green = parseInt(safe.slice(2, 4), 16);
+  const blue = parseInt(safe.slice(4, 6), 16);
+
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 };
 
 const getTaskBorderClass = (tags: Tag[]) => {
@@ -437,7 +547,6 @@ const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAn
       const laneCenterRadius = getTrackLaneCenterRadius(laneIndex);
       const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex);
       const laneStrokeWidth = outerRadius - innerRadius;
-      const roundedAngles = getRoundedArcAngles(laneCenterRadius, laneStrokeWidth, startAngle, endAngle);
       const midAngle = startAngle + (endAngle - startAngle) / 2;
       const labelPoint = polarToCartesian(CENTER, CENTER, laneCenterRadius, midAngle);
       const progress = getBlurProgress(labelPoint, minuteAngle);
@@ -447,32 +556,18 @@ const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAn
       ctx.globalAlpha = task.completed ? 0.42 : 0.92;
       ctx.strokeStyle = getClockTaskColor(task);
       ctx.lineWidth = laneStrokeWidth;
-      ctx.lineCap = 'round';
+      ctx.lineCap = 'butt';
       ctx.beginPath();
       ctx.arc(
         CENTER,
         CENTER,
         laneCenterRadius,
-        (roundedAngles.startAngle - 90) * Math.PI / 180,
-        (roundedAngles.endAngle - 90) * Math.PI / 180,
+        (startAngle - 90) * Math.PI / 180,
+        (endAngle - 90) * Math.PI / 180,
         false,
       );
       ctx.stroke();
       ctx.restore();
-
-      if ((task.duration ?? 0) >= 40) {
-        ctx.save();
-        ctx.translate(labelPoint.x, labelPoint.y);
-        ctx.rotate((midAngle + 90) * Math.PI / 180);
-        ctx.filter = `blur(${0.8 + progress * 7}px)`;
-        ctx.fillStyle = '#111111';
-        ctx.globalAlpha = task.completed ? 0.6 : 0.92;
-        ctx.font = '400 12px ui-sans-serif, system-ui, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(task.title.slice(0, 14), 0, 0);
-        ctx.restore();
-      }
     });
 };
 
@@ -1004,6 +1099,7 @@ const CircleScheduler = ({
   const minuteAngle = minutesToAngle(currentMinutes);
   const activeTask = tasks.find((task) => isCurrentMinuteInsideTask(task, currentMinutes));
   const activeTaskProgress = activeTask ? getTaskProgress(activeTask, currentMinutes) : 0;
+  const activeTaskColor = activeTask ? getClockTaskColor(activeTask) : '#ff7a91';
   const trackTasks = assignTasksToTrackLanes(tasks);
   const renderClockSurface = (blurred: boolean) => (
     <>
@@ -1028,17 +1124,14 @@ const CircleScheduler = ({
         const laneCenterRadius = getTrackLaneCenterRadius(laneIndex);
         const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex);
         const laneStrokeWidth = outerRadius - innerRadius;
-        const roundedAngles = getRoundedArcAngles(laneCenterRadius, laneStrokeWidth, startAngle, endAngle);
-        const labelAngle = startAngle + (endAngle - startAngle) / 2;
-        const labelPoint = polarToCartesian(CENTER, CENTER, laneCenterRadius, labelAngle);
         return (
           <g key={`${blurred ? 'b' : 's'}-task-${task.id}`}>
             <path
-              d={describeOpenArc(CENTER, CENTER, laneCenterRadius, roundedAngles.startAngle, roundedAngles.endAngle)}
+              d={describeOpenArc(CENTER, CENTER, laneCenterRadius, startAngle, endAngle)}
               fill="none"
               stroke={taskColor}
               strokeWidth={laneStrokeWidth}
-              strokeLinecap="round"
+              strokeLinecap="butt"
               opacity={task.completed ? 0.42 : 0.92}
               filter={blurred ? 'url(#surfaceBlur)' : undefined}
               className={blurred ? undefined : 'cursor-pointer transition-opacity hover:opacity-100'}
@@ -1047,24 +1140,6 @@ const CircleScheduler = ({
                 onInspectTask(task);
               }}
             />
-            {(task.duration ?? 0) >= 40 && (
-              <text
-                x={labelPoint.x}
-                y={labelPoint.y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="pointer-events-none fill-black text-[12px] md:text-xs"
-                filter={blurred ? 'url(#surfaceBlur)' : undefined}
-                style={{
-                  transformBox: 'fill-box',
-                  transformOrigin: 'center',
-                  transform: `rotate(${labelAngle + 90}deg)`,
-                  opacity: task.completed ? 0.6 : 1,
-                }}
-              >
-                {task.title.slice(0, 14)}
-              </text>
-            )}
           </g>
         );
       })}
@@ -1173,8 +1248,43 @@ const CircleScheduler = ({
         </defs>
 
         <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="transparent" />
-        <g mask="url(#blurMask)">
-          {renderClockSurface(true)}
+        <line
+          x1={CENTER}
+          y1={CENTER - (OUTER_BACKGROUND_RADIUS - 30)}
+          x2={CENTER}
+          y2={CENTER + (OUTER_BACKGROUND_RADIUS - 30)}
+          stroke="rgba(20, 20, 20, 0.06)"
+          strokeWidth="0.9"
+        />
+        <g>
+          {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
+            const laneCenterRadius = getTrackLaneCenterRadius(laneIndex);
+            const glyphs = buildArcGlyphLayout(task.title, laneCenterRadius, startAngle, endAngle, (char) => {
+              const approxWidths: Record<string, number> = {
+                ' ': 4,
+              };
+              return approxWidths[char] ?? (/[\u3131-\u318E\uAC00-\uD7A3]/.test(char) ? 11 : 7);
+            });
+
+            return glyphs.map(({ char, x, y, rotation }, glyphIndex) => (
+              <text
+                key={`${task.id}-label-${glyphIndex}`}
+                x={x}
+                y={y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="pointer-events-none fill-black text-[11px] font-medium"
+                style={{
+                  opacity: task.completed ? 0.58 : 0.94,
+                  transformBox: 'fill-box',
+                  transformOrigin: 'center',
+                  transform: `rotate(${rotation}deg)`,
+                }}
+              >
+                {char}
+              </text>
+            ));
+          })}
         </g>
         <g>
           {OUTER_HOUR_LABELS.map(({ value, angle, point }) => (
@@ -1242,7 +1352,13 @@ const CircleScheduler = ({
           className="center-stack"
         >
           <div className="center-progress-shell" aria-hidden="true">
-            <div className="center-progress-fill" style={{ transform: `scaleY(${activeTaskProgress})` }} />
+            <div
+              className="center-progress-fill"
+              style={{
+                transform: `scaleY(${activeTaskProgress})`,
+                background: `linear-gradient(180deg, ${hexToRgba(activeTaskColor, 0.84)} 0%, ${hexToRgba(activeTaskColor, 0.18)} 100%)`,
+              }}
+            />
           </div>
           <div className="center-lens" aria-hidden="true">
             <div className="center-lens__title">
