@@ -138,20 +138,6 @@ const describeOpenArc = (
   ].join(' ');
 };
 
-const describeOpenArcDirectional = (
-  x: number,
-  y: number,
-  radius: number,
-  startAngle: number,
-  endAngle: number,
-  reverse: boolean,
-) => {
-  if (!reverse) {
-    return describeOpenArc(x, y, radius, startAngle, endAngle);
-  }
-  return describeOpenArc(x, y, radius, endAngle, startAngle + 360);
-};
-
 const timeToMinutes = (time: string) => {
   const [hours, minutes] = time.split(':').map(Number);
   return hours * 60 + minutes;
@@ -188,7 +174,6 @@ const TRACK_LANE_WIDTH = (TRACK_OUTER_RADIUS - TRACK_INNER_RADIUS - TRACK_LANE_G
 const OUTER_BOUNDARY_RADIUS = RADIUS + 45;
 const OUTER_HOUR_LABEL_RADIUS = OUTER_BOUNDARY_RADIUS + 34;
 const OUTER_BACKGROUND_RADIUS = OUTER_BOUNDARY_RADIUS + 4;
-const CENTER_LENS_RADIUS = 96;
 const OUTER_RING_SEGMENTS = Array.from({ length: 144 }, (_, index) => {
   const angle = index * 2.5;
   const isCardinal = index % 6 === 0;
@@ -266,23 +251,6 @@ const getTrackLaneCenterRadius = (laneIndex: number) => {
 const getTrackSeparatorRadius = (laneIndex: number) => {
   const { innerRadius } = getTrackLaneRadii(laneIndex);
   return innerRadius - TRACK_LANE_GAP / 2;
-};
-
-const getRoundedArcAngles = (
-  centerRadius: number,
-  strokeWidth: number,
-  startAngle: number,
-  endAngle: number,
-) => {
-  const safeEnd = clampArcEnd(startAngle, endAngle);
-  const angleSpan = safeEnd - startAngle;
-  const capOffset = (strokeWidth / 2 / centerRadius) * (180 / Math.PI);
-  const clampedOffset = Math.min(capOffset, Math.max(0, angleSpan / 2 - 0.1));
-
-  return {
-    startAngle: startAngle + clampedOffset,
-    endAngle: safeEnd - clampedOffset,
-  };
 };
 
 const shouldReverseLabelPath = (angle: number) => angle > 90 && angle < 270;
@@ -511,15 +479,6 @@ const getBlurProgress = (point: { x: number; y: number }, minuteAngle: number) =
   return Math.min(1, easedDirectional * 0.72 + projected * 0.28);
 };
 
-const beginRingArcPath = (ctx: CanvasRenderingContext2D, innerRadius: number, outerRadius: number, startAngle: number, endAngle: number) => {
-  const startRadians = (startAngle - 90) * Math.PI / 180;
-  const endRadians = (endAngle - 90) * Math.PI / 180;
-  ctx.beginPath();
-  ctx.arc(CENTER, CENTER, outerRadius, startRadians, endRadians, false);
-  ctx.arc(CENTER, CENTER, innerRadius, endRadians, startRadians, true);
-  ctx.closePath();
-};
-
 const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAngle: number) => {
   ctx.clearRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
 
@@ -717,7 +676,7 @@ const TaskCreationModal = ({
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-shell max-w-md rotate-1" onClick={(event) => event.stopPropagation()}>
+      <div className="modal-shell max-w-md" onClick={(event) => event.stopPropagation()}>
         <button onClick={onClose} className="absolute right-4 top-4 text-stone-500 transition-colors hover:text-rose-500">
           <X size={20} />
         </button>
@@ -1012,32 +971,6 @@ const RoutineSettingsModal = ({
   );
 };
 
-const AmbientVisuals = ({ now }: { now: Date }) => {
-  const minuteAngle = minutesToAngle(now.getHours() * 60 + now.getMinutes());
-  const trailLayers = [88, 62, 40, 22];
-
-  return (
-    <>
-      <rect x="0" y="0" width="600" height="600" fill="#f4f4f4" />
-      <circle cx={CENTER} cy={CENTER} r={RADIUS + 34} fill="#f3f3f3" opacity="0.98" />
-      {trailLayers.map((spread, index) => {
-        const start = minuteAngle - 8 - index * 2.5;
-        const end = minuteAngle + 8 + index * 2.5;
-        const opacity = 0.22 - index * 0.04;
-        return (
-          <path
-            key={spread}
-            d={describeArc(CENTER, CENTER, RADIUS + 8 + index * 8, start, end)}
-            fill="#d90429"
-            opacity={opacity}
-            filter={`url(#handBlur${index + 1})`}
-          />
-        );
-      })}
-    </>
-  );
-};
-
 const CircleScheduler = ({
   tasks,
   onAddTask,
@@ -1156,47 +1089,6 @@ const CircleScheduler = ({
       return (next + count) % count;
     });
   };
-  const renderClockSurface = (blurred: boolean) => (
-    <>
-      {OUTER_RING_SEGMENTS.map(({ angle, start, end, isCardinal }) => (
-        !blurred ? null : (
-        <g key={`${blurred ? 'b' : 's'}-outer-tick-${angle}`}>
-          <line
-            x1={start.x}
-            y1={start.y}
-            x2={end.x}
-            y2={end.y}
-            stroke={isCardinal ? 'rgba(20,20,20,0.06)' : 'rgba(20,20,20,0.025)'}
-            strokeWidth={isCardinal ? 0.9 : 0.6}
-            strokeLinecap="round"
-            filter={blurred ? 'url(#tickBlur)' : undefined}
-          />
-        </g>
-        )
-      ))}
-      {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
-        const taskColor = getClockTaskColor(task);
-        const laneCenterRadius = getTrackLaneCenterRadius(laneIndex);
-        const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex);
-        const laneStrokeWidth = outerRadius - innerRadius;
-        return (
-          <g key={`${blurred ? 'b' : 's'}-task-${task.id}`}>
-            <path
-              d={describeOpenArc(CENTER, CENTER, laneCenterRadius, startAngle, endAngle)}
-              fill="none"
-              stroke={taskColor}
-              strokeWidth={laneStrokeWidth}
-              strokeLinecap="butt"
-              opacity={task.completed ? 0.42 : 0.92}
-              filter={blurred ? 'url(#surfaceBlur)' : undefined}
-              className={blurred ? undefined : 'transition-opacity'}
-            />
-          </g>
-        );
-      })}
-    </>
-  );
-
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[2rem] bg-[#f6f6f8]">
       <TaskCreationModal
@@ -1237,67 +1129,6 @@ const CircleScheduler = ({
           }}
           onClick={handleRingClick}
         >
-        <defs>
-          <filter id="paperNoise">
-            <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="0.8" />
-          </filter>
-          <filter id="markerBlur">
-            <feGaussianBlur stdDeviation="8" />
-          </filter>
-          <filter id="markerBlurLight">
-            <feGaussianBlur stdDeviation="4" />
-          </filter>
-          <filter id="markerBlurHeavy">
-            <feGaussianBlur stdDeviation="14" />
-          </filter>
-          <filter id="numberBlur">
-            <feGaussianBlur stdDeviation="12" />
-          </filter>
-          <filter id="numberBlurLight">
-            <feGaussianBlur stdDeviation="6" />
-          </filter>
-          <filter id="numberBlurHeavy">
-            <feGaussianBlur stdDeviation="20" />
-          </filter>
-          <filter id="tickBlur">
-            <feGaussianBlur stdDeviation="2.5" />
-          </filter>
-          <filter id="surfaceBlur">
-            <feGaussianBlur stdDeviation="5.5" />
-          </filter>
-          <filter id="handBlur1">
-            <feGaussianBlur stdDeviation="4" />
-          </filter>
-          <filter id="handBlur2">
-            <feGaussianBlur stdDeviation="8" />
-          </filter>
-          <filter id="handBlur3">
-            <feGaussianBlur stdDeviation="14" />
-          </filter>
-          <filter id="handBlur4">
-            <feGaussianBlur stdDeviation="22" />
-          </filter>
-          <linearGradient id="blurGradient" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform={`rotate(${minuteAngle} 0.5 0.5)`}>
-            <stop offset="0%" stopColor="white" />
-            <stop offset="24%" stopColor="black" />
-            <stop offset="58%" stopColor="black" />
-            <stop offset="100%" stopColor="white" />
-          </linearGradient>
-          <linearGradient id="sharpGradient" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform={`rotate(${minuteAngle} 0.5 0.5)`}>
-            <stop offset="0%" stopColor="black" />
-            <stop offset="20%" stopColor="white" />
-            <stop offset="42%" stopColor="white" />
-            <stop offset="100%" stopColor="black" />
-          </linearGradient>
-          <mask id="blurMask">
-            <rect x="0" y="0" width="600" height="600" fill="url(#blurGradient)" />
-          </mask>
-          <mask id="sharpMask">
-            <rect x="0" y="0" width="600" height="600" fill="url(#sharpGradient)" />
-          </mask>
-        </defs>
-
         <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="transparent" />
         <line
           x1={CENTER}
