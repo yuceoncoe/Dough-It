@@ -14,6 +14,7 @@ import {
   Moon,
   Paintbrush,
   Pencil,
+  Plus,
   RefreshCw,
   Settings,
   Sparkles,
@@ -166,11 +167,22 @@ const clampArcEnd = (startAngle: number, endAngle: number) => {
 
 const getAngularDistance = (fromAngle: number, toAngle: number) => Math.abs(((fromAngle - toAngle + 540) % 360) - 180);
 
-const TRACK_LANE_COUNT = 4;
+const getDirectionalTextVisuals = (angle: number, minuteAngle: number) => {
+  const distance = getAngularDistance(angle, minuteAngle);
+  const progress = distance / 180;
+  return {
+    blur: progress * 3.2,
+    opacity: 0.82 - progress * 0.34,
+  };
+};
+
+const DEFAULT_TRACK_LANE_COUNT = 4;
 const TRACK_INNER_RADIUS = 118;
 const TRACK_OUTER_RADIUS = RADIUS + 10;
 const TRACK_LANE_GAP = 10;
-const TRACK_LANE_WIDTH = (TRACK_OUTER_RADIUS - TRACK_INNER_RADIUS - TRACK_LANE_GAP * (TRACK_LANE_COUNT - 1)) / TRACK_LANE_COUNT;
+const getTrackLaneWidth = (laneCount: number) => (
+  (TRACK_OUTER_RADIUS - TRACK_INNER_RADIUS - TRACK_LANE_GAP * (laneCount - 1)) / laneCount
+);
 const OUTER_BOUNDARY_RADIUS = RADIUS + 45;
 const OUTER_HOUR_LABEL_RADIUS = OUTER_BOUNDARY_RADIUS + 34;
 const OUTER_BACKGROUND_RADIUS = OUTER_BOUNDARY_RADIUS + 4;
@@ -231,25 +243,26 @@ const getCenterTaskProgress = (task: Task | null, currentMinutes: number) => {
   return getTaskProgress(task, currentMinutes);
 };
 
-const getTrackLaneRadii = (laneIndex: number) => {
-  const outerRadius = TRACK_OUTER_RADIUS - laneIndex * (TRACK_LANE_WIDTH + TRACK_LANE_GAP);
-  const innerRadius = outerRadius - TRACK_LANE_WIDTH;
+const getTrackLaneRadii = (laneIndex: number, laneCount: number) => {
+  const laneWidth = getTrackLaneWidth(laneCount);
+  const outerRadius = TRACK_OUTER_RADIUS - laneIndex * (laneWidth + TRACK_LANE_GAP);
+  const innerRadius = outerRadius - laneWidth;
   return { innerRadius, outerRadius };
 };
 
-const getTrackLaneFillRadii = (laneIndex: number) => {
-  const outerRadius = laneIndex === 0 ? TRACK_OUTER_RADIUS : getTrackSeparatorRadius(laneIndex - 1);
-  const innerRadius = laneIndex === TRACK_LANE_COUNT - 1 ? TRACK_INNER_RADIUS : getTrackSeparatorRadius(laneIndex);
+const getTrackLaneFillRadii = (laneIndex: number, laneCount: number) => {
+  const outerRadius = laneIndex === 0 ? TRACK_OUTER_RADIUS : getTrackSeparatorRadius(laneIndex - 1, laneCount);
+  const innerRadius = laneIndex === laneCount - 1 ? TRACK_INNER_RADIUS : getTrackSeparatorRadius(laneIndex, laneCount);
   return { innerRadius, outerRadius };
 };
 
-const getTrackLaneCenterRadius = (laneIndex: number) => {
-  const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex);
+const getTrackLaneCenterRadius = (laneIndex: number, laneCount: number) => {
+  const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex, laneCount);
   return (innerRadius + outerRadius) / 2;
 };
 
-const getTrackSeparatorRadius = (laneIndex: number) => {
-  const { innerRadius } = getTrackLaneRadii(laneIndex);
+const getTrackSeparatorRadius = (laneIndex: number, laneCount: number) => {
+  const { innerRadius } = getTrackLaneRadii(laneIndex, laneCount);
   return innerRadius - TRACK_LANE_GAP / 2;
 };
 
@@ -327,6 +340,7 @@ const buildArcGlyphLayout = (
       char,
       x: point.x,
       y: point.y,
+      angle: ((charAngle % 360) + 360) % 360,
       rotation: charAngle + (reverse ? 180 : 0),
     };
   });
@@ -345,11 +359,60 @@ const getTaskIntervals = (tasks: Task[]) => tasks
       startAngle: minutesToAngle(startMinute),
       endAngle: minutesToAngle(endMinute),
     };
-  })
-  .sort((left, right) => left.startMinute - right.startMinute || left.endMinute - right.endMinute);
+  });
 
-const assignTasksToTrackLanes = (tasks: Task[]) => {
-  const laneEndMinutes = Array.from({ length: TRACK_LANE_COUNT }, () => -1);
+const getTaskSegments = (task: Task) => {
+  if (!task.startTime || !task.duration || task.duration <= 0) {
+    return [];
+  }
+
+  const startMinute = timeToMinutes(task.startTime);
+  const duration = task.duration;
+  const endMinute = startMinute + duration;
+
+  if (duration >= 1440) {
+    return [{ startMinute: 0, endMinute: 1440 }];
+  }
+
+  if (endMinute <= 1440) {
+    return [{ startMinute, endMinute }];
+  }
+
+  return [
+    { startMinute, endMinute: 1440 },
+    { startMinute: 0, endMinute: endMinute % 1440 },
+  ];
+};
+
+const getRequiredTrackLaneCount = (tasks: Task[]) => {
+  const events = tasks.flatMap((task) => (
+    getTaskSegments(task).flatMap(({ startMinute, endMinute }) => ([
+      { minute: startMinute, delta: 1 },
+      { minute: endMinute, delta: -1 },
+    ]))
+  ));
+
+  if (!events.length) {
+    return DEFAULT_TRACK_LANE_COUNT;
+  }
+
+  events.sort((left, right) => (
+    left.minute - right.minute || left.delta - right.delta
+  ));
+
+  let currentOverlap = 0;
+  let maxOverlap = 0;
+
+  events.forEach(({ delta }) => {
+    currentOverlap += delta;
+    maxOverlap = Math.max(maxOverlap, currentOverlap);
+  });
+
+  return Math.max(DEFAULT_TRACK_LANE_COUNT, maxOverlap);
+};
+
+const assignTasksToTrackLanes = (tasks: Task[], laneCount: number) => {
+  const laneEndMinutes = Array.from({ length: laneCount }, () => -1);
 
   return getTaskIntervals(tasks).map((entry) => {
     let laneIndex = laneEndMinutes.findIndex((laneEndMinute) => laneEndMinute <= entry.startMinute);
@@ -373,28 +436,22 @@ const getTaskColor = (tags: Tag[]) => {
   const urgent = tags.includes('urgent');
   const important = tags.includes('important');
   if (urgent && important) {
-    return '#ff8f6b';
+    return '#ff5f57';
   }
   if (urgent) {
-    return '#f97373';
+    return '#ff9f0a';
   }
   if (important) {
-    return '#5ea8ff';
+    return '#0a84ff';
   }
-  return '#d8d6cf';
+  return '#30d158';
 };
 
 const getClockTaskColor = (task: Task) => {
   if (task.completed) {
     return '#d4d4d4';
   }
-  if (task.tags.includes('urgent')) {
-    return '#d90429';
-  }
-  if (task.tags.includes('important')) {
-    return '#9a9a9a';
-  }
-  return '#ececec';
+  return getTaskColor(task.tags);
 };
 
 const hexToRgba = (hex: string, alpha: number) => {
@@ -418,15 +475,15 @@ const getTaskBorderClass = (tags: Tag[]) => {
   const urgent = tags.includes('urgent');
   const important = tags.includes('important');
   if (urgent && important) {
-    return 'border-orange-400';
+    return 'border-rose-500';
   }
   if (urgent) {
-    return 'border-rose-400';
+    return 'border-amber-400';
   }
   if (important) {
-    return 'border-sky-400';
+    return 'border-sky-500';
   }
-  return 'border-stone-300';
+  return 'border-emerald-400';
 };
 
 const getTaskIcon = (task: Task) => {
@@ -480,6 +537,9 @@ const getBlurProgress = (point: { x: number; y: number }, minuteAngle: number) =
 };
 
 const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAngle: number) => {
+  const laneCount = getRequiredTrackLaneCount(tasks);
+  const trackTasks = assignTasksToTrackLanes(tasks, laneCount);
+
   ctx.clearRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
 
   ctx.fillStyle = '#f6f6f8';
@@ -507,8 +567,8 @@ const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAn
     ctx.restore();
   });
 
-  Array.from({ length: TRACK_LANE_COUNT - 1 }, (_, laneIndex) => laneIndex).forEach((laneIndex) => {
-    const separatorRadius = getTrackSeparatorRadius(laneIndex);
+  Array.from({ length: laneCount - 1 }, (_, laneIndex) => laneIndex).forEach((laneIndex) => {
+    const separatorRadius = getTrackSeparatorRadius(laneIndex, laneCount);
     ctx.save();
     ctx.strokeStyle = 'rgba(20, 20, 20, 0.06)';
     ctx.lineWidth = 0.9;
@@ -518,9 +578,9 @@ const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAn
     ctx.restore();
   });
 
-  assignTasksToTrackLanes(tasks).forEach(({ task, startAngle, endAngle, laneIndex }) => {
-      const laneCenterRadius = getTrackLaneCenterRadius(laneIndex);
-      const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex);
+  trackTasks.forEach(({ task, startAngle, endAngle, laneIndex }) => {
+      const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
+      const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex, laneCount);
       const laneStrokeWidth = outerRadius - innerRadius;
       const midAngle = startAngle + (endAngle - startAngle) / 2;
       const labelPoint = polarToCartesian(CENTER, CENTER, laneCenterRadius, midAngle);
@@ -798,6 +858,92 @@ const TaskActionSheet = ({
   );
 };
 
+const DayTaskEditorModal = ({
+  isOpen,
+  title,
+  startTime,
+  endTime,
+  tags,
+  isEditing,
+  onClose,
+  onTitleChange,
+  onStartTimeChange,
+  onEndTimeChange,
+  onToggleTag,
+  onSubmit,
+}: {
+  isOpen: boolean;
+  title: string;
+  startTime: string;
+  endTime: string;
+  tags: Tag[];
+  isEditing: boolean;
+  onClose: () => void;
+  onTitleChange: (value: string) => void;
+  onStartTimeChange: (value: string) => void;
+  onEndTimeChange: (value: string) => void;
+  onToggleTag: (tag: Tag) => void;
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+}) => {
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-shell max-w-md" onClick={(event) => event.stopPropagation()}>
+        <button onClick={onClose} className="absolute right-4 top-4 text-stone-500 transition-colors hover:text-rose-500">
+          <X size={20} />
+        </button>
+        <h2 className="font-hand text-3xl text-stone-800">{isEditing ? '일정 수정' : '빠른 추가'}</h2>
+        <p className="mb-6 mt-2 text-sm text-stone-500">제목, 시간, 태그를 입력해서 하루 일정에 바로 반영합니다.</p>
+
+        <form onSubmit={onSubmit} className="space-y-3">
+          <input
+            autoFocus
+            className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
+            placeholder="일정 이름"
+            value={title}
+            onChange={(event) => onTitleChange(event.target.value)}
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
+              <div className="mb-1">시작</div>
+              <input type="time" className="w-full bg-transparent outline-none" value={startTime} onChange={(event) => onStartTimeChange(event.target.value)} />
+            </label>
+            <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
+              <div className="mb-1">종료</div>
+              <input type="time" className="w-full bg-transparent outline-none" value={endTime} onChange={(event) => onEndTimeChange(event.target.value)} />
+            </label>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <button type="button" onClick={() => onToggleTag('urgent')} className={`rounded-2xl border px-4 py-3 text-left ${tags.includes('urgent') ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+              <div className="flex items-center gap-2">
+                <AlertCircle size={16} />
+                긴급
+              </div>
+            </button>
+            <button type="button" onClick={() => onToggleTag('important')} className={`rounded-2xl border px-4 py-3 text-left ${tags.includes('important') ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+              <div className="flex items-center gap-2">
+                <Star size={16} />
+                중요
+              </div>
+            </button>
+          </div>
+          <div className="mt-6 flex gap-3">
+            <button type="button" onClick={onClose} className="flex-1 rounded-2xl border border-stone-300 bg-white px-4 py-3 text-stone-700 transition-colors hover:bg-stone-50">
+              취소
+            </button>
+            <button type="submit" disabled={!title.trim() || !startTime || !endTime} className="flex-1 rounded-2xl bg-stone-900 px-4 py-3 text-white disabled:cursor-not-allowed disabled:opacity-50">
+              {isEditing ? '일정 업데이트' : '하루 일정에 추가'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const RoutineSettingsModal = ({
   isOpen,
   routines,
@@ -1061,7 +1207,8 @@ const CircleScheduler = ({
   const displayTask = hasOverlapSlider ? overlappingActiveTasks[safeOverlapIndex] : activeTask;
   const activeTaskProgress = getCenterTaskProgress(displayTask, currentMinutes);
   const activeTaskColor = displayTask ? getClockTaskColor(displayTask) : '#ff7a91';
-  const trackTasks = assignTasksToTrackLanes(tasks);
+  const laneCount = getRequiredTrackLaneCount(tasks);
+  const trackTasks = assignTasksToTrackLanes(tasks, laneCount);
 
   useEffect(() => {
     if (!overlappingActiveTasks.length) {
@@ -1140,7 +1287,7 @@ const CircleScheduler = ({
         />
         <g>
           {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
-            const laneCenterRadius = getTrackLaneCenterRadius(laneIndex);
+            const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
             const glyphs = buildArcGlyphLayout(task.title, laneCenterRadius, startAngle, endAngle, (char) => {
               const approxWidths: Record<string, number> = {
                 ' ': 4,
@@ -1148,33 +1295,35 @@ const CircleScheduler = ({
               return approxWidths[char] ?? (/[\u3131-\u318E\uAC00-\uD7A3]/.test(char) ? 11 : 7);
             });
 
-            return glyphs.map(({ char, x, y, rotation }, glyphIndex) => (
-              <text
-                key={`${task.id}-label-${glyphIndex}`}
-                x={x}
-                y={y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="pointer-events-none fill-black text-[11px] font-medium"
-                style={{
-                  opacity: task.completed ? 0.58 : 0.94,
-                  transformBox: 'fill-box',
-                  transformOrigin: 'center',
-                  transform: `rotate(${rotation}deg)`,
-                }}
-              >
-                {char}
-              </text>
-            ));
+            return glyphs.map(({ char, x, y, angle, rotation }, glyphIndex) => {
+              const { blur, opacity } = getDirectionalTextVisuals(angle, minuteAngle);
+
+              return (
+                <text
+                  key={`${task.id}-label-${glyphIndex}`}
+                  x={x}
+                  y={y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className="pointer-events-none fill-black text-[11px] font-medium"
+                  style={{
+                    opacity: (task.completed ? 0.58 : 0.94) * opacity,
+                    filter: `blur(${blur}px)`,
+                    transformBox: 'fill-box',
+                    transformOrigin: 'center',
+                    transform: `rotate(${rotation}deg)`,
+                  }}
+                >
+                  {char}
+                </text>
+              );
+            });
           })}
         </g>
         <g>
           {OUTER_HOUR_LABELS.map(({ value, angle, point }) => (
             (() => {
-              const distance = getAngularDistance(angle, minuteAngle);
-              const progress = distance / 180;
-              const blur = progress * 3.2;
-              const opacity = 0.82 - progress * 0.34;
+              const { blur, opacity } = getDirectionalTextVisuals(angle, minuteAngle);
 
               return (
                 <text
@@ -1387,6 +1536,7 @@ const DayScheduleView = ({
   const [showRoutines, setShowRoutines] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [sheetTask, setSheetTask] = useState<Task | null>(null);
+  const [editorOpen, setEditorOpen] = useState(false);
 
   const sortedTasks = tasks
     .filter((task) => showRoutines || !task.isRoutine)
@@ -1406,6 +1556,11 @@ const DayScheduleView = ({
     setEndTime('');
     setTags([]);
     setEditingId(null);
+  };
+
+  const closeEditor = () => {
+    setEditorOpen(false);
+    resetForm();
   };
 
   const toggleTag = (tag: Tag) => {
@@ -1438,6 +1593,7 @@ const DayScheduleView = ({
     setTags(task.tags);
     setStartTime(task.startTime ?? '');
     setEndTime(task.startTime && task.duration ? minutesToTime(timeToMinutes(task.startTime) + task.duration) : '');
+    setEditorOpen(true);
   };
 
   const submitForm = (event: React.FormEvent<HTMLFormElement>) => {
@@ -1466,6 +1622,7 @@ const DayScheduleView = ({
       addTask(title.trim(), tags, startTime, duration);
     }
     resetForm();
+    setEditorOpen(false);
   };
 
   return (
@@ -1490,6 +1647,20 @@ const DayScheduleView = ({
           setSheetTask(null);
         }}
       />
+      <DayTaskEditorModal
+        isOpen={editorOpen}
+        title={title}
+        startTime={startTime}
+        endTime={endTime}
+        tags={tags}
+        isEditing={editingId !== null}
+        onClose={closeEditor}
+        onTitleChange={setTitle}
+        onStartTimeChange={setStartTime}
+        onEndTimeChange={setEndTime}
+        onToggleTag={toggleTag}
+        onSubmit={submitForm}
+      />
 
       <div className="flex items-center justify-between gap-3 px-4 pb-3 pt-4 md:px-6">
         <div className="flex items-center gap-3">
@@ -1504,6 +1675,16 @@ const DayScheduleView = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              resetForm();
+              setEditorOpen(true);
+            }}
+            className="rounded-full border border-stone-300 bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
+            aria-label="빠른 일정 추가"
+          >
+            <Plus size={18} />
+          </button>
           <button onClick={onOpenSettings} className="rounded-full border border-stone-300 bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
             <Settings size={18} />
           </button>
@@ -1518,49 +1699,7 @@ const DayScheduleView = ({
           />
         </div>
 
-        <div className="flex min-h-0 flex-col gap-4 overflow-hidden">
-          <div className="rounded-[2rem] border border-white/75 bg-white/70 p-5 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-hand text-3xl text-stone-800">{editingId ? '일정 수정' : '빠른 추가'}</h2>
-              {editingId && <button onClick={resetForm} className="text-sm text-rose-600">취소</button>}
-            </div>
-            <form onSubmit={submitForm} className="space-y-3">
-              <input
-                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
-                placeholder="일정 이름"
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
-                  <div className="mb-1">시작</div>
-                  <input type="time" className="w-full bg-transparent outline-none" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
-                </label>
-                <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
-                  <div className="mb-1">종료</div>
-                  <input type="time" className="w-full bg-transparent outline-none" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
-                </label>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <button type="button" onClick={() => toggleTag('urgent')} className={`rounded-2xl border px-4 py-3 text-left ${tags.includes('urgent') ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-                  <div className="flex items-center gap-2">
-                    <AlertCircle size={16} />
-                    긴급
-                  </div>
-                </button>
-                <button type="button" onClick={() => toggleTag('important')} className={`rounded-2xl border px-4 py-3 text-left ${tags.includes('important') ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-                  <div className="flex items-center gap-2">
-                    <Star size={16} />
-                    중요
-                  </div>
-                </button>
-              </div>
-              <button type="submit" disabled={!title.trim() || !startTime || !endTime} className="w-full rounded-2xl bg-stone-900 px-4 py-3 text-white disabled:cursor-not-allowed disabled:opacity-50">
-                {editingId ? '일정 업데이트' : '하루 일정에 추가'}
-              </button>
-            </form>
-          </div>
-
+        <div className="flex min-h-0 flex-col overflow-hidden">
           <div className="flex min-h-0 flex-1 flex-col rounded-[2rem] border border-white/75 bg-white/70 p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
@@ -1593,8 +1732,10 @@ const DayScheduleView = ({
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {task.tags.includes('urgent') && <span className="h-2.5 w-2.5 rounded-full bg-rose-400" />}
-                      {task.tags.includes('important') && <span className="h-2.5 w-2.5 rounded-full bg-sky-400" />}
+                      <span
+                        className="h-2.5 w-2.5 rounded-full"
+                        style={{ backgroundColor: task.completed ? '#d4d4d4' : getTaskColor(task.tags) }}
+                      />
                     </div>
                   </div>
                 </button>
@@ -1649,7 +1790,7 @@ const App = () => {
         onSaveRoutines={setRoutines}
       />
 
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]">
         {activeTab === 'home' && (
           <DayScheduleView
             date={todayStr}
@@ -1678,7 +1819,7 @@ const App = () => {
         ) : null}
       </main>
 
-      <nav className="flex h-18 items-center justify-around border-t border-stone-200 bg-white/90 px-2 pb-safe shadow-[0_-12px_25px_rgba(85,72,56,0.08)] backdrop-blur">
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex h-18 items-center justify-around border-t border-stone-200 bg-white/90 px-2 pb-safe shadow-[0_-12px_25px_rgba(85,72,56,0.08)] backdrop-blur">
         <button
           onClick={() => {
             setActiveTab('home');
