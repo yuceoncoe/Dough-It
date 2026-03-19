@@ -171,8 +171,8 @@ const getDirectionalTextVisuals = (angle: number, minuteAngle: number) => {
   const distance = getAngularDistance(angle, minuteAngle);
   const progress = distance / 180;
   return {
-    blur: progress * 3.2,
-    opacity: 0.82 - progress * 0.34,
+    blur: progress * 1.6,
+    opacity: 0.88 - progress * 0.24,
   };
 };
 
@@ -384,6 +384,11 @@ const getTaskSegments = (task: Task) => {
   ];
 };
 
+const segmentsOverlap = (
+  left: { startMinute: number; endMinute: number },
+  right: { startMinute: number; endMinute: number },
+) => left.startMinute < right.endMinute && right.startMinute < left.endMinute;
+
 const getRequiredTrackLaneCount = (tasks: Task[]) => {
   const events = tasks.flatMap((task) => (
     getTaskSegments(task).flatMap(({ startMinute, endMinute }) => ([
@@ -412,22 +417,26 @@ const getRequiredTrackLaneCount = (tasks: Task[]) => {
 };
 
 const assignTasksToTrackLanes = (tasks: Task[], laneCount: number) => {
-  const laneEndMinutes = Array.from({ length: laneCount }, () => -1);
+  const laneAssignments = Array.from({ length: laneCount }, () => [] as Array<{ startMinute: number; endMinute: number }>);
 
   return getTaskIntervals(tasks).map((entry) => {
-    let laneIndex = laneEndMinutes.findIndex((laneEndMinute) => laneEndMinute <= entry.startMinute);
+    const entrySegments = getTaskSegments(entry.task);
+    let laneIndex = laneAssignments.findIndex((laneSegments) => (
+      entrySegments.every((entrySegment) => laneSegments.every((laneSegment) => !segmentsOverlap(entrySegment, laneSegment)))
+    ));
+
     if (laneIndex === -1) {
       laneIndex = 0;
-      let earliestEndMinute = laneEndMinutes[0];
-      for (let index = 1; index < laneEndMinutes.length; index += 1) {
-        if (laneEndMinutes[index] < earliestEndMinute) {
-          earliestEndMinute = laneEndMinutes[index];
+      let lightestLaneLoad = laneAssignments[0].length;
+      for (let index = 1; index < laneAssignments.length; index += 1) {
+        if (laneAssignments[index].length < lightestLaneLoad) {
+          lightestLaneLoad = laneAssignments[index].length;
           laneIndex = index;
         }
       }
     }
 
-    laneEndMinutes[laneIndex] = entry.endMinute;
+    laneAssignments[laneIndex].push(...entrySegments);
     return { ...entry, laneIndex };
   });
 };
@@ -587,7 +596,7 @@ const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAn
       const progress = getBlurProgress(labelPoint, minuteAngle);
 
       ctx.save();
-      ctx.filter = `blur(${1.8 + progress * 11}px)`;
+      ctx.filter = `blur(${0.8 + progress * 5.2}px)`;
       ctx.globalAlpha = task.completed ? 0.42 : 0.92;
       ctx.strokeStyle = getClockTaskColor(task);
       ctx.lineWidth = laneStrokeWidth;
