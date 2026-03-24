@@ -35,9 +35,7 @@
 :root {
   color-scheme: light;
   font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
-  background:
-    radial-gradient(circle at top, rgba(255, 244, 216, 0.85), transparent 32%),
-    linear-gradient(180deg, #f8f4ec 0%, #ece4d8 100%);
+  background: #f6f6f8;
   color: #292524;
 }
 
@@ -50,6 +48,7 @@ body,
 
 body {
   min-height: 100vh;
+  background: #f6f6f8;
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -130,6 +129,8 @@ textarea {
   top: 50%;
   width: 0;
   height: 0;
+  --center-lens-size: 10.4rem;
+  --center-gauge-size: calc(var(--center-lens-size) * 0.79);
   transform-style: preserve-3d;
   pointer-events: none;
   z-index: 10;
@@ -139,13 +140,14 @@ textarea {
   position: absolute;
   left: 0;
   top: 0;
-  z-index: 14;
-  width: clamp(6.4rem, 19%, 8.6rem);
+  z-index: 20;
+  width: var(--center-lens-size);
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%);
   border-radius: 9999px;
   pointer-events: auto;
-  touch-action: pan-x;
+  touch-action: none;
+  user-select: none;
 }
 
 .center-carousel__pager {
@@ -176,7 +178,8 @@ textarea {
   position: absolute;
   left: 0;
   top: 0;
-  width: clamp(6.4rem, 19%, 8.6rem);
+  z-index: 12;
+  width: var(--center-lens-size);
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%);
   border-radius: 9999px;
@@ -210,8 +213,9 @@ textarea {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  display: block;
   width: fit-content;
-  max-width: 68%;
+  max-width: 120px;
   padding: 0.5rem 0.82rem 0.46rem;
   border-radius: 9999px;
   background: rgba(255, 255, 255, 0.7);
@@ -219,20 +223,24 @@ textarea {
     0 1px 0 rgba(255, 255, 255, 0.85) inset,
     0 6px 14px rgba(0, 0, 0, 0.08);
   text-align: center;
-  font-size: clamp(0.84rem, 1.5vw, 1rem);
+  font-size: 14px;
   font-weight: 700;
   line-height: 1;
   color: rgba(255, 122, 145, 0.92);
-  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  pointer-events: none;
 }
 
 .center-progress-shell {
   position: absolute;
   left: 0;
   top: 0;
-  width: clamp(5.2rem, 16%, 7rem);
+  z-index: 11;
+  width: var(--center-gauge-size);
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%);
   border-radius: 9999px;
@@ -269,19 +277,21 @@ textarea {
 }
 
 @media (max-width: 640px) {
-  .center-carousel,
-  .center-lens {
-    width: clamp(5.8rem, 18%, 7.4rem);
-  }
-
-  .center-progress-shell {
-    width: clamp(4.8rem, 15%, 6.2rem);
+  .center-stack {
+    --center-lens-size: 8.6rem;
+    --center-gauge-size: calc(var(--center-lens-size) * 0.79);
   }
 
   .center-lens__title {
-    max-width: 60%;
-    font-size: clamp(0.62rem, 2.3vw, 0.76rem);
-    padding: 0.34rem 0.56rem 0.3rem;
+    max-width: 120px;
+    padding: 0.5rem 0.82rem 0.46rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .center-stack {
+    --center-lens-size: 11.2rem;
+    --center-gauge-size: calc(var(--center-lens-size) * 0.79);
   }
 }
 

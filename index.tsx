@@ -495,6 +495,38 @@ const getTaskBorderClass = (tags: Tag[]) => {
   return 'border-emerald-400';
 };
 
+const getTaskToneLabel = (task: Task) => {
+  if (task.completed) {
+    return '완료';
+  }
+  if (task.tags.includes('urgent') && task.tags.includes('important')) {
+    return '긴급 · 중요';
+  }
+  if (task.tags.includes('urgent')) {
+    return '긴급';
+  }
+  if (task.tags.includes('important')) {
+    return '중요';
+  }
+  return task.isRoutine ? '루틴' : '일반';
+};
+
+const getTaskTonePillClass = (task: Task) => {
+  if (task.completed) {
+    return 'bg-stone-100 text-stone-500';
+  }
+  if (task.tags.includes('urgent') && task.tags.includes('important')) {
+    return 'bg-rose-50 text-rose-600';
+  }
+  if (task.tags.includes('urgent')) {
+    return 'bg-amber-50 text-amber-700';
+  }
+  if (task.tags.includes('important')) {
+    return 'bg-sky-50 text-sky-600';
+  }
+  return task.isRoutine ? 'bg-stone-100 text-stone-600' : 'bg-emerald-50 text-emerald-600';
+};
+
 const getTaskIcon = (task: Task) => {
   const title = task.title.toLowerCase();
   if (task.isRoutine) {
@@ -1135,6 +1167,8 @@ const CircleScheduler = ({
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const sliderDragStartRef = useRef<number | null>(null);
+  const sliderPointerIdRef = useRef<number | null>(null);
+  const sliderDidSwipeRef = useRef(false);
   const transitionResetRef = useRef<number | null>(null);
   const [anchorAngle, setAnchorAngle] = useState<number | null>(null);
   const [hoverAngle, setHoverAngle] = useState<number | null>(null);
@@ -1396,14 +1430,37 @@ const CircleScheduler = ({
               className="center-carousel"
               onPointerDown={(event) => {
                 sliderDragStartRef.current = event.clientX;
+                sliderPointerIdRef.current = event.pointerId;
+                sliderDidSwipeRef.current = false;
                 event.currentTarget.setPointerCapture(event.pointerId);
+              }}
+              onPointerMove={(event) => {
+                if (sliderDragStartRef.current === null || sliderDidSwipeRef.current) {
+                  return;
+                }
+                if (sliderPointerIdRef.current !== event.pointerId) {
+                  return;
+                }
+                const delta = event.clientX - sliderDragStartRef.current;
+                if (Math.abs(delta) < 24) {
+                  return;
+                }
+                sliderDidSwipeRef.current = true;
+                sliderDragStartRef.current = null;
+                moveOverlapSlider(delta < 0 ? 1 : -1);
               }}
               onPointerUp={(event) => {
                 if (sliderDragStartRef.current === null) {
+                  sliderPointerIdRef.current = null;
                   return;
                 }
                 const delta = event.clientX - sliderDragStartRef.current;
                 sliderDragStartRef.current = null;
+                sliderPointerIdRef.current = null;
+                if (sliderDidSwipeRef.current) {
+                  sliderDidSwipeRef.current = false;
+                  return;
+                }
                 if (Math.abs(delta) < 28) {
                   return;
                 }
@@ -1411,9 +1468,15 @@ const CircleScheduler = ({
               }}
               onPointerCancel={() => {
                 sliderDragStartRef.current = null;
+                sliderPointerIdRef.current = null;
+                sliderDidSwipeRef.current = false;
               }}
               onPointerLeave={() => {
-                sliderDragStartRef.current = null;
+                if (sliderDidSwipeRef.current) {
+                  sliderDragStartRef.current = null;
+                  sliderPointerIdRef.current = null;
+                  sliderDidSwipeRef.current = false;
+                }
               }}
             >
               <div className="center-carousel__pager" aria-hidden="true">
@@ -1437,15 +1500,12 @@ const CircleScheduler = ({
               className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
               style={{ color: displayTask ? activeTaskColor : 'rgba(214, 211, 209, 0.92)' }}
             >
-              {displayTask ? (displayTask.title.length > 12 ? `${displayTask.title.slice(0, 12)}…` : displayTask.title) : '비어 있음'}
+              {displayTask ? displayTask.title : '비어 있음'}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-white/80 bg-white/70 px-4 py-2 text-center text-xs text-stone-500 shadow-sm backdrop-blur">
-        {anchorAngle === null ? '원형을 눌러 시작 시간을 정하고, 다시 눌러 시간 구간을 완성하세요.' : '원형을 한 번 더 눌러 이 일정 구간을 확정하세요.'}
-      </div>
     </div>
   );
 };
@@ -1465,7 +1525,7 @@ const CalendarView = ({
   const buildDateKey = (day: number) => `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
   return (
-    <section className="flex h-full flex-col overflow-hidden bg-[linear-gradient(180deg,#fbf7f0_0%,#f0ebe1_100%)] p-4 md:p-8">
+    <section className="flex h-full flex-col overflow-hidden bg-[#f6f6f8] p-4 md:p-8">
       <div className="mb-5 flex items-center justify-between gap-3">
         <div>
           <h1 className="font-hand text-4xl text-stone-800 md:text-5xl">달력 보기</h1>
@@ -1635,7 +1695,7 @@ const DayScheduleView = ({
   };
 
   return (
-    <section className="flex h-full flex-col bg-[linear-gradient(180deg,#fbf8f1_0%,#efe7db_100%)]">
+    <section className="flex h-full flex-col bg-[#f6f6f8]">
       <TaskActionSheet
         task={sheetTask}
         onClose={() => setSheetTask(null)}
@@ -1701,7 +1761,7 @@ const DayScheduleView = ({
       </div>
 
       <div className="grid flex-1 grid-cols-1 gap-4 overflow-hidden px-4 pb-4 md:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
-        <div className="min-h-[45vh] overflow-hidden rounded-[2rem] border border-white/75 bg-white/40 p-3 shadow-[0_20px_70px_rgba(130,108,77,0.12)] backdrop-blur">
+        <div className="min-h-[45vh] overflow-hidden">
           <CircleScheduler
             tasks={tasks}
             onAddTask={addTask}
@@ -1709,42 +1769,51 @@ const DayScheduleView = ({
         </div>
 
         <div className="flex min-h-0 flex-col overflow-hidden">
-          <div className="flex min-h-0 flex-1 flex-col rounded-[2rem] border border-white/75 bg-white/70 p-5 shadow-sm">
+          <div className="flex min-h-0 flex-1 flex-col p-1">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <h2 className="font-hand text-3xl text-stone-800">일정 목록</h2>
-                <p className="text-sm text-stone-500">카드를 누르면 모바일에 맞는 작업 메뉴가 열립니다.</p>
+                <h2 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-stone-900">일정 목록</h2>
+                <p className="text-sm text-stone-400">가볍게 눌러 일정 상태를 관리할 수 있습니다.</p>
               </div>
-              <button onClick={() => setShowRoutines((current) => !current)} className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-3 py-2 text-sm text-stone-600 shadow-sm">
+              <button onClick={() => setShowRoutines((current) => !current)} className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-sm font-medium text-stone-500 shadow-[0_1px_8px_rgba(15,23,42,0.06)] ring-1 ring-black/5">
                 {showRoutines ? <Eye size={16} /> : <EyeOff size={16} />}
                 {showRoutines ? '전체 보기' : '루틴 숨기기'}
               </button>
             </div>
 
-            <div className="space-y-3 overflow-y-auto pb-safe pr-1">
+            <div className="space-y-2.5 overflow-y-auto pb-safe pr-1">
               {sortedTasks.length === 0 && (
-                <div className="rounded-[1.6rem] border border-dashed border-stone-300 px-4 py-6 text-center text-stone-500">
+                <div className="rounded-[1.4rem] bg-white px-4 py-6 text-center text-stone-400 shadow-[0_1px_10px_rgba(15,23,42,0.04)] ring-1 ring-black/5">
                   아직 이 날짜에 등록된 일정이 없습니다.
                 </div>
               )}
               {sortedTasks.map((task) => (
-                <button key={task.id} onClick={() => setSheetTask(task)} className={`w-full rounded-[1.6rem] border border-l-4 bg-white/90 p-4 text-left shadow-sm transition-transform hover:-translate-y-0.5 ${getTaskBorderClass(task.tags)}`}>
-                  <div className="flex items-start justify-between gap-3">
+                <button
+                  key={task.id}
+                  onClick={() => setSheetTask(task)}
+                  className="w-full rounded-[1.45rem] bg-white px-4 py-3.5 text-left shadow-[0_1px_10px_rgba(15,23,42,0.04)] ring-1 ring-black/5 transition-transform hover:-translate-y-0.5"
+                >
+                  <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        {task.isRoutine ? <Lock size={14} className="shrink-0 text-stone-400" /> : <Zap size={14} className="shrink-0 text-amber-500" />}
-                        <span className={`font-hand text-2xl ${task.completed ? 'text-stone-400 line-through' : 'text-stone-800'}`}>{task.title}</span>
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className="h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: task.completed ? '#d4d4d4' : getTaskColor(task.tags) }}
+                        />
+                        <span className={`truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
+                          {task.title}
+                        </span>
                       </div>
-                      <div className="mt-1 flex items-center gap-2 text-xs text-stone-500">
-                        <Clock size={12} />
+                      <div className="mt-1.5 flex items-center gap-2 text-[12px] text-stone-400">
+                        <Clock size={12} className="shrink-0" />
                         {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="h-2.5 w-2.5 rounded-full"
-                        style={{ backgroundColor: task.completed ? '#d4d4d4' : getTaskColor(task.tags) }}
-                      />
+                    <div className="flex shrink-0 flex-col items-end gap-2">
+                      <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
+                        {getTaskToneLabel(task)}
+                      </span>
+                      {task.isRoutine ? <Lock size={13} className="text-stone-300" /> : <Zap size={13} className="text-stone-300" />}
                     </div>
                   </div>
                 </button>
