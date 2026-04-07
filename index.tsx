@@ -41,6 +41,9 @@ interface RoutineState {
   weekend: Task[];
 }
 
+type RoutineScope = 'single' | 'future';
+type RoutineAction = 'edit' | 'delete';
+
 const CENTER = 300;
 const RADIUS = 248;
 const STORAGE_KEYS = {
@@ -186,6 +189,7 @@ const getTrackLaneWidth = (laneCount: number) => (
 const OUTER_BOUNDARY_RADIUS = RADIUS + 45;
 const OUTER_HOUR_LABEL_RADIUS = OUTER_BOUNDARY_RADIUS + 34;
 const OUTER_BACKGROUND_RADIUS = OUTER_BOUNDARY_RADIUS + 4;
+const CURRENT_HAND_RADIUS = OUTER_BOUNDARY_RADIUS - 8;
 const OUTER_RING_SEGMENTS = Array.from({ length: 144 }, (_, index) => {
   const angle = index * 2.5;
   const isCardinal = index % 6 === 0;
@@ -738,6 +742,16 @@ const addOrReplaceDateTasks = (tasksByDate: Record<string, Task[]>, date: string
   return { ...tasksByDate, [date]: generateRoutinesForDate(date, routines) };
 };
 
+const getRoutineBucketForDate = (dateStr: string): keyof RoutineState => {
+  const date = new Date(`${dateStr}T00:00:00`);
+  return date.getDay() === 0 || date.getDay() === 6 ? 'weekend' : 'weekday';
+};
+
+const getRoutineBaseId = (taskId: string, dateStr: string) => {
+  const prefix = `routine-${dateStr}-`;
+  return taskId.startsWith(prefix) ? taskId.slice(prefix.length) : null;
+};
+
 const formatDateLabel = (date: string) =>
   new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
     weekday: 'long',
@@ -843,14 +857,12 @@ const TaskActionSheet = ({
   onClose,
   onToggleComplete,
   onEdit,
-  onUnschedule,
   onDelete,
 }: {
   task: Task | null;
   onClose: () => void;
   onToggleComplete: (task: Task) => void;
   onEdit: (task: Task) => void;
-  onUnschedule: (task: Task) => void;
   onDelete: (task: Task) => void;
 }) => {
   if (!task) {
@@ -858,40 +870,38 @@ const TaskActionSheet = ({
   }
 
   return (
-    <div className="modal-backdrop items-end md:items-center" onClick={onClose}>
+    <div className="modal-backdrop items-center" onClick={onClose}>
       <div className="action-sheet" onClick={(event) => event.stopPropagation()}>
-        <div className="mx-auto mb-4 h-1.5 w-14 rounded-full bg-stone-300 md:hidden" />
-        <div className="mb-1 flex items-center gap-2 text-sm text-stone-500">
-          {getTaskIcon(task)}
+        <div className="sheet-header">
+          <h3 className="sheet-header__title font-hand text-2xl text-stone-800">{task.title}</h3>
+          <div className="sheet-header__actions">
+            <button type="button" onClick={() => onEdit(task)} className="sheet-icon-button" aria-label="일정 수정">
+              <Pencil size={18} />
+            </button>
+            <button type="button" onClick={() => onDelete(task)} className="sheet-icon-button sheet-icon-button--danger" aria-label="일정 삭제">
+              <Trash2 size={18} />
+            </button>
+          </div>
+        </div>
+        <div className="mt-2 text-base font-semibold tracking-[-0.03em] text-stone-500">
           <span>{task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '아직 배치되지 않음'}</span>
         </div>
-        <h3 className="font-hand text-3xl text-stone-800">{task.title}</h3>
-        <p className="mt-1 text-sm text-stone-500">{task.isRoutine ? '루틴 블록' : '이 시간 블록에 적용할 작업을 선택하세요'}</p>
         <div className="mt-5 space-y-3">
-          <button onClick={() => onToggleComplete(task)} className="sheet-button">
-            <Check size={18} />
-            {task.completed ? '진행 중으로 되돌리기' : '완료로 표시'}
-          </button>
-          {!task.isRoutine && (
-            <button onClick={() => onEdit(task)} className="sheet-button">
-              <Pencil size={18} />
-              일정 수정
+          <div className="sheet-toggle-row">
+            <span>진행 상태</span>
+            <button
+              type="button"
+              onClick={() => onToggleComplete(task)}
+              className={`sheet-toggle ${task.completed ? 'is-on' : ''}`}
+              aria-pressed={task.completed}
+              aria-label={task.completed ? '완료 상태 끄기' : '완료 상태 켜기'}
+            >
+              <span className="sheet-toggle__label">{task.completed ? '완료됨' : '진행 중'}</span>
+              <span className="sheet-toggle__thumb" />
             </button>
-          )}
-          {!task.isRoutine && task.startTime && (
-            <button onClick={() => onUnschedule(task)} className="sheet-button">
-              <Clock size={18} />
-              원형 시계에서 빼기
-            </button>
-          )}
-          {!task.isRoutine && (
-            <button onClick={() => onDelete(task)} className="sheet-button text-rose-700">
-              <Trash2 size={18} />
-              일정 삭제
-            </button>
-          )}
+          </div>
         </div>
-        <button onClick={onClose} className="mt-4 w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-stone-700">
+        <button onClick={onClose} className="mt-4 w-full rounded-[8px] bg-stone-900 px-4 py-3 text-white transition-colors hover:bg-stone-800">
           닫기
         </button>
       </div>
@@ -950,11 +960,11 @@ const DayTaskEditorModal = ({
           <div className="grid grid-cols-2 gap-3">
             <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
               <div className="mb-1">시작</div>
-              <input type="time" className="w-full bg-transparent outline-none" value={startTime} onChange={(event) => onStartTimeChange(event.target.value)} />
+              <input type="time" className="time-field" value={startTime} onChange={(event) => onStartTimeChange(event.target.value)} />
             </label>
             <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
               <div className="mb-1">종료</div>
-              <input type="time" className="w-full bg-transparent outline-none" value={endTime} onChange={(event) => onEndTimeChange(event.target.value)} />
+              <input type="time" className="time-field" value={endTime} onChange={(event) => onEndTimeChange(event.target.value)} />
             </label>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -980,6 +990,49 @@ const DayTaskEditorModal = ({
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+};
+
+const RoutineActionModal = ({
+  isOpen,
+  action,
+  taskTitle,
+  onClose,
+  onSelectScope,
+}: {
+  isOpen: boolean;
+  action: RoutineAction | null;
+  taskTitle: string;
+  onClose: () => void;
+  onSelectScope: (scope: RoutineScope) => void;
+}) => {
+  if (!isOpen || !action) {
+    return null;
+  }
+
+  const isDelete = action === 'delete';
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-shell max-w-md" onClick={(event) => event.stopPropagation()}>
+        <h2 className="font-hand text-2xl text-stone-800">{isDelete ? '루틴 삭제 범위' : '루틴 수정 범위'}</h2>
+        <p className="mt-2 text-sm text-stone-500">
+          <span className="font-semibold text-stone-700">{taskTitle}</span>
+          {isDelete ? ' 루틴을 어디까지 반영할지 선택해 주세요.' : ' 루틴 변경을 어디까지 반영할지 선택해 주세요.'}
+        </p>
+        <div className="mt-5 space-y-3">
+          <button onClick={() => onSelectScope('single')} className="sheet-button">
+            {isDelete ? '이번 일정만 삭제하기' : '이번 일정만 수정하기'}
+          </button>
+          <button onClick={() => onSelectScope('future')} className="sheet-button">
+            {isDelete ? '앞으로 모든 일정 삭제하기' : '앞으로 모든 일정 수정하기'}
+          </button>
+        </div>
+        <button onClick={onClose} className="mt-4 w-full rounded-[8px] border border-stone-300 bg-white px-4 py-3 text-stone-700 transition-colors hover:bg-stone-50">
+          취소
+        </button>
       </div>
     </div>
   );
@@ -1114,11 +1167,11 @@ const RoutineSettingsModal = ({
               <div className="grid grid-cols-2 gap-3">
                 <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
                   <div className="mb-1">시작</div>
-                  <input type="time" className="w-full bg-transparent outline-none" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
+                  <input type="time" className="time-field" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
                 </label>
                 <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
                   <div className="mb-1">종료</div>
-                  <input type="time" className="w-full bg-transparent outline-none" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
+                  <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
                 </label>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -1391,19 +1444,24 @@ const CircleScheduler = ({
             <line
               x1={CENTER}
               y1={CENTER}
-              x2={polarToCartesian(CENTER, CENTER, RADIUS, anchorAngle).x}
-              y2={polarToCartesian(CENTER, CENTER, RADIUS, anchorAngle).y}
+              x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, anchorAngle).x}
+              y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, anchorAngle).y}
               stroke="#d90429"
               strokeWidth="2"
               strokeDasharray="5 5"
             />
-            <circle cx={polarToCartesian(CENTER, CENTER, RADIUS, anchorAngle).x} cy={polarToCartesian(CENTER, CENTER, RADIUS, anchorAngle).y} r="5" fill="#d90429" />
+            <circle
+              cx={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, anchorAngle).x}
+              cy={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, anchorAngle).y}
+              r="5"
+              fill="#d90429"
+            />
           </>
         )}
 
         {anchorAngle !== null && hoverAngle !== null && hoverAngle !== anchorAngle && (
           <path
-            d={describeArc(CENTER, CENTER, RADIUS, anchorAngle, clampArcEnd(anchorAngle, hoverAngle))}
+            d={describeArc(CENTER, CENTER, CURRENT_HAND_RADIUS, anchorAngle, clampArcEnd(anchorAngle, hoverAngle))}
             fill="rgba(217, 4, 41, 0.12)"
             stroke="#d90429"
             strokeWidth="2"
@@ -1414,8 +1472,8 @@ const CircleScheduler = ({
         <line
           x1={CENTER}
           y1={CENTER}
-          x2={polarToCartesian(CENTER, CENTER, OUTER_BOUNDARY_RADIUS - 8, minuteAngle).x}
-          y2={polarToCartesian(CENTER, CENTER, OUTER_BOUNDARY_RADIUS - 8, minuteAngle).y}
+          x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
+          y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
           stroke="#d90429"
           strokeWidth="2.8"
           strokeLinecap="round"
@@ -1591,12 +1649,16 @@ const DayScheduleView = ({
   onBack,
   onOpenSettings,
   onTasksChange,
+  onApplyRoutineEdit,
+  onApplyRoutineDelete,
 }: {
   date: string;
   tasks: Task[];
   onBack?: () => void;
   onOpenSettings: () => void;
   onTasksChange: (tasks: Task[]) => void;
+  onApplyRoutineEdit: (date: string, task: Task, updates: Pick<Task, 'title' | 'tags' | 'startTime' | 'duration'>, scope: RoutineScope) => void;
+  onApplyRoutineDelete: (date: string, task: Task, scope: RoutineScope) => void;
 }) => {
   const [title, setTitle] = useState('');
   const [startTime, setStartTime] = useState('');
@@ -1606,6 +1668,8 @@ const DayScheduleView = ({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [sheetTask, setSheetTask] = useState<Task | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [pendingRoutineAction, setPendingRoutineAction] = useState<{ action: RoutineAction; task: Task } | null>(null);
+  const [routineEditScope, setRoutineEditScope] = useState<RoutineScope>('single');
 
   const sortedTasks = tasks
     .filter((task) => showRoutines || !task.isRoutine)
@@ -1625,6 +1689,7 @@ const DayScheduleView = ({
     setEndTime('');
     setTags([]);
     setEditingId(null);
+    setRoutineEditScope('single');
   };
 
   const closeEditor = () => {
@@ -1679,13 +1744,20 @@ const DayScheduleView = ({
     if (editingId) {
       const current = tasks.find((task) => task.id === editingId);
       if (current) {
-        updateTask({
-          ...current,
+        const nextValues = {
           title: title.trim(),
           tags,
           startTime,
           duration,
-        });
+        };
+        if (current.isRoutine && routineEditScope === 'future') {
+          onApplyRoutineEdit(date, current, nextValues, 'future');
+        } else {
+          updateTask({
+            ...current,
+            ...nextValues,
+          });
+        }
       }
     } else {
       addTask(title.trim(), tags, startTime, duration);
@@ -1700,20 +1772,51 @@ const DayScheduleView = ({
         task={sheetTask}
         onClose={() => setSheetTask(null)}
         onToggleComplete={(task) => {
-          updateTask({ ...task, completed: !task.completed });
-          setSheetTask(null);
+          const nextTask = { ...task, completed: !task.completed };
+          updateTask(nextTask);
+          setSheetTask(nextTask);
         }}
         onEdit={(task) => {
-          startEditing(task);
-          setSheetTask(null);
-        }}
-        onUnschedule={(task) => {
-          updateTask({ ...task, startTime: null, duration: null });
-          setSheetTask(null);
+          if (task.isRoutine) {
+            setPendingRoutineAction({ action: 'edit', task });
+          } else {
+            startEditing(task);
+            setSheetTask(null);
+          }
         }}
         onDelete={(task) => {
-          deleteTask(task.id);
+          if (task.isRoutine) {
+            setPendingRoutineAction({ action: 'delete', task });
+          } else {
+            deleteTask(task.id);
+            setSheetTask(null);
+          }
+        }}
+      />
+      <RoutineActionModal
+        isOpen={pendingRoutineAction !== null}
+        action={pendingRoutineAction?.action ?? null}
+        taskTitle={pendingRoutineAction?.task.title ?? ''}
+        onClose={() => setPendingRoutineAction(null)}
+        onSelectScope={(scope) => {
+          if (!pendingRoutineAction) {
+            return;
+          }
+          const { action, task } = pendingRoutineAction;
+          setPendingRoutineAction(null);
           setSheetTask(null);
+          if (action === 'edit') {
+            setRoutineEditScope(scope);
+            startEditing(task);
+            return;
+          }
+          if (action === 'delete') {
+            if (scope === 'future') {
+              onApplyRoutineDelete(date, task, 'future');
+            } else {
+              deleteTask(task.id);
+            }
+          }
         }}
       />
       <DayTaskEditorModal
@@ -1740,7 +1843,6 @@ const DayScheduleView = ({
           )}
           <div>
             <h1 className="font-hand text-3xl text-stone-800 md:text-4xl">{formatDateLabel(date)}</h1>
-            <p className="text-sm text-stone-500">기기 안에서 오프라인으로 동작하는 오늘의 원형 일정입니다.</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -1760,7 +1862,7 @@ const DayScheduleView = ({
         </div>
       </div>
 
-      <div className="grid flex-1 grid-cols-1 gap-4 overflow-hidden px-4 pb-4 md:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
+      <div className="grid flex-1 grid-cols-1 gap-4 overflow-visible px-4 pb-4 md:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
         <div className="min-h-[45vh] overflow-hidden">
           <CircleScheduler
             tasks={tasks}
@@ -1768,12 +1870,11 @@ const DayScheduleView = ({
           />
         </div>
 
-        <div className="flex min-h-0 flex-col overflow-hidden">
+        <div className="flex min-h-0 flex-col overflow-visible">
           <div className="flex min-h-0 flex-1 flex-col p-1">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-stone-900">일정 목록</h2>
-                <p className="text-sm text-stone-400">가볍게 눌러 일정 상태를 관리할 수 있습니다.</p>
               </div>
               <button onClick={() => setShowRoutines((current) => !current)} className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-sm font-medium text-stone-500 shadow-[0_1px_8px_rgba(15,23,42,0.06)] ring-1 ring-black/5">
                 {showRoutines ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -1781,43 +1882,45 @@ const DayScheduleView = ({
               </button>
             </div>
 
-            <div className="space-y-2.5 overflow-y-auto pb-safe pr-1">
-              {sortedTasks.length === 0 && (
-                <div className="rounded-[1.4rem] bg-white px-4 py-6 text-center text-stone-400 shadow-[0_1px_10px_rgba(15,23,42,0.04)] ring-1 ring-black/5">
-                  아직 이 날짜에 등록된 일정이 없습니다.
-                </div>
-              )}
-              {sortedTasks.map((task) => (
-                <button
-                  key={task.id}
-                  onClick={() => setSheetTask(task)}
-                  className="w-full rounded-[1.45rem] bg-white px-4 py-3.5 text-left shadow-[0_1px_10px_rgba(15,23,42,0.04)] ring-1 ring-black/5 transition-transform hover:-translate-y-0.5"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2.5">
-                        <span
-                          className="h-2.5 w-2.5 shrink-0 rounded-full"
-                          style={{ backgroundColor: task.completed ? '#d4d4d4' : getTaskColor(task.tags) }}
-                        />
-                        <span className={`truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
-                          {task.title}
-                        </span>
-                      </div>
-                      <div className="mt-1.5 flex items-center gap-2 text-[12px] text-stone-400">
-                        <Clock size={12} className="shrink-0" />
-                        {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
-                      </div>
-                    </div>
-                    <div className="flex shrink-0 flex-col items-end gap-2">
-                      <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
-                        {getTaskToneLabel(task)}
-                      </span>
-                      {task.isRoutine ? <Lock size={13} className="text-stone-300" /> : <Zap size={13} className="text-stone-300" />}
-                    </div>
+            <div className="overflow-y-auto pb-safe">
+              <div className="space-y-2.5">
+                {sortedTasks.length === 0 && (
+                  <div className="task-card rounded-[1.4rem] bg-white px-4 py-6 text-center text-stone-400">
+                    아직 이 날짜에 등록된 일정이 없습니다.
                   </div>
-                </button>
-              ))}
+                )}
+                {sortedTasks.map((task) => (
+                  <button
+                    key={task.id}
+                    onClick={() => setSheetTask(task)}
+                    className="task-card block w-full rounded-[0.75rem] bg-white px-4 py-3.5 text-left"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2.5">
+                          <span
+                            className="h-2.5 w-2.5 shrink-0 rounded-full"
+                            style={{ backgroundColor: task.completed ? '#d4d4d4' : getTaskColor(task.tags) }}
+                          />
+                          <span className={`truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
+                            {task.title}
+                          </span>
+                        </div>
+                        <div className="mt-1.5 flex items-center gap-2 text-[12px] text-stone-400">
+                          <Clock size={12} className="shrink-0" />
+                          {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 flex-col items-end gap-2">
+                        <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
+                          {getTaskToneLabel(task)}
+                        </span>
+                        {task.isRoutine ? <Lock size={13} className="text-stone-300" /> : <Zap size={13} className="text-stone-300" />}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -1853,6 +1956,78 @@ const App = () => {
     setTasksByDate((current) => ({ ...current, [date]: nextTasks }));
   };
 
+  const applyRoutineEdit = (
+    date: string,
+    task: Task,
+    updates: Pick<Task, 'title' | 'tags' | 'startTime' | 'duration'>,
+    scope: RoutineScope,
+  ) => {
+    if (scope === 'single') {
+      setTasksByDate((current) => ({
+        ...current,
+        [date]: (current[date] ?? []).map((item) => item.id === task.id ? { ...item, ...updates } : item),
+      }));
+      return;
+    }
+
+    const baseId = getRoutineBaseId(task.id, date);
+    if (!baseId) {
+      return;
+    }
+    const bucket = getRoutineBucketForDate(date);
+
+    setRoutines((current) => ({
+      ...current,
+      [bucket]: current[bucket].map((item) => item.id === baseId ? { ...item, ...updates } : item),
+    }));
+
+    setTasksByDate((current) => {
+      const next = { ...current };
+      Object.entries(current).forEach(([entryDate, entryTasks]) => {
+        if (entryDate < date || getRoutineBucketForDate(entryDate) !== bucket) {
+          return;
+        }
+        next[entryDate] = entryTasks.map((item) => {
+          const entryBaseId = getRoutineBaseId(item.id, entryDate);
+          return entryBaseId === baseId ? { ...item, ...updates } : item;
+        });
+      });
+      return next;
+    });
+  };
+
+  const applyRoutineDelete = (date: string, task: Task, scope: RoutineScope) => {
+    if (scope === 'single') {
+      setTasksByDate((current) => ({
+        ...current,
+        [date]: (current[date] ?? []).filter((item) => item.id !== task.id),
+      }));
+      return;
+    }
+
+    const baseId = getRoutineBaseId(task.id, date);
+    if (!baseId) {
+      return;
+    }
+    const bucket = getRoutineBucketForDate(date);
+
+    setRoutines((current) => ({
+      ...current,
+      [bucket]: current[bucket].filter((item) => item.id !== baseId),
+    }));
+
+    setTasksByDate((current) => {
+      const next = { ...current };
+      Object.entries(current).forEach(([entryDate, entryTasks]) => {
+        if (entryDate < date || getRoutineBucketForDate(entryDate) !== bucket) {
+          return;
+        }
+        next[entryDate] = entryTasks.filter((item) => getRoutineBaseId(item.id, entryDate) !== baseId);
+      });
+      return next;
+    });
+  };
+
   const openDate = (date: string) => {
     setTasksByDate((current) => addOrReplaceDateTasks(current, date, routines));
     setSelectedDate(date);
@@ -1875,6 +2050,8 @@ const App = () => {
             tasks={tasksByDate[todayStr] ?? []}
             onOpenSettings={() => setSettingsOpen(true)}
             onTasksChange={(nextTasks) => updateTasksForDate(todayStr, nextTasks)}
+            onApplyRoutineEdit={applyRoutineEdit}
+            onApplyRoutineDelete={applyRoutineDelete}
           />
         )}
 
@@ -1885,6 +2062,8 @@ const App = () => {
             onBack={() => setSelectedDate(null)}
             onOpenSettings={() => setSettingsOpen(true)}
             onTasksChange={(nextTasks) => updateTasksForDate(selectedDate, nextTasks)}
+            onApplyRoutineEdit={applyRoutineEdit}
+            onApplyRoutineDelete={applyRoutineDelete}
           />
         ) : null}
 
