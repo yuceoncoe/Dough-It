@@ -759,6 +759,34 @@ const formatDateLabel = (date: string) =>
     day: 'numeric',
   });
 
+const getToneSelectionKey = (tags: Tag[]) => {
+  const hasUrgent = tags.includes('urgent');
+  const hasImportant = tags.includes('important');
+  if (hasUrgent && hasImportant) {
+    return 'urgent-important';
+  }
+  if (hasUrgent) {
+    return 'urgent';
+  }
+  if (hasImportant) {
+    return 'important';
+  }
+  return 'normal';
+};
+
+const getToneTags = (tone: 'urgent-important' | 'urgent' | 'important' | 'normal'): Tag[] => {
+  switch (tone) {
+    case 'urgent-important':
+      return ['urgent', 'important'];
+    case 'urgent':
+      return ['urgent'];
+    case 'important':
+      return ['important'];
+    default:
+      return [];
+  }
+};
+
 const TaskCreationModal = ({
   isOpen,
   initialTimeRange,
@@ -785,25 +813,24 @@ const TaskCreationModal = ({
     return null;
   }
 
-  const toggleTag = (tag: Tag) => {
-    setTags((current) => current.includes(tag) ? current.filter((item) => item !== tag) : [...current, tag]);
-  };
-
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-shell max-w-md" onClick={(event) => event.stopPropagation()}>
-        <button onClick={onClose} className="absolute right-4 top-4 text-stone-500 transition-colors hover:text-rose-500">
-          <X size={20} />
-        </button>
-        <div className="mb-2 flex items-center gap-2 text-sm text-stone-500">
-          <Clock size={14} />
+      <div className="action-sheet relative max-w-md" onClick={(event) => event.stopPropagation()}>
+        <div className="sheet-header">
+          <h2 className="sheet-header__title font-hand text-2xl text-stone-800">일정 추가</h2>
+          <div className="sheet-header__actions">
+            <button type="button" onClick={onClose} className="sheet-icon-button" aria-label="닫기">
+              <X size={18} />
+            </button>
+          </div>
+        </div>
+        <div className="mt-2 text-base font-semibold tracking-[-0.03em] text-stone-500">
           <span>{initialTimeRange.start} - {initialTimeRange.end}</span>
         </div>
-        <h2 className="font-hand text-3xl text-stone-800">일정 추가</h2>
-        <p className="mb-6 mt-2 text-sm text-stone-500">이 시간 블록에 맞는 아이젠하워 태그를 선택하세요.</p>
+        <p className="mb-6 mt-3 text-sm text-stone-500">이 시간 블록에 맞는 아이젠하워 태그를 선택하세요.</p>
         <input
           autoFocus
-          className="w-full border-b-2 border-stone-300 bg-transparent py-3 text-2xl text-stone-800 outline-none placeholder:text-stone-400 focus:border-stone-700"
+          className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-xl text-stone-800 outline-none placeholder:text-stone-400 focus:border-stone-500"
           placeholder="일정 이름"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
@@ -815,24 +842,40 @@ const TaskCreationModal = ({
         />
         <div className="mt-6 grid grid-cols-2 gap-3">
           <button
-            onClick={() => toggleTag('urgent')}
-            className={`rounded-2xl border px-4 py-3 text-left transition-all ${tags.includes('urgent') ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
+            onClick={() => setTags(getToneTags('urgent-important'))}
+            className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-fuchsia-400 bg-fuchsia-100 text-fuchsia-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
           >
             <div className="flex items-center gap-2 font-medium">
-              <AlertCircle size={16} />
+              긴급+중요
+            </div>
+            <div className="mt-1 text-xs opacity-80">가장 먼저 챙겨야 해요</div>
+          </button>
+          <button
+            onClick={() => setTags(getToneTags('urgent'))}
+            className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'urgent' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
+          >
+            <div className="flex items-center gap-2 font-medium">
               긴급
             </div>
             <div className="mt-1 text-xs opacity-80">빠르게 처리해야 해요</div>
           </button>
           <button
-            onClick={() => toggleTag('important')}
-            className={`rounded-2xl border px-4 py-3 text-left transition-all ${tags.includes('important') ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
+            onClick={() => setTags(getToneTags('important'))}
+            className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
           >
             <div className="flex items-center gap-2 font-medium">
-              <Star size={16} />
               중요
             </div>
             <div className="mt-1 text-xs opacity-80">가치가 큰 시간이에요</div>
+          </button>
+          <button
+            onClick={() => setTags(getToneTags('normal'))}
+            className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
+          >
+            <div className="flex items-center gap-2 font-medium">
+              일반
+            </div>
+            <div className="mt-1 text-xs opacity-80">부담 없이 진행해요</div>
           </button>
         </div>
         <div className="mt-6 flex gap-3">
@@ -920,7 +963,7 @@ const DayTaskEditorModal = ({
   onTitleChange,
   onStartTimeChange,
   onEndTimeChange,
-  onToggleTag,
+  onSetTags,
   onSubmit,
 }: {
   isOpen: boolean;
@@ -933,7 +976,7 @@ const DayTaskEditorModal = ({
   onTitleChange: (value: string) => void;
   onStartTimeChange: (value: string) => void;
   onEndTimeChange: (value: string) => void;
-  onToggleTag: (tag: Tag) => void;
+  onSetTags: (tags: Tag[]) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 }) => {
   if (!isOpen) {
@@ -942,12 +985,16 @@ const DayTaskEditorModal = ({
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-shell max-w-md" onClick={(event) => event.stopPropagation()}>
-        <button onClick={onClose} className="absolute right-4 top-4 text-stone-500 transition-colors hover:text-rose-500">
-          <X size={20} />
-        </button>
-        <h2 className="font-hand text-3xl text-stone-800">{isEditing ? '일정 수정' : '빠른 추가'}</h2>
-        <p className="mb-6 mt-2 text-sm text-stone-500">제목, 시간, 태그를 입력해서 하루 일정에 바로 반영합니다.</p>
+      <div className="action-sheet relative max-w-md" onClick={(event) => event.stopPropagation()}>
+        <div className="sheet-header">
+          <h2 className="sheet-header__title font-hand text-2xl text-stone-800">{isEditing ? '일정 수정' : '빠른 추가'}</h2>
+          <div className="sheet-header__actions">
+            <button type="button" onClick={onClose} className="sheet-icon-button" aria-label="닫기">
+              <X size={18} />
+            </button>
+          </div>
+        </div>
+        <p className="mb-6 mt-3 text-sm text-stone-500">제목, 시간, 태그를 입력해서 하루 일정에 바로 반영합니다.</p>
 
         <form onSubmit={onSubmit} className="space-y-3">
           <input
@@ -957,7 +1004,7 @@ const DayTaskEditorModal = ({
             value={title}
             onChange={(event) => onTitleChange(event.target.value)}
           />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-3">
             <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
               <div className="mb-1">시작</div>
               <input type="time" className="time-field" value={startTime} onChange={(event) => onStartTimeChange(event.target.value)} />
@@ -968,17 +1015,17 @@ const DayTaskEditorModal = ({
             </label>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <button type="button" onClick={() => onToggleTag('urgent')} className={`rounded-2xl border px-4 py-3 text-left ${tags.includes('urgent') ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-              <div className="flex items-center gap-2">
-                <AlertCircle size={16} />
-                긴급
-              </div>
+            <button type="button" onClick={() => onSetTags(getToneTags('urgent-important'))} className={`rounded-2xl border px-4 py-3 text-left ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-fuchsia-400 bg-fuchsia-100 text-fuchsia-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+              긴급+중요
             </button>
-            <button type="button" onClick={() => onToggleTag('important')} className={`rounded-2xl border px-4 py-3 text-left ${tags.includes('important') ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-              <div className="flex items-center gap-2">
-                <Star size={16} />
-                중요
-              </div>
+            <button type="button" onClick={() => onSetTags(getToneTags('urgent'))} className={`rounded-2xl border px-4 py-3 text-left ${getToneSelectionKey(tags) === 'urgent' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+              긴급
+            </button>
+            <button type="button" onClick={() => onSetTags(getToneTags('important'))} className={`rounded-2xl border px-4 py-3 text-left ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+              중요
+            </button>
+            <button type="button" onClick={() => onSetTags(getToneTags('normal'))} className={`rounded-2xl border px-4 py-3 text-left ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+              일반
             </button>
           </div>
           <div className="mt-6 flex gap-3">
@@ -1357,6 +1404,7 @@ const CircleScheduler = ({
       />
 
       <div className="relative aspect-square w-full max-w-[680px]">
+        <div className="relative h-full w-full">
         <CanvasClockSurface tasks={tasks} minuteAngle={minuteAngle} />
 
         <svg
@@ -1401,7 +1449,7 @@ const CircleScheduler = ({
                   y={y}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="pointer-events-none fill-black text-[11px] font-medium"
+                  className="pointer-events-none fill-black text-[13px] font-medium"
                   style={{
                     opacity: (task.completed ? 0.58 : 0.94) * opacity,
                     filter: `blur(${blur}px)`,
@@ -1428,7 +1476,7 @@ const CircleScheduler = ({
                   y={point.y}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="fill-black text-[11px] font-medium"
+                  className="fill-black text-[16px] font-semibold"
                   opacity={opacity}
                   style={{ filter: `blur(${blur}px)` }}
                 >
@@ -1480,6 +1528,7 @@ const CircleScheduler = ({
           opacity="0.96"
         />
         </svg>
+        </div>
         <div
           className="center-stack"
         >
@@ -1830,7 +1879,7 @@ const DayScheduleView = ({
         onTitleChange={setTitle}
         onStartTimeChange={setStartTime}
         onEndTimeChange={setEndTime}
-        onToggleTag={toggleTag}
+        onSetTags={setTags}
         onSubmit={submitForm}
       />
 
@@ -1871,14 +1920,13 @@ const DayScheduleView = ({
         </div>
 
         <div className="flex min-h-0 flex-col overflow-visible">
-          <div className="flex min-h-0 flex-1 flex-col p-1">
+          <div className="flex min-h-0 flex-1 flex-col">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-stone-900">일정 목록</h2>
               </div>
-              <button onClick={() => setShowRoutines((current) => !current)} className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-sm font-medium text-stone-500 shadow-[0_1px_8px_rgba(15,23,42,0.06)] ring-1 ring-black/5">
-                {showRoutines ? <Eye size={16} /> : <EyeOff size={16} />}
-                {showRoutines ? '전체 보기' : '루틴 숨기기'}
+              <button onClick={() => setShowRoutines((current) => !current)} className="inline-flex h-9 min-w-[100px] items-center justify-center rounded-full bg-white px-4 py-2 text-[10px] font-medium text-stone-500 shadow-[0_1px_8px_rgba(15,23,42,0.06)] ring-1 ring-black/5">
+                {showRoutines ? '루틴숨기기' : '루틴보기'}
               </button>
             </div>
 
