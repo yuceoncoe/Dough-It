@@ -5,7 +5,10 @@ import { INITIAL_ROUTINES, getTodayString, seedTasksForToday, addOrReplaceDateTa
 import RoutineSettingsModal from './components/ui/RoutineSettingsModal';
 import DayScheduleView from './components/calendar/DayScheduleView';
 import CalendarView from './components/calendar/CalendarView';
+import TaskRatingCarousel from './components/ui/TaskRatingCarousel';
 import { Home, Calendar as CalendarIcon } from 'lucide-react';
+import { syncTaskAlarms, requestNotificationPermissions } from './utils/notifications';
+import { timeToMinutes } from './utils/time';
 
 const App = () => {
   const todayStr = getTodayString();
@@ -17,6 +20,12 @@ const App = () => {
   const [activeTab, setActiveTab] = useState<'home' | 'calendar'>('home');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [pendingRatingTasks, setPendingRatingTasks] = useState<Task[]>([]);
+  const [skippedRatingTaskIds, setSkippedRatingTaskIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    requestNotificationPermissions();
+  }, []);
 
   useEffect(() => {
     persistJson(STORAGE_KEYS.routines, routines);
@@ -24,11 +33,52 @@ const App = () => {
 
   useEffect(() => {
     persistJson(STORAGE_KEYS.tasksByDate, tasksByDate);
+    syncTaskAlarms(tasksByDate);
   }, [tasksByDate]);
 
   useEffect(() => {
     setTasksByDate((current) => addOrReplaceDateTasks(current, todayStr, routines));
   }, [todayStr, routines]);
+
+  useEffect(() => {
+    const checkEndedTasks = () => {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      
+      const todayTasks = tasksByDate[todayStr] ?? [];
+      const endedUnratedTasks = todayTasks.filter(task => {
+        if (!task.startTime || !task.duration) return false;
+        if (task.rating !== undefined) return false;
+        if (skippedRatingTaskIds.has(task.id)) return false;
+        
+        const taskEndMinutes = timeToMinutes(task.startTime) + task.duration;
+        return currentMinutes >= taskEndMinutes;
+      });
+
+      if (endedUnratedTasks.length > 0) {
+        setPendingRatingTasks(endedUnratedTasks);
+      } else {
+        setPendingRatingTasks([]);
+      }
+    };
+
+    checkEndedTasks();
+    const interval = setInterval(checkEndedTasks, 60000);
+    return () => clearInterval(interval);
+  }, [tasksByDate, todayStr, skippedRatingTaskIds]);
+
+  const handleRateTask = (taskId: string, rating: number) => {
+    setTasksByDate(current => {
+      const todayTasks = current[todayStr] ?? [];
+      const nextTasks = todayTasks.map(t => t.id === taskId ? { ...t, rating } : t);
+      return { ...current, [todayStr]: nextTasks };
+    });
+  };
+
+  const handleCloseRating = () => {
+    setSkippedRatingTaskIds(new Set([...skippedRatingTaskIds, ...pendingRatingTasks.map(t => t.id)]));
+    setPendingRatingTasks([]);
+  };
 
   const updateTasksForDate = (date: string, nextTasks: Task[]) => {
     setTasksByDate((current) => ({ ...current, [date]: nextTasks }));
@@ -120,6 +170,13 @@ const App = () => {
         onClose={() => setSettingsOpen(false)}
         onSaveRoutines={setRoutines}
       />
+      {pendingRatingTasks.length > 0 && (
+        <TaskRatingCarousel
+          tasks={pendingRatingTasks}
+          onRateTask={handleRateTask}
+          onClose={handleCloseRating}
+        />
+      )}
 
       <main className="flex-1 overflow-hidden pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]">
         {activeTab === 'home' && (

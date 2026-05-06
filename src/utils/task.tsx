@@ -39,6 +39,34 @@ export const getDirectionalTextVisuals = (angle: number, minuteAngle: number) =>
   };
 };
 
+export const QuadrantBadge = ({ task }: { task: Task }) => {
+  const isQ1 = task.tags.includes('urgent') && task.tags.includes('important');
+  const isQ2 = !task.tags.includes('urgent') && task.tags.includes('important');
+  const isQ3 = task.tags.includes('urgent') && !task.tags.includes('important');
+  const isQ4 = !task.tags.includes('urgent') && !task.tags.includes('important');
+
+  if (task.completed) {
+    return (
+      <div className="grid h-[14px] w-[14px] shrink-0 grid-cols-2 grid-rows-2 gap-[2px] opacity-60">
+        <div className={`rounded-tl-[3px] ${isQ1 ? 'bg-stone-400' : 'bg-stone-200'}`} />
+        <div className={`rounded-tr-[3px] ${isQ2 ? 'bg-stone-400' : 'bg-stone-200'}`} />
+        <div className={`rounded-bl-[3px] ${isQ3 ? 'bg-stone-400' : 'bg-stone-200'}`} />
+        <div className={`rounded-br-[3px] ${isQ4 ? 'bg-stone-400' : 'bg-stone-200'}`} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid h-[14px] w-[14px] shrink-0 grid-cols-2 grid-rows-2 gap-[2px]">
+      <div className={`rounded-tl-[3px] ${isQ1 ? 'bg-rose-500' : 'bg-stone-200'}`} />
+      <div className={`rounded-tr-[3px] ${isQ2 ? 'bg-sky-500' : 'bg-stone-200'}`} />
+      <div className={`rounded-bl-[3px] ${isQ3 ? 'bg-amber-400' : 'bg-stone-200'}`} />
+      <div className={`rounded-br-[3px] ${isQ4 ? 'bg-emerald-400' : 'bg-stone-200'}`} />
+    </div>
+  );
+};
+
+
 export const DEFAULT_TRACK_LANE_COUNT = 4;
 export const TRACK_INNER_RADIUS = 118;
 export const TRACK_OUTER_RADIUS = RADIUS + 10;

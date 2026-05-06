@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RoutineState, Tag, Task } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
-import { getTaskBorderClass } from '../../utils/task';
+import { getTaskTonePillClass, getTaskToneLabel, QuadrantBadge } from '../../utils/task';
 import { Clock, Trash2, X } from 'lucide-react';
 
 export const RoutineSettingsModal = ({
@@ -73,8 +73,8 @@ export const RoutineSettingsModal = ({
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-shell h-[92vh] max-w-4xl overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
+    <div className="modal-backdrop items-center" onClick={onClose}>
+      <div className="action-sheet h-[92vh] !w-full !max-w-4xl overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
         <div className="border-b border-stone-200 px-5 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -102,26 +102,41 @@ export const RoutineSettingsModal = ({
         </div>
         <div className="grid h-[calc(92vh-170px)] grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
           <div className="overflow-y-auto border-b border-stone-200 p-5 md:border-b-0 md:border-r">
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {draft[activeTab].map((task) => (
-                <div key={task.id} className={`rounded-3xl border border-l-4 bg-white/85 p-4 shadow-sm ${getTaskBorderClass(task.tags)}`}>
+                <div
+                  key={task.id}
+                  className="task-card block w-full rounded-[0.75rem] bg-white px-4 py-3.5 text-left"
+                >
                   <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="font-hand text-2xl text-stone-800">{task.title}</div>
-                      <div className="mt-1 flex items-center gap-2 text-xs text-stone-500">
-                        <Clock size={12} />
-                        {task.startTime} - {minutesToTime(timeToMinutes(task.startTime ?? '00:00') + (task.duration ?? 0))}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2.5">
+                        <QuadrantBadge task={task} />
+                        <span className={`truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
+                          {task.title}
+                        </span>
+                      </div>
+                      <div className="mt-1.5 flex items-center gap-2 text-[12px] text-stone-400">
+                        <Clock size={12} className="shrink-0" />
+                        {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
                       </div>
                     </div>
-                    <button onClick={() => handleDelete(task.id)} className="rounded-full p-2 text-stone-400 transition-colors hover:bg-rose-50 hover:text-rose-500">
-                      <Trash2 size={16} />
-                    </button>
+                    <div className="flex shrink-0 flex-col items-end justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
+                          {getTaskToneLabel(task)}
+                        </span>
+                      </div>
+                      <button onClick={() => handleDelete(task.id)} className="rounded-full p-1 text-stone-300 transition-colors hover:bg-rose-50 hover:text-rose-500">
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="overflow-y-auto bg-stone-50/80 p-5">
+          <div className="overflow-y-auto bg-white p-5">
             <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
             <div className="mt-4 space-y-4">
               <input

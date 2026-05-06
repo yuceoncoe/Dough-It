@@ -8,6 +8,9 @@ import RoutineActionModal from '../ui/RoutineActionModal';
 import DayTaskEditorModal from '../ui/DayTaskEditorModal';
 import CircleScheduler from '../scheduler/CircleScheduler';
 import { ChevronLeft, Plus, Settings, Clock, Lock, Zap } from 'lucide-react';
+import { QuadrantBadge } from '../../utils/task';
+
+
 
 export const DayScheduleView = ({
   date,
@@ -263,10 +266,7 @@ export const DayScheduleView = ({
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2.5">
-                          <span
-                            className="h-2.5 w-2.5 shrink-0 rounded-full"
-                            style={{ backgroundColor: task.completed ? '#d4d4d4' : getTaskColor(task.tags) }}
-                          />
+                          <QuadrantBadge task={task} />
                           <span className={`truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
                             {task.title}
                           </span>
@@ -276,11 +276,14 @@ export const DayScheduleView = ({
                           {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
                         </div>
                       </div>
-                      <div className="flex shrink-0 flex-col items-end gap-2">
+                      <div className="flex shrink-0 flex-col items-end gap-1.5">
                         <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
                           {getTaskToneLabel(task)}
                         </span>
-                        {task.isRoutine ? <Lock size={13} className="text-stone-300" /> : <Zap size={13} className="text-stone-300" />}
+                        <div className="flex items-center gap-1.5">
+                          {task.rating !== undefined && <span className="text-xs font-bold text-amber-500">⭐️ {task.rating}</span>}
+                          {task.isRoutine ? <Lock size={13} className="text-stone-300" /> : <Zap size={13} className="text-stone-300" />}
+                        </div>
                       </div>
                     </div>
                   </button>
