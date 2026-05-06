@@ -13,10 +13,10 @@
     "allowJs": true,
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "include": ["index.tsx", "capacitor.config.ts"]
+  "include": ["src", "capacitor.config.ts"]
 }
