@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.doughit.circleday',
-  appName: '도우 잇',
+  appName: 'circle day',
   webDir: 'dist',
   server: {
     androidScheme: 'https',

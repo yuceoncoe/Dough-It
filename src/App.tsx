@@ -289,7 +289,7 @@ const AppShell = ({
         />
       )}
 
-      <main className="flex-1 overflow-hidden pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]">
+      <main className="app-main flex-1 overflow-hidden">
         {activeTab === 'home' && (
           <DayScheduleView
             date={todayStr}
@@ -322,7 +322,7 @@ const AppShell = ({
         ) : null}
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex h-18 items-center justify-around border-t border-stone-200 bg-white/90 px-2 pb-safe shadow-[0_-12px_25px_rgba(85,72,56,0.08)] backdrop-blur">
+      <nav className="bottom-nav fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-stone-200 bg-white/90 px-2 shadow-[0_-12px_25px_rgba(85,72,56,0.08)] backdrop-blur">
         <button
           onClick={() => {
             setActiveTab('home');

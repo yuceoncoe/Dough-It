@@ -45,46 +45,46 @@ export const DayTaskEditorModal = ({
             </button>
           </div>
         </div>
-        <p className="mb-6 mt-3 text-sm text-stone-500">제목, 시간, 태그를 입력해서 하루 일정에 바로 반영합니다.</p>
+        <p className="mb-4 mt-3 text-sm leading-relaxed text-stone-500">제목, 시간, 태그를 입력해서 하루 일정에 바로 반영합니다.</p>
 
         <form onSubmit={onSubmit} className="space-y-3">
           <input
             autoFocus
-            className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
+            className="w-full rounded-[12px] border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
             placeholder="일정 이름"
             value={title}
             onChange={(event) => onTitleChange(event.target.value)}
           />
           <div className="space-y-3">
-            <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
+            <label className="block rounded-[12px] border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
               <div className="mb-1">시작</div>
               <input type="time" className="time-field" value={startTime} onChange={(event) => onStartTimeChange(event.target.value)} />
             </label>
-            <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
+            <label className="block rounded-[12px] border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
               <div className="mb-1">종료</div>
               <input type="time" className="time-field" value={endTime} onChange={(event) => onEndTimeChange(event.target.value)} />
             </label>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <button type="button" onClick={() => onSetTags(getToneTags('urgent-important'))} className={`rounded-2xl border px-4 py-3 text-left ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-fuchsia-400 bg-fuchsia-100 text-fuchsia-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+            <button type="button" onClick={() => onSetTags(getToneTags('urgent-important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-fuchsia-400 bg-fuchsia-100 text-fuchsia-900' : 'border-stone-300 bg-white text-stone-600'}`}>
               긴급+중요
             </button>
-            <button type="button" onClick={() => onSetTags(getToneTags('urgent'))} className={`rounded-2xl border px-4 py-3 text-left ${getToneSelectionKey(tags) === 'urgent' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+            <button type="button" onClick={() => onSetTags(getToneTags('urgent'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
               긴급
             </button>
-            <button type="button" onClick={() => onSetTags(getToneTags('important'))} className={`rounded-2xl border px-4 py-3 text-left ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+            <button type="button" onClick={() => onSetTags(getToneTags('important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
               중요
             </button>
-            <button type="button" onClick={() => onSetTags(getToneTags('normal'))} className={`rounded-2xl border px-4 py-3 text-left ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+            <button type="button" onClick={() => onSetTags(getToneTags('normal'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
               일반
             </button>
           </div>
-          <div className="mt-6 flex gap-3">
-            <button type="button" onClick={onClose} className="flex-1 rounded-2xl border border-stone-300 bg-white px-4 py-3 text-stone-700 transition-colors hover:bg-stone-50">
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <button type="button" onClick={onClose} className="rounded-[12px] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700 transition-colors hover:bg-stone-50">
               취소
             </button>
-            <button type="submit" disabled={!title.trim() || !startTime || !endTime} className="flex-1 rounded-2xl bg-stone-900 px-4 py-3 text-white disabled:cursor-not-allowed disabled:opacity-50">
-              {isEditing ? '일정 업데이트' : '하루 일정에 추가'}
+            <button type="submit" disabled={!title.trim() || !startTime || !endTime} className="rounded-[12px] bg-stone-900 px-4 py-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50">
+              {isEditing ? '업데이트' : '일정 추가'}
             </button>
           </div>
         </form>

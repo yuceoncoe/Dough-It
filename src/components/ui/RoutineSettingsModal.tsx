@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RoutineState, Tag, Task } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
-import { getTaskTonePillClass, getTaskToneLabel, QuadrantBadge } from '../../utils/task';
+import { getTaskTonePillClass, getTaskToneLabel, QuadrantBadge, getToneSelectionKey, getToneTags } from '../../utils/task';
 import { Clock, LogOut, Trash2, X } from 'lucide-react';
 
 export const RoutineSettingsModal = ({
@@ -46,10 +46,6 @@ export const RoutineSettingsModal = ({
     return null;
   }
 
-  const toggleTag = (tag: Tag) => {
-    setTags((current) => current.includes(tag) ? current.filter((item) => item !== tag) : [...current, tag]);
-  };
-
   const handleAdd = () => {
     if (!title.trim() || !startTime || !endTime) {
       return;
@@ -82,18 +78,18 @@ export const RoutineSettingsModal = ({
 
   return (
     <div className="modal-backdrop items-center" onClick={onClose}>
-      <div className="action-sheet h-[92vh] !w-full !max-w-4xl overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
-        <div className="border-b border-stone-200 px-5 py-4">
+      <div className="action-sheet flex h-[min(92dvh,46rem)] !w-full !max-w-4xl flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
+        <div className="shrink-0 border-b border-stone-200 px-5 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="font-hand text-3xl text-stone-800">루틴 보관함</h2>
-              <p className="text-sm text-stone-500">평일과 주말의 기본 루틴을 관리합니다.</p>
+            <div className="min-w-0 pr-3">
+              <h2 className="font-hand truncate text-2xl text-stone-800 sm:text-3xl">루틴 보관함</h2>
+              <p className="mt-1 text-xs leading-relaxed text-stone-500 sm:text-sm">평일과 주말의 기본 루틴을 관리합니다.</p>
             </div>
-            <button onClick={onClose} className="rounded-full p-2 text-stone-500 transition-colors hover:bg-stone-100 hover:text-rose-500">
+            <button onClick={onClose} className="sheet-icon-button shrink-0" aria-label="닫기">
               <X size={20} />
             </button>
           </div>
-          <div className="mt-4 rounded-2xl border border-stone-200 bg-white px-4 py-3">
+          <div className="mt-3 rounded-[14px] border border-stone-200 bg-white px-4 py-3">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <div className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">계정</div>
@@ -111,23 +107,23 @@ export const RoutineSettingsModal = ({
               </button>
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl bg-stone-100 p-1">
+          <div className="mt-3 grid grid-cols-2 gap-2 rounded-[14px] bg-stone-100 p-1">
             <button
               onClick={() => setActiveTab('weekday')}
-              className={`rounded-2xl px-4 py-2 text-sm font-medium ${activeTab === 'weekday' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500'}`}
+              className={`rounded-[12px] px-4 py-2 text-sm font-medium ${activeTab === 'weekday' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500'}`}
             >
               평일
             </button>
             <button
               onClick={() => setActiveTab('weekend')}
-              className={`rounded-2xl px-4 py-2 text-sm font-medium ${activeTab === 'weekend' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500'}`}
+              className={`rounded-[12px] px-4 py-2 text-sm font-medium ${activeTab === 'weekend' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500'}`}
             >
               주말
             </button>
           </div>
         </div>
-        <div className="grid h-[calc(92vh-250px)] grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
-          <div className="overflow-y-auto border-b border-stone-200 p-5 md:border-b-0 md:border-r">
+        <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
+          <div className="min-h-0 overflow-y-auto border-b border-stone-200 p-5 md:border-b-0 md:border-r">
             <div className="space-y-2.5">
               {draft[activeTab].map((task) => (
                 <div
@@ -162,45 +158,51 @@ export const RoutineSettingsModal = ({
               ))}
             </div>
           </div>
-          <div className="overflow-y-auto bg-white p-5">
+          <div className="min-h-0 overflow-y-auto bg-white p-5">
             <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 space-y-3">
               <input
-                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
+                className="w-full rounded-[12px] border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
                 placeholder="일정 이름"
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
               />
-              <div className="grid grid-cols-2 gap-3">
-                <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
+              <div className="space-y-3">
+                <label className="block rounded-[12px] border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
                   <div className="mb-1">시작</div>
                   <input type="time" className="time-field" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
                 </label>
-                <label className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600">
+                <label className="block rounded-[12px] border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
                   <div className="mb-1">종료</div>
                   <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
                 </label>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => toggleTag('urgent')} className={`rounded-2xl border px-4 py-3 text-left ${tags.includes('urgent') ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                <button onClick={() => setTags(getToneTags('urgent-important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-fuchsia-400 bg-fuchsia-100 text-fuchsia-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                  긴급+중요
+                </button>
+                <button onClick={() => setTags(getToneTags('urgent'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                   긴급
                 </button>
-                <button onClick={() => toggleTag('important')} className={`rounded-2xl border px-4 py-3 text-left ${tags.includes('important') ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                <button onClick={() => setTags(getToneTags('important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                   중요
+                </button>
+                <button onClick={() => setTags(getToneTags('normal'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                  일반
                 </button>
               </div>
               <button
                 onClick={handleAdd}
                 disabled={!title.trim() || !startTime || !endTime}
-                className="w-full rounded-2xl bg-stone-900 px-4 py-3 text-white disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-[12px] bg-stone-900 px-4 py-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
               >
                 블록 추가
               </button>
             </div>
           </div>
         </div>
-        <div className="flex justify-end gap-3 border-t border-stone-200 px-5 py-4">
-          <button onClick={onClose} className="rounded-2xl border border-stone-300 bg-white px-4 py-3 text-stone-700">
+        <div className="grid shrink-0 grid-cols-2 gap-3 border-t border-stone-200 px-5 py-4 sm:flex sm:justify-end">
+          <button onClick={onClose} className="rounded-[12px] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700">
             취소
           </button>
           <button
@@ -208,7 +210,7 @@ export const RoutineSettingsModal = ({
               onSaveRoutines(draft);
               onClose();
             }}
-            className="rounded-2xl bg-amber-400 px-4 py-3 text-stone-900"
+            className="rounded-[12px] bg-amber-400 px-4 py-3 text-sm font-semibold text-stone-900"
           >
             루틴 저장
           </button>
