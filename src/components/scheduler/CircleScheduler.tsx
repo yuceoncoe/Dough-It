@@ -22,6 +22,7 @@ export const CircleScheduler = ({
   const arcDragPointerIdRef = useRef<number | null>(null);
   const arcDragMovedRef = useRef(false);
   const [pendingArc, setPendingArc] = useState<{ startAngle: number; endAngle: number } | null>(null);
+  const [hasPendingArcEnd, setHasPendingArcEnd] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [now, setNow] = useState(new Date());
   const [overlapIndex, setOverlapIndex] = useState(0);
@@ -105,20 +106,27 @@ export const CircleScheduler = ({
   };
 
   const beginRingSelection = (event: React.PointerEvent<SVGCircleElement>) => {
-    if (pendingArc !== null) {
-      return;
-    }
-
     const angle = getPointerAngle(event.clientX, event.clientY);
     if (angle === null) {
       return;
     }
 
     event.preventDefault();
-    arcDragHandleRef.current = 'end';
     arcDragPointerIdRef.current = event.pointerId;
     arcDragMovedRef.current = false;
-    setPendingArc({ startAngle: angle, endAngle: angle + 1.25 });
+
+    if (pendingArc === null) {
+      arcDragHandleRef.current = 'start';
+      setHasPendingArcEnd(false);
+      setPendingArc({ startAngle: angle, endAngle: angle + 1.25 });
+    } else if (!hasPendingArcEnd) {
+      arcDragHandleRef.current = 'end';
+      setHasPendingArcEnd(true);
+      setPendingArc((current) => current ? { ...current, endAngle: clampArcEnd(current.startAngle, angle) } : current);
+    } else {
+      return;
+    }
+
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
@@ -197,6 +205,7 @@ export const CircleScheduler = ({
         onClose={() => {
           setShowCreateModal(false);
           setPendingArc(null);
+          setHasPendingArcEnd(false);
         }}
         onSave={(title, tags) => {
           if (!pendingArc) {
@@ -207,6 +216,7 @@ export const CircleScheduler = ({
           onAddTask(title, tags, startTime, duration);
           setShowCreateModal(false);
           setPendingArc(null);
+          setHasPendingArcEnd(false);
         }}
       />
 
@@ -219,7 +229,6 @@ export const CircleScheduler = ({
           viewBox={`${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_SIZE} ${SVG_VIEWBOX_SIZE}`}
           className="absolute inset-0 h-full w-full select-none"
           style={{ touchAction: 'none' }}
-          onPointerDown={beginRingSelection}
           onPointerMove={moveArcHandle}
           onPointerUp={endArcHandleDrag}
           onPointerCancel={endArcHandleDrag}
@@ -298,14 +307,16 @@ export const CircleScheduler = ({
 
         {pendingArc !== null && (
           <>
-            <path
-              d={describeArc(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle, pendingArc.endAngle)}
-              fill="rgba(217, 4, 41, 0.12)"
-              stroke="#d90429"
-              strokeWidth="2"
-              strokeDasharray="5 5"
-              pointerEvents="none"
-            />
+            {hasPendingArcEnd && (
+              <path
+                d={describeArc(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle, pendingArc.endAngle)}
+                fill="rgba(217, 4, 41, 0.12)"
+                stroke="#d90429"
+                strokeWidth="2"
+                strokeDasharray="5 5"
+                pointerEvents="none"
+              />
+            )}
             <line
               x1={CENTER}
               y1={CENTER}
@@ -316,17 +327,19 @@ export const CircleScheduler = ({
               strokeDasharray="5 5"
               pointerEvents="none"
             />
-            <line
-              x1={CENTER}
-              y1={CENTER}
-              x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.endAngle).x}
-              y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.endAngle).y}
-              stroke="#d90429"
-              strokeWidth="2"
-              strokeDasharray="5 5"
-              pointerEvents="none"
-            />
-            {(['start', 'end'] as const).map((handle) => {
+            {hasPendingArcEnd && (
+              <line
+                x1={CENTER}
+                y1={CENTER}
+                x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.endAngle).x}
+                y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.endAngle).y}
+                stroke="#d90429"
+                strokeWidth="2"
+                strokeDasharray="5 5"
+                pointerEvents="none"
+              />
+            )}
+            {(hasPendingArcEnd ? ['start', 'end'] as const : ['start'] as const).map((handle) => {
               const angle = handle === 'start' ? pendingArc.startAngle : pendingArc.endAngle;
               const point = polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, angle);
               return (
@@ -363,18 +376,27 @@ export const CircleScheduler = ({
           <div className="absolute inset-x-4 bottom-4 z-30 flex items-center justify-center gap-2">
             <button
               type="button"
-              onClick={() => setPendingArc(null)}
+              onClick={() => {
+                setPendingArc(null);
+                setHasPendingArcEnd(false);
+              }}
               className="rounded-full border border-stone-300 bg-white/90 px-4 py-2 text-xs font-semibold text-stone-600 shadow-sm backdrop-blur"
             >
               취소
             </button>
-            <button
-              type="button"
-              onClick={() => setShowCreateModal(true)}
-              className="rounded-full bg-stone-900 px-5 py-2 text-xs font-semibold text-white shadow-sm"
-            >
-              {minutesToTime(angleToMinutes(pendingArc.startAngle % 360))} - {minutesToTime(angleToMinutes(pendingArc.endAngle % 360))} 추가
-            </button>
+            {hasPendingArcEnd ? (
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(true)}
+                className="rounded-full bg-stone-900 px-5 py-2 text-xs font-semibold text-white shadow-sm"
+              >
+                {minutesToTime(angleToMinutes(pendingArc.startAngle % 360))} - {minutesToTime(angleToMinutes(pendingArc.endAngle % 360))} 추가
+              </button>
+            ) : (
+              <div className="rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-stone-500 shadow-sm backdrop-blur">
+                종료 시간을 터치하세요
+              </div>
+            )}
           </div>
         )}
         <div
