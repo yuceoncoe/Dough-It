@@ -33,11 +33,20 @@ const AppShell = ({
   const [isBootstrapping, setIsBootstrapping] = useState(true);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [notificationStatus, setNotificationStatus] = useState<'idle' | 'enabled' | 'unsupported' | 'denied' | 'error'>('idle');
   const hydrationTokenRef = useRef(0);
   const isHydratedRef = useRef(false);
 
   useEffect(() => {
-    void requestNotificationPermissions(user.id);
+    if (!('Notification' in window)) {
+      setNotificationStatus('unsupported');
+      return;
+    }
+    if (Notification.permission === 'granted') {
+      setNotificationStatus('enabled');
+    } else if (Notification.permission === 'denied') {
+      setNotificationStatus('denied');
+    }
   }, [user.id]);
 
   useEffect(() => {
@@ -277,9 +286,21 @@ const AppShell = ({
         userEmail={user.email ?? null}
         saveError={saveError}
         isSaving={isSaving}
+        notificationStatus={notificationStatus}
         onClose={() => setSettingsOpen(false)}
         onSaveRoutines={setRoutines}
         onSignOut={onSignOut}
+        onEnableNotifications={async () => {
+          try {
+            const enabled = await requestNotificationPermissions(user.id);
+            setNotificationStatus(enabled ? 'enabled' : 'denied');
+            if (enabled) {
+              await syncTaskAlarms(tasksByDate, user.id);
+            }
+          } catch {
+            setNotificationStatus('error');
+          }
+        }}
       />
       {pendingRatingTasks.length > 0 && (
         <TaskRatingCarousel

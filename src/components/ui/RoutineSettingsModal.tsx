@@ -10,18 +10,22 @@ export const RoutineSettingsModal = ({
   userEmail,
   saveError,
   isSaving,
+  notificationStatus,
   onClose,
   onSaveRoutines,
   onSignOut,
+  onEnableNotifications,
 }: {
   isOpen: boolean;
   routines: RoutineState;
   userEmail: string | null;
   saveError: string | null;
   isSaving: boolean;
+  notificationStatus: 'idle' | 'enabled' | 'unsupported' | 'denied' | 'error';
   onClose: () => void;
   onSaveRoutines: (routines: RoutineState) => void;
   onSignOut: () => Promise<void>;
+  onEnableNotifications: () => Promise<void>;
 }) => {
   const [activeTab, setActiveTab] = useState<'weekday' | 'weekend'>('weekday');
   const [draft, setDraft] = useState<RoutineState>(routines);
@@ -76,6 +80,14 @@ export const RoutineSettingsModal = ({
     setDraft((current) => ({ ...current, [activeTab]: current[activeTab].filter((task) => task.id !== id) }));
   };
 
+  const notificationLabel = {
+    idle: '푸쉬 알림 켜기',
+    enabled: '푸쉬 알림 켜짐',
+    unsupported: '알림 미지원',
+    denied: '알림 차단됨',
+    error: '알림 설정 실패',
+  }[notificationStatus];
+
   return (
     <div className="modal-backdrop items-center" onClick={onClose}>
       <div className="action-sheet flex h-[min(92dvh,46rem)] !w-full !max-w-4xl flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
@@ -97,14 +109,24 @@ export const RoutineSettingsModal = ({
                 {saveError ? <div className="mt-1 text-xs text-rose-600">{saveError}</div> : null}
                 {isSaving ? <div className="mt-1 text-xs text-stone-400">저장 중...</div> : null}
               </div>
-              <button
-                type="button"
-                onClick={() => void onSignOut()}
-                className="inline-flex shrink-0 items-center gap-2 rounded-full border border-stone-300 bg-white px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-stone-50"
-              >
-                <LogOut size={16} />
-                로그아웃
-              </button>
+              <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => void onEnableNotifications()}
+                  disabled={notificationStatus === 'enabled' || notificationStatus === 'unsupported'}
+                  className={`inline-flex items-center justify-center rounded-full border px-3 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${notificationStatus === 'enabled' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-stone-300 bg-white text-stone-600 hover:bg-stone-50'}`}
+                >
+                  {notificationLabel}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void onSignOut()}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-stone-50"
+                >
+                  <LogOut size={16} />
+                  로그아웃
+                </button>
+              </div>
             </div>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-2 rounded-[14px] bg-stone-100 p-1">
