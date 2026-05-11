@@ -40,7 +40,8 @@ export const DayScheduleView = ({
   const [pendingRoutineAction, setPendingRoutineAction] = useState<{ action: RoutineAction; task: Task } | null>(null);
   const [routineEditScope, setRoutineEditScope] = useState<RoutineScope>('single');
   const [swipedTaskId, setSwipedTaskId] = useState<string | null>(null);
-  const swipeStartRef = useRef<{ id: string; x: number; y: number } | null>(null);
+  const [swipeOffset, setSwipeOffset] = useState<{ id: string; x: number } | null>(null);
+  const swipeStartRef = useRef<{ id: string; x: number; y: number; isHorizontal: boolean | null } | null>(null);
 
   const sortedTasks = tasks
     .filter((task) => showRoutines || !task.isRoutine)
@@ -290,27 +291,56 @@ export const DayScheduleView = ({
                         setSheetTask(task);
                       }}
                       onPointerDown={(event) => {
-                        swipeStartRef.current = { id: task.id, x: event.clientX, y: event.clientY };
+                        swipeStartRef.current = { id: task.id, x: event.clientX, y: event.clientY, isHorizontal: null };
                       }}
-                      onPointerUp={(event) => {
+                      onPointerMove={(event) => {
                         const start = swipeStartRef.current;
-                        swipeStartRef.current = null;
                         if (!start || start.id !== task.id) {
                           return;
                         }
                         const deltaX = event.clientX - start.x;
                         const deltaY = event.clientY - start.y;
-                        if (Math.abs(deltaX) < 36 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) {
+                        if (start.isHorizontal === null) {
+                          if (Math.abs(deltaX) < 8 && Math.abs(deltaY) < 8) {
+                            return;
+                          }
+                          start.isHorizontal = Math.abs(deltaX) > Math.abs(deltaY) * 1.15;
+                        }
+                        if (!start.isHorizontal) {
                           return;
                         }
                         event.preventDefault();
                         event.stopPropagation();
-                        setSwipedTaskId(deltaX < 0 ? task.id : null);
+                        const baseOffset = swipedTaskId === task.id ? -80 : 0;
+                        const nextOffset = Math.max(-96, Math.min(0, baseOffset + deltaX));
+                        setSwipeOffset({ id: task.id, x: nextOffset });
+                      }}
+                      onPointerUp={(event) => {
+                        const start = swipeStartRef.current;
+                        const currentOffset = swipeOffset?.id === task.id ? swipeOffset.x : (swipedTaskId === task.id ? -80 : 0);
+                        swipeStartRef.current = null;
+                        setSwipeOffset(null);
+                        if (!start || start.id !== task.id) {
+                          return;
+                        }
+                        const deltaX = event.clientX - start.x;
+                        const deltaY = event.clientY - start.y;
+                        if (!start.isHorizontal && Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
+                          return;
+                        }
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setSwipedTaskId(currentOffset <= -42 ? task.id : null);
                       }}
                       onPointerCancel={() => {
                         swipeStartRef.current = null;
+                        setSwipeOffset(null);
                       }}
-                      className={`task-card relative block w-full rounded-[0.75rem] bg-white px-4 py-3.5 text-left transition-transform duration-200 ${swipedTaskId === task.id ? '-translate-x-20' : 'translate-x-0'}`}
+                      className="task-card relative block w-full rounded-[0.75rem] bg-white px-4 py-3.5 text-left transition-transform duration-200"
+                      style={{
+                        transform: `translateX(${swipeOffset?.id === task.id ? swipeOffset.x : (swipedTaskId === task.id ? -80 : 0)}px)`,
+                        touchAction: 'pan-y',
+                      }}
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0">
