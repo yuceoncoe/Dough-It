@@ -1,14 +1,39 @@
 # 도우 잇
 
-React, Vite, Tailwind, Capacitor로 만든 오프라인 중심 시간 관리 앱입니다.
+React, Vite, Tailwind, Capacitor로 만든 시간 관리 앱입니다.
 
 ## 변경 내용
 
 - 인터넷 없이도 실행되도록 런타임 CDN 의존성을 제거했습니다.
-- `localStorage` 로 루틴, 일정, 비주얼 모드를 기기에 저장합니다.
+- Supabase 로그인 기반으로 사용자별 루틴, 일정, 평가 상태를 저장합니다.
 - 데스크톱 중심 조작을 탭 중심의 모바일 상호작용으로 바꿨습니다.
 - 아이폰 앱 패키징을 위해 Capacitor 설정과 iOS 스크립트를 추가했습니다.
 - 원형 시계 위에 미디어아트 확장이 가능한 비주얼 모드 레이어를 넣었습니다.
+
+## Supabase 설정
+
+1. 의존성 설치
+
+```bash
+npm install
+```
+
+2. 환경 변수 설정
+
+`.env.example` 를 참고해서 프로젝트 루트에 `.env` 파일을 만듭니다.
+
+```bash
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+3. 데이터베이스 테이블 생성
+
+Supabase SQL Editor에서 [`supabase/schema.sql`](./supabase/schema.sql) 내용을 실행합니다.
+
+4. 첫 계정 생성 후 가입 제한 권장
+
+혼자만 사용할 예정이면 첫 계정을 만든 뒤 Supabase Auth 설정에서 신규 가입을 막는 것을 권장합니다.
 
 ## 개발 실행
 
@@ -43,6 +68,6 @@ npm run ios:open
 
 ## 참고
 
-- 데이터는 기기 내부에 저장됩니다.
+- 사용자별 데이터는 Supabase `user_app_state` 테이블에 저장됩니다.
 - 루틴 수정은 새로 여는 날짜에 반영되고, 이미 저장된 날짜는 기존 일정 상태를 유지합니다.
 - 비주얼 레이어는 일정 계산 로직과 분리되어 있어 이후 SVG, Canvas, 셰이더 기반 표현으로 확장하기 쉽습니다.
