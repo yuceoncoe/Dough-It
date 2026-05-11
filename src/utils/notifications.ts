@@ -16,20 +16,27 @@ const urlBase64ToUint8Array = (base64String: string) => {
 };
 
 const getPushSubscription = async () => {
-  if (!vapidPublicKey || !('serviceWorker' in navigator) || !('PushManager' in window)) {
-    return null;
-  }
-
   const registration = await navigator.serviceWorker.register('/push-sw.js');
   const currentSubscription = await registration.pushManager.getSubscription();
   if (currentSubscription) {
-    return currentSubscription;
+    return { registration, subscription: currentSubscription };
   }
 
-  return registration.pushManager.subscribe({
+  const subscription = await registration.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
   });
+
+  return { registration, subscription };
+};
+
+const getExistingPushSubscription = async () => {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    return null;
+  }
+  const registration = await navigator.serviceWorker.register('/push-sw.js');
+  const subscription = await registration.pushManager.getSubscription();
+  return subscription ? { registration, subscription } : null;
 };
 
 const savePushSubscription = async (userId: string, subscription: PushSubscription) => {
@@ -53,8 +60,17 @@ const savePushSubscription = async (userId: string, subscription: PushSubscripti
 };
 
 export const requestNotificationPermissions = async (userId: string) => {
+  if (!window.isSecureContext) {
+    throw new Error('HTTPS 환경에서만 푸쉬 알림을 사용할 수 있습니다.');
+  }
+  if (!vapidPublicKey) {
+    throw new Error('VAPID 공개 키가 배포 환경에 설정되지 않았습니다.');
+  }
   if (!('Notification' in window)) {
-    return false;
+    throw new Error('이 브라우저는 알림을 지원하지 않습니다.');
+  }
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    throw new Error('이 브라우저는 웹 푸쉬를 지원하지 않습니다.');
   }
   if (Notification.permission === 'denied') {
     return false;
@@ -66,12 +82,18 @@ export const requestNotificationPermissions = async (userId: string) => {
     }
   }
 
-  const subscription = await getPushSubscription();
-  if (!subscription) {
+  const push = await getPushSubscription();
+  if (!push) {
     return false;
   }
 
-  await savePushSubscription(userId, subscription);
+  await savePushSubscription(userId, push.subscription);
+  await push.registration.showNotification('circle day 알림 켜짐', {
+    body: '일정 시작/종료 푸쉬 알림을 받을 준비가 되었어요.',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: 'circle-day-push-enabled',
+  });
   return true;
 };
 
@@ -80,10 +102,15 @@ export const syncTaskAlarms = async (tasksByDate: Record<string, Task[]>, userId
     return;
   }
 
-  const hasSubscription = await requestNotificationPermissions(userId);
-  if (!hasSubscription) {
+  if (Notification.permission !== 'granted') {
     return;
   }
+
+  const push = await getExistingPushSubscription();
+  if (!push) {
+    return;
+  }
+  await savePushSubscription(userId, push.subscription);
 
   const now = new Date();
   const todayTasks = tasksByDate[getTodayKey()] ?? [];

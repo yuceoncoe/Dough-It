@@ -11,6 +11,7 @@ export const RoutineSettingsModal = ({
   saveError,
   isSaving,
   notificationStatus,
+  notificationMessage,
   onClose,
   onSaveRoutines,
   onSignOut,
@@ -22,6 +23,7 @@ export const RoutineSettingsModal = ({
   saveError: string | null;
   isSaving: boolean;
   notificationStatus: 'idle' | 'enabled' | 'unsupported' | 'denied' | 'error';
+  notificationMessage: string | null;
   onClose: () => void;
   onSaveRoutines: (routines: RoutineState) => void;
   onSignOut: () => Promise<void>;
@@ -108,6 +110,7 @@ export const RoutineSettingsModal = ({
                 <div className="truncate text-sm text-stone-600">{userEmail ?? '로그인됨'}</div>
                 {saveError ? <div className="mt-1 text-xs text-rose-600">{saveError}</div> : null}
                 {isSaving ? <div className="mt-1 text-xs text-stone-400">저장 중...</div> : null}
+                {notificationMessage ? <div className="mt-1 text-xs text-stone-500">{notificationMessage}</div> : null}
               </div>
               <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
                 <button

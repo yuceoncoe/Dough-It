@@ -34,6 +34,7 @@ const AppShell = ({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [notificationStatus, setNotificationStatus] = useState<'idle' | 'enabled' | 'unsupported' | 'denied' | 'error'>('idle');
+  const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
   const hydrationTokenRef = useRef(0);
   const isHydratedRef = useRef(false);
 
@@ -287,18 +288,25 @@ const AppShell = ({
         saveError={saveError}
         isSaving={isSaving}
         notificationStatus={notificationStatus}
+        notificationMessage={notificationMessage}
         onClose={() => setSettingsOpen(false)}
         onSaveRoutines={setRoutines}
         onSignOut={onSignOut}
         onEnableNotifications={async () => {
           try {
+            setNotificationMessage(null);
             const enabled = await requestNotificationPermissions(user.id);
             setNotificationStatus(enabled ? 'enabled' : 'denied');
             if (enabled) {
+              setNotificationMessage('테스트 알림을 보냈습니다. 일정 알림도 예약할게요.');
               await syncTaskAlarms(tasksByDate, user.id);
+            } else {
+              setNotificationMessage('알림 권한이 허용되지 않았습니다.');
             }
-          } catch {
+          } catch (error) {
+            const message = error instanceof Error ? error.message : '푸쉬 알림 설정에 실패했습니다.';
             setNotificationStatus('error');
+            setNotificationMessage(message);
           }
         }}
       />
