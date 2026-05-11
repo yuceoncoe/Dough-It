@@ -551,7 +551,7 @@ export function generateRoutinesForDate(dateStr: string, routines: RoutineState)
   }));
 }
 
-export const seedTasksForToday = (todayStr: string, routines: RoutineState) => ({
+export const seedTasksForToday = (todayStr: string, routines: RoutineState): Record<string, Task[]> => ({
   [todayStr]: [
     { id: 'seed-1', title: '아침 산책', tags: [], startTime: '06:30', duration: 30, completed: false, isRoutine: false },
     { id: 'seed-2', title: '우선순위 블록', tags: ['important'], startTime: '16:00', duration: 90, completed: false, isRoutine: false },
@@ -560,10 +560,15 @@ export const seedTasksForToday = (todayStr: string, routines: RoutineState) => (
 });
 
 export const addOrReplaceDateTasks = (tasksByDate: Record<string, Task[]>, date: string, routines: RoutineState) => {
-  if (tasksByDate[date]?.length) {
-    return tasksByDate;
-  }
-  return { ...tasksByDate, [date]: generateRoutinesForDate(date, routines) };
+  const existingTasks = tasksByDate[date] ?? [];
+  const existingRoutineById = new Map(existingTasks.filter((task) => task.isRoutine).map((task) => [task.id, task]));
+  const manualTasks = existingTasks.filter((task) => !task.isRoutine);
+  const routineTasks = generateRoutinesForDate(date, routines).map((task) => {
+    const existing = existingRoutineById.get(task.id);
+    return existing ? { ...task, completed: existing.completed, rating: existing.rating } : task;
+  });
+
+  return { ...tasksByDate, [date]: [...manualTasks, ...routineTasks] };
 };
 
 export const getRoutineBucketForDate = (dateStr: string): keyof RoutineState => {

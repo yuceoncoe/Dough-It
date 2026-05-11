@@ -37,8 +37,8 @@ const AppShell = ({
   const isHydratedRef = useRef(false);
 
   useEffect(() => {
-    requestNotificationPermissions();
-  }, []);
+    void requestNotificationPermissions(user.id);
+  }, [user.id]);
 
   useEffect(() => {
     let isActive = true;
@@ -105,7 +105,7 @@ const AppShell = ({
     };
 
     persistCachedAppState(user.id, snapshot);
-    syncTaskAlarms(tasksByDate);
+    void syncTaskAlarms(tasksByDate, user.id);
 
     const timeoutId = window.setTimeout(async () => {
       try {

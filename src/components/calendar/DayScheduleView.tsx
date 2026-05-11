@@ -203,7 +203,7 @@ export const DayScheduleView = ({
         onSubmit={submitForm}
       />
 
-      <div className="flex items-center justify-between gap-3 px-4 pb-3 pt-4 md:px-6">
+      <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-stone-200/0 bg-[#f6f6f8]/95 px-4 pb-3 pt-4 backdrop-blur md:px-6">
         <div className="flex items-center gap-3">
           {onBack && (
             <button onClick={onBack} className="rounded-full border border-stone-300 bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">

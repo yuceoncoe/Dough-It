@@ -19,7 +19,7 @@ export const CalendarView = ({
 
   return (
     <section className="flex h-full flex-col overflow-hidden bg-[#f6f6f8] p-4 md:p-8">
-      <div className="mb-5 flex items-center justify-between gap-3">
+      <div className="sticky top-0 z-30 mb-5 flex items-center justify-between gap-3 bg-[#f6f6f8]/95 pb-3 backdrop-blur">
         <div>
           <h1 className="font-hand text-4xl text-stone-800 md:text-5xl">달력 보기</h1>
           <p className="text-sm text-stone-500">날짜를 누르면 그날의 24시간 원형 시계로 이동합니다.</p>
