@@ -21,8 +21,6 @@ export const CircleScheduler = ({
   const arcDragHandleRef = useRef<'start' | 'end' | null>(null);
   const arcDragPointerIdRef = useRef<number | null>(null);
   const arcDragMovedRef = useRef(false);
-  const [anchorAngle, setAnchorAngle] = useState<number | null>(null);
-  const [hoverAngle, setHoverAngle] = useState<number | null>(null);
   const [pendingArc, setPendingArc] = useState<{ startAngle: number; endAngle: number } | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [now, setNow] = useState(new Date());
@@ -61,41 +59,6 @@ export const CircleScheduler = ({
       angle += 360;
     }
     return Math.round(angle / 1.25) * 1.25;
-  };
-
-  const commitSelection = (endAngle: number) => {
-    if (anchorAngle === null) {
-      return;
-    }
-    if (Math.abs(endAngle - anchorAngle) < 1) {
-      setAnchorAngle(null);
-      setHoverAngle(null);
-      return;
-    }
-    const safeEnd = clampArcEnd(anchorAngle, endAngle);
-    setPendingArc({ startAngle: anchorAngle, endAngle: safeEnd });
-    setAnchorAngle(null);
-    setHoverAngle(null);
-  };
-
-  const handleRingClick = (event: React.MouseEvent<SVGSVGElement>) => {
-    if (arcDragMovedRef.current) {
-      arcDragMovedRef.current = false;
-      return;
-    }
-    if (pendingArc !== null) {
-      return;
-    }
-    const angle = getPointerAngle(event.clientX, event.clientY);
-    if (angle === null) {
-      return;
-    }
-    if (anchorAngle === null) {
-      setAnchorAngle(angle);
-      setHoverAngle(angle);
-      return;
-    }
-    commitSelection(angle);
   };
 
   const normalizeAngleNearReference = (angle: number, reference: number) => {
@@ -141,6 +104,24 @@ export const CircleScheduler = ({
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
+  const beginRingSelection = (event: React.PointerEvent<SVGCircleElement>) => {
+    if (pendingArc !== null) {
+      return;
+    }
+
+    const angle = getPointerAngle(event.clientX, event.clientY);
+    if (angle === null) {
+      return;
+    }
+
+    event.preventDefault();
+    arcDragHandleRef.current = 'end';
+    arcDragPointerIdRef.current = event.pointerId;
+    arcDragMovedRef.current = false;
+    setPendingArc({ startAngle: angle, endAngle: angle + 1.25 });
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
   const moveArcHandle = (event: React.PointerEvent<SVGSVGElement>) => {
     const handle = arcDragHandleRef.current;
     if (!handle || arcDragPointerIdRef.current !== event.pointerId) {
@@ -157,6 +138,7 @@ export const CircleScheduler = ({
   const endArcHandleDrag = () => {
     arcDragHandleRef.current = null;
     arcDragPointerIdRef.current = null;
+    arcDragMovedRef.current = false;
   };
 
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -237,18 +219,12 @@ export const CircleScheduler = ({
           viewBox={`${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_SIZE} ${SVG_VIEWBOX_SIZE}`}
           className="absolute inset-0 h-full w-full select-none"
           style={{ touchAction: 'none' }}
-          onMouseMove={(event) => {
-            const angle = getPointerAngle(event.clientX, event.clientY);
-            if (angle !== null) {
-              setHoverAngle(angle);
-            }
-          }}
+          onPointerDown={beginRingSelection}
           onPointerMove={moveArcHandle}
           onPointerUp={endArcHandleDrag}
           onPointerCancel={endArcHandleDrag}
-          onClick={handleRingClick}
         >
-        <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="transparent" />
+        <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="transparent" onPointerDown={beginRingSelection} />
         <line
           x1={CENTER}
           y1={CENTER - (OUTER_BACKGROUND_RADIUS - 30)}
@@ -257,7 +233,7 @@ export const CircleScheduler = ({
           stroke="rgba(20, 20, 20, 0.06)"
           strokeWidth="0.9"
         />
-        <g>
+        <g className="pointer-events-none">
           {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
             const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
             const safeEndAngle = clampArcEnd(startAngle, endAngle);
@@ -320,36 +296,6 @@ export const CircleScheduler = ({
           ))}
         </g>
 
-        {anchorAngle !== null && (
-          <>
-            <line
-              x1={CENTER}
-              y1={CENTER}
-              x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, anchorAngle).x}
-              y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, anchorAngle).y}
-              stroke="#d90429"
-              strokeWidth="2"
-              strokeDasharray="5 5"
-            />
-            <circle
-              cx={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, anchorAngle).x}
-              cy={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, anchorAngle).y}
-              r="5"
-              fill="#d90429"
-            />
-          </>
-        )}
-
-        {anchorAngle !== null && hoverAngle !== null && hoverAngle !== anchorAngle && (
-          <path
-            d={describeArc(CENTER, CENTER, CURRENT_HAND_RADIUS, anchorAngle, clampArcEnd(anchorAngle, hoverAngle))}
-            fill="rgba(217, 4, 41, 0.12)"
-            stroke="#d90429"
-            strokeWidth="2"
-            strokeDasharray="5 5"
-          />
-        )}
-
         {pendingArc !== null && (
           <>
             <path
@@ -358,6 +304,7 @@ export const CircleScheduler = ({
               stroke="#d90429"
               strokeWidth="2"
               strokeDasharray="5 5"
+              pointerEvents="none"
             />
             <line
               x1={CENTER}
@@ -367,6 +314,7 @@ export const CircleScheduler = ({
               stroke="#d90429"
               strokeWidth="2"
               strokeDasharray="5 5"
+              pointerEvents="none"
             />
             <line
               x1={CENTER}
@@ -376,6 +324,7 @@ export const CircleScheduler = ({
               stroke="#d90429"
               strokeWidth="2"
               strokeDasharray="5 5"
+              pointerEvents="none"
             />
             {(['start', 'end'] as const).map((handle) => {
               const angle = handle === 'start' ? pendingArc.startAngle : pendingArc.endAngle;
@@ -406,6 +355,7 @@ export const CircleScheduler = ({
           strokeWidth="2.8"
           strokeLinecap="round"
           opacity="0.96"
+          pointerEvents="none"
         />
         </svg>
         </div>
