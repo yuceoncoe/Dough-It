@@ -53,7 +53,7 @@ export const CircleScheduler = ({
     const dx = x - CENTER;
     const dy = y - CENTER;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance < 88 || distance > OUTER_BACKGROUND_RADIUS + 34) {
+    if (distance < 1) {
       return null;
     }
     let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
