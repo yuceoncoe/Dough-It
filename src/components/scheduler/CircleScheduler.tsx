@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Task, Tag } from '../../types';
 import { minutesToAngle, angleToMinutes, minutesToTime } from '../../utils/time';
-import { isCurrentMinuteInsideTask, getCenterTaskProgress, getClockTaskColor, getRequiredTrackLaneCount, assignTasksToTrackLanes, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, CENTER, RADIUS, OUTER_BACKGROUND_RADIUS, getTrackLaneCenterRadius, buildArcGlyphLayout, getDirectionalTextVisuals, OUTER_HOUR_LABELS, CURRENT_HAND_RADIUS, clampArcEnd, hexToRgba } from '../../utils/task';
+import { isCurrentMinuteInsideTask, getCenterTaskProgress, getClockTaskColor, getRequiredTrackLaneCount, assignTasksToTrackLanes, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, CENTER, RADIUS, OUTER_BACKGROUND_RADIUS, getTrackLaneCenterRadius, getDirectionalTextVisuals, OUTER_HOUR_LABELS, CURRENT_HAND_RADIUS, clampArcEnd, hexToRgba } from '../../utils/task';
 import { polarToCartesian, describeArc } from '../../utils/geometry';
 import TaskCreationModal from '../ui/TaskCreationModal';
 import CanvasClockSurface from './CanvasClockSurface';
@@ -100,6 +100,13 @@ export const CircleScheduler = ({
   const activeTaskColor = displayTask ? getClockTaskColor(displayTask) : '#ff7a91';
   const laneCount = getRequiredTrackLaneCount(tasks);
   const trackTasks = assignTasksToTrackLanes(tasks, laneCount);
+  const clampLabelCoordinate = (value: number, size: number) => (
+    Math.max(SVG_VIEWBOX_MIN + size / 2 + 6, Math.min(SVG_VIEWBOX_MIN + SVG_VIEWBOX_SIZE - size / 2 - 6, value))
+  );
+  const getTaskLabelText = (title: string) => {
+    const trimmed = title.trim();
+    return trimmed.length > 8 ? `${trimmed.slice(0, 8)}...` : trimmed;
+  };
 
   useEffect(() => {
     if (!overlappingActiveTasks.length) {
@@ -180,36 +187,41 @@ export const CircleScheduler = ({
         <g>
           {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
             const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
-            const glyphs = buildArcGlyphLayout(task.title, laneCenterRadius, startAngle, endAngle, (char) => {
-              const approxWidths: Record<string, number> = {
-                ' ': 4,
-              };
-              return approxWidths[char] ?? (/[\u3131-\u318E\uAC00-\uD7A3]/.test(char) ? 11 : 7);
-            });
+            const safeEndAngle = clampArcEnd(startAngle, endAngle);
+            const midAngle = startAngle + (safeEndAngle - startAngle) / 2;
+            const labelPoint = polarToCartesian(CENTER, CENTER, laneCenterRadius, midAngle);
+            const labelText = getTaskLabelText(task.title);
+            const labelWidth = Math.min(132, Math.max(52, labelText.length * 18 + 24));
+            const labelHeight = 30;
+            const labelX = clampLabelCoordinate(labelPoint.x, labelWidth);
+            const labelY = clampLabelCoordinate(labelPoint.y, labelHeight);
+            const isCompleted = task.completed;
+            const textColor = isCompleted ? 'rgba(120, 113, 108, 0.72)' : 'rgba(41, 37, 36, 0.88)';
 
-            return glyphs.map(({ char, x, y, angle, rotation }, glyphIndex) => {
-              const { blur, opacity } = getDirectionalTextVisuals(angle, minuteAngle);
-
-              return (
+            return (
+              <g key={`${task.id}-label`} className="pointer-events-none">
+                <rect
+                  x={labelX - labelWidth / 2}
+                  y={labelY - labelHeight / 2}
+                  width={labelWidth}
+                  height={labelHeight}
+                  rx="15"
+                  fill="rgba(255,255,255,0.82)"
+                  stroke="rgba(214,211,209,0.72)"
+                  strokeWidth="1"
+                />
                 <text
-                  key={`${task.id}-label-${glyphIndex}`}
-                  x={x}
-                  y={y}
+                  x={labelX}
+                  y={labelY + 1}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="pointer-events-none fill-black text-[13px] font-medium"
-                  style={{
-                    opacity: (task.completed ? 0.58 : 0.94) * opacity,
-                    filter: `blur(${blur}px)`,
-                    transformBox: 'fill-box',
-                    transformOrigin: 'center',
-                    transform: `rotate(${rotation}deg)`,
-                  }}
+                  className="text-[18px] font-semibold"
+                  fill={textColor}
                 >
-                  {char}
+                  {labelText}
                 </text>
-              );
-            });
+              </g>
+            );
           })}
         </g>
         <g>

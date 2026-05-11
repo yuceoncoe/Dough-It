@@ -2,18 +2,26 @@ import React, { useEffect, useRef, useState } from 'react';
 import { RoutineState, Tag, Task } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
 import { getTaskTonePillClass, getTaskToneLabel, QuadrantBadge } from '../../utils/task';
-import { Clock, Trash2, X } from 'lucide-react';
+import { Clock, LogOut, Trash2, X } from 'lucide-react';
 
 export const RoutineSettingsModal = ({
   isOpen,
   routines,
+  userEmail,
+  saveError,
+  isSaving,
   onClose,
   onSaveRoutines,
+  onSignOut,
 }: {
   isOpen: boolean;
   routines: RoutineState;
+  userEmail: string | null;
+  saveError: string | null;
+  isSaving: boolean;
   onClose: () => void;
   onSaveRoutines: (routines: RoutineState) => void;
+  onSignOut: () => Promise<void>;
 }) => {
   const [activeTab, setActiveTab] = useState<'weekday' | 'weekend'>('weekday');
   const [draft, setDraft] = useState<RoutineState>(routines);
@@ -79,11 +87,29 @@ export const RoutineSettingsModal = ({
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-hand text-3xl text-stone-800">루틴 보관함</h2>
-              <p className="text-sm text-stone-500">평일과 주말의 기본 루틴을 오프라인으로 저장합니다.</p>
+              <p className="text-sm text-stone-500">평일과 주말의 기본 루틴을 관리합니다.</p>
             </div>
             <button onClick={onClose} className="rounded-full p-2 text-stone-500 transition-colors hover:bg-stone-100 hover:text-rose-500">
               <X size={20} />
             </button>
+          </div>
+          <div className="mt-4 rounded-2xl border border-stone-200 bg-white px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">계정</div>
+                <div className="truncate text-sm text-stone-600">{userEmail ?? '로그인됨'}</div>
+                {saveError ? <div className="mt-1 text-xs text-rose-600">{saveError}</div> : null}
+                {isSaving ? <div className="mt-1 text-xs text-stone-400">저장 중...</div> : null}
+              </div>
+              <button
+                type="button"
+                onClick={() => void onSignOut()}
+                className="inline-flex shrink-0 items-center gap-2 rounded-full border border-stone-300 bg-white px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-stone-50"
+              >
+                <LogOut size={16} />
+                로그아웃
+              </button>
+            </div>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl bg-stone-100 p-1">
             <button
@@ -100,7 +126,7 @@ export const RoutineSettingsModal = ({
             </button>
           </div>
         </div>
-        <div className="grid h-[calc(92vh-170px)] grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid h-[calc(92vh-250px)] grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
           <div className="overflow-y-auto border-b border-stone-200 p-5 md:border-b-0 md:border-r">
             <div className="space-y-2.5">
               {draft[activeTab].map((task) => (

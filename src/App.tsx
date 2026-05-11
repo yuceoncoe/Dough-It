@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
-import { Home, Calendar as CalendarIcon, Loader2, LogOut } from 'lucide-react';
+import { Home, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
 import { RoutineState, Task, RoutineScope } from './types';
 import { addOrReplaceDateTasks, getRoutineBaseId, getRoutineBucketForDate, getTodayString } from './utils/task';
 import RoutineSettingsModal from './components/ui/RoutineSettingsModal';
@@ -274,8 +274,12 @@ const AppShell = ({
       <RoutineSettingsModal
         isOpen={settingsOpen}
         routines={routines}
+        userEmail={user.email ?? null}
+        saveError={saveError}
+        isSaving={isSaving}
         onClose={() => setSettingsOpen(false)}
         onSaveRoutines={setRoutines}
+        onSignOut={onSignOut}
       />
       {pendingRatingTasks.length > 0 && (
         <TaskRatingCarousel
@@ -284,24 +288,6 @@ const AppShell = ({
           onClose={handleCloseRating}
         />
       )}
-
-      <div className="flex items-center justify-between gap-3 border-b border-stone-200/70 bg-white/80 px-4 py-3 backdrop-blur md:px-6">
-        <div className="min-w-0">
-          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Supabase Sync</div>
-          <div className="truncate text-sm text-stone-600">{user.email}</div>
-          {saveError ? <div className="mt-1 text-xs text-rose-600">{saveError}</div> : null}
-        </div>
-        <div className="flex items-center gap-2">
-          {isSaving ? <span className="text-xs text-stone-400">저장 중...</span> : null}
-          <button
-            onClick={() => void onSignOut()}
-            className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-3 py-2 text-sm text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
-          >
-            <LogOut size={16} />
-            로그아웃
-          </button>
-        </div>
-      </div>
 
       <main className="flex-1 overflow-hidden pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]">
         {activeTab === 'home' && (
