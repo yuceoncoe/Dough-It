@@ -38,10 +38,11 @@ export const DayScheduleView = ({
   const [sheetTask, setSheetTask] = useState<Task | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [pendingRoutineAction, setPendingRoutineAction] = useState<{ action: RoutineAction; task: Task } | null>(null);
+  const [pendingDeleteTask, setPendingDeleteTask] = useState<Task | null>(null);
   const [routineEditScope, setRoutineEditScope] = useState<RoutineScope>('single');
   const [swipedTaskId, setSwipedTaskId] = useState<string | null>(null);
-  const [swipeOffset, setSwipeOffset] = useState<{ id: string; x: number } | null>(null);
   const swipeStartRef = useRef<{ id: string; x: number; y: number; isHorizontal: boolean | null } | null>(null);
+  const swipeCardRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const sortedTasks = tasks
     .filter((task) => showRoutines || !task.isRoutine)
@@ -99,7 +100,16 @@ export const DayScheduleView = ({
       setPendingRoutineAction({ action: 'delete', task });
       return;
     }
-    deleteTask(task.id);
+    setPendingDeleteTask(task);
+  };
+
+  const setSwipeCardOffset = (taskId: string, offset: number, animated: boolean) => {
+    const card = swipeCardRefs.current[taskId];
+    if (!card) {
+      return;
+    }
+    card.style.transition = animated ? 'transform 180ms ease' : 'none';
+    card.style.transform = `translateX(${offset}px)`;
   };
 
   const startEditing = (task: Task) => {
@@ -200,6 +210,36 @@ export const DayScheduleView = ({
           }
         }}
       />
+      {pendingDeleteTask ? (
+        <div className="modal-backdrop" onClick={() => setPendingDeleteTask(null)}>
+          <div className="action-sheet max-w-md" onClick={(event) => event.stopPropagation()}>
+            <h2 className="font-hand text-2xl text-stone-800">일정 삭제</h2>
+            <p className="mt-3 text-sm leading-6 text-stone-500">
+              <span className="font-semibold text-stone-700">{pendingDeleteTask.title}</span>
+              {' '}일정을 삭제할까요?
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setPendingDeleteTask(null)}
+                className="rounded-[12px] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteTask(pendingDeleteTask.id);
+                  setPendingDeleteTask(null);
+                }}
+                className="rounded-[12px] bg-rose-500 px-4 py-3 text-sm font-semibold text-white"
+              >
+                삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <DayTaskEditorModal
         isOpen={editorOpen}
         title={title}
@@ -291,6 +331,7 @@ export const DayScheduleView = ({
                         setSheetTask(task);
                       }}
                       onPointerDown={(event) => {
+                        setSwipeCardOffset(task.id, swipedTaskId === task.id ? -80 : 0, false);
                         swipeStartRef.current = { id: task.id, x: event.clientX, y: event.clientY, isHorizontal: null };
                       }}
                       onPointerMove={(event) => {
@@ -313,13 +354,11 @@ export const DayScheduleView = ({
                         event.stopPropagation();
                         const baseOffset = swipedTaskId === task.id ? -80 : 0;
                         const nextOffset = Math.max(-96, Math.min(0, baseOffset + deltaX));
-                        setSwipeOffset({ id: task.id, x: nextOffset });
+                        setSwipeCardOffset(task.id, nextOffset, false);
                       }}
                       onPointerUp={(event) => {
                         const start = swipeStartRef.current;
-                        const currentOffset = swipeOffset?.id === task.id ? swipeOffset.x : (swipedTaskId === task.id ? -80 : 0);
                         swipeStartRef.current = null;
-                        setSwipeOffset(null);
                         if (!start || start.id !== task.id) {
                           return;
                         }
@@ -330,15 +369,22 @@ export const DayScheduleView = ({
                         }
                         event.preventDefault();
                         event.stopPropagation();
-                        setSwipedTaskId(currentOffset <= -42 ? task.id : null);
+                        const baseOffset = swipedTaskId === task.id ? -80 : 0;
+                        const currentOffset = Math.max(-96, Math.min(0, baseOffset + deltaX));
+                        const shouldOpen = currentOffset <= -42;
+                        setSwipedTaskId(shouldOpen ? task.id : null);
+                        setSwipeCardOffset(task.id, shouldOpen ? -80 : 0, true);
                       }}
                       onPointerCancel={() => {
                         swipeStartRef.current = null;
-                        setSwipeOffset(null);
+                        setSwipeCardOffset(task.id, swipedTaskId === task.id ? -80 : 0, true);
                       }}
-                      className="task-card relative block w-full rounded-[0.75rem] bg-white px-4 py-3.5 text-left transition-transform duration-200"
+                      ref={(node) => {
+                        swipeCardRefs.current[task.id] = node;
+                      }}
+                      className="task-card relative block w-full rounded-[0.75rem] bg-white px-4 py-3.5 text-left"
                       style={{
-                        transform: `translateX(${swipeOffset?.id === task.id ? swipeOffset.x : (swipedTaskId === task.id ? -80 : 0)}px)`,
+                        transform: `translateX(${swipedTaskId === task.id ? -80 : 0}px)`,
                         touchAction: 'pan-y',
                       }}
                     >
