@@ -19,7 +19,7 @@ const getPushSubscription = async () => {
   const registration = await navigator.serviceWorker.register('/push-sw.js');
   const currentSubscription = await registration.pushManager.getSubscription();
   if (currentSubscription) {
-    return { registration, subscription: currentSubscription };
+    await currentSubscription.unsubscribe();
   }
 
   const subscription = await registration.pushManager.subscribe({

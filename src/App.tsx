@@ -43,9 +43,7 @@ const AppShell = ({
       setNotificationStatus('unsupported');
       return;
     }
-    if (Notification.permission === 'granted') {
-      setNotificationStatus('enabled');
-    } else if (Notification.permission === 'denied') {
+    if (Notification.permission === 'denied') {
       setNotificationStatus('denied');
     }
   }, [user.id]);

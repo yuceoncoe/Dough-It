@@ -84,7 +84,7 @@ export const RoutineSettingsModal = ({
 
   const notificationLabel = {
     idle: '푸쉬 알림 켜기',
-    enabled: '푸쉬 알림 켜짐',
+    enabled: '푸쉬 알림 다시 연결',
     unsupported: '알림 미지원',
     denied: '알림 차단됨',
     error: '알림 설정 실패',
@@ -116,7 +116,7 @@ export const RoutineSettingsModal = ({
                 <button
                   type="button"
                   onClick={() => void onEnableNotifications()}
-                  disabled={notificationStatus === 'enabled' || notificationStatus === 'unsupported'}
+                  disabled={notificationStatus === 'unsupported'}
                   className={`inline-flex items-center justify-center rounded-full border px-3 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${notificationStatus === 'enabled' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-stone-300 bg-white text-stone-600 hover:bg-stone-50'}`}
                 >
                   {notificationLabel}
