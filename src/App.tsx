@@ -39,13 +39,31 @@ const AppShell = ({
   const isHydratedRef = useRef(false);
 
   useEffect(() => {
-    if (!('Notification' in window)) {
-      setNotificationStatus('unsupported');
-      return;
-    }
-    if (Notification.permission === 'denied') {
-      setNotificationStatus('denied');
-    }
+    const checkNotificationStatus = async () => {
+      if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+        setNotificationStatus('unsupported');
+        return;
+      }
+      if (Notification.permission === 'denied') {
+        setNotificationStatus('denied');
+        return;
+      }
+      if (Notification.permission === 'granted') {
+        try {
+          const registration = await navigator.serviceWorker.getRegistration('/push-sw.js');
+          if (registration) {
+            const subscription = await registration.pushManager.getSubscription();
+            if (subscription) {
+              setNotificationStatus('enabled');
+              return;
+            }
+          }
+        } catch (error) {
+          // ignore
+        }
+      }
+    };
+    void checkNotificationStatus();
   }, [user.id]);
 
   useEffect(() => {

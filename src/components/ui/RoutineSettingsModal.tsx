@@ -35,6 +35,7 @@ export const RoutineSettingsModal = ({
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [tags, setTags] = useState<Tag[]>([]);
+  const [isEnabling, setIsEnabling] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -84,11 +85,21 @@ export const RoutineSettingsModal = ({
 
   const notificationLabel = {
     idle: '푸쉬 알림 켜기',
-    enabled: '푸쉬 알림 다시 연결',
+    enabled: '푸쉬 알림 켜짐',
     unsupported: '알림 미지원',
     denied: '알림 차단됨',
     error: '알림 설정 실패',
   }[notificationStatus];
+
+  const handleEnableNotifications = async () => {
+    if (isEnabling || notificationStatus === 'enabled') return;
+    setIsEnabling(true);
+    try {
+      await onEnableNotifications();
+    } finally {
+      setIsEnabling(false);
+    }
+  };
 
   return (
     <div className="modal-backdrop items-center" onClick={onClose}>
@@ -115,11 +126,11 @@ export const RoutineSettingsModal = ({
               <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
                 <button
                   type="button"
-                  onClick={() => void onEnableNotifications()}
-                  disabled={notificationStatus === 'unsupported'}
+                  onClick={() => void handleEnableNotifications()}
+                  disabled={notificationStatus === 'unsupported' || notificationStatus === 'enabled' || isEnabling}
                   className={`inline-flex items-center justify-center rounded-full border px-3 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${notificationStatus === 'enabled' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-stone-300 bg-white text-stone-600 hover:bg-stone-50'}`}
                 >
-                  {notificationLabel}
+                  {isEnabling ? '설정 중...' : notificationLabel}
                 </button>
                 <button
                   type="button"
