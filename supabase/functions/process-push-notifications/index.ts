@@ -1,25 +1,26 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import webpush from 'npm:web-push@3';
-
-const supabaseUrl = Deno.env.get('SUPABASE_URL');
-const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-const vapidSubject = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:admin@example.com';
-const vapidPublicKey = Deno.env.get('VAPID_PUBLIC_KEY');
-const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY');
-const cronSecret = Deno.env.get('CRON_SECRET');
-
-if (!supabaseUrl || !serviceRoleKey || !vapidPublicKey || !vapidPrivateKey) {
-  throw new Error('Missing Supabase or VAPID environment variables.');
-}
-
-webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
-
-const supabase = createClient(supabaseUrl, serviceRoleKey);
 
 Deno.serve(async (request) => {
+  try {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  const rawVapidSubject = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:admin@example.com';
+  const vapidSubject = rawVapidSubject.includes(':') ? rawVapidSubject : `mailto:${rawVapidSubject}`;
+  const vapidPublicKey = Deno.env.get('VAPID_PUBLIC_KEY') ?? Deno.env.get('VITE_VAPID_PUBLIC_KEY');
+  const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY');
+  const cronSecret = Deno.env.get('CRON_SECRET');
+
   if (cronSecret && request.headers.get('x-cron-secret') !== cronSecret) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
+
+  if (!supabaseUrl || !serviceRoleKey || !vapidPublicKey || !vapidPrivateKey) {
+    return Response.json({ error: 'Missing Supabase or VAPID environment variables.' }, { status: 500 });
+  }
+
+  const webpush = await import('npm:web-push@3');
+  webpush.default.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
+  const supabase = createClient(supabaseUrl, serviceRoleKey);
 
   const { data: dueNotifications, error } = await supabase
     .from('scheduled_notifications')
@@ -61,7 +62,7 @@ Deno.serve(async (request) => {
     });
 
     const results = await Promise.allSettled(
-      subscriptions.map((subscription) => webpush.sendNotification(subscription.subscription, payload)),
+      subscriptions.map((subscription) => webpush.default.sendNotification(subscription.subscription, payload)),
     );
 
     const hasSuccess = results.some((result) => result.status === 'fulfilled');
@@ -80,5 +81,9 @@ Deno.serve(async (request) => {
     }
   }
 
-  return Response.json({ processed: dueNotifications?.length ?? 0, sent, failed });
+    return Response.json({ processed: dueNotifications?.length ?? 0, sent, failed });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return Response.json({ error: message }, { status: 500 });
+  }
 });
