@@ -51,9 +51,19 @@ body {
   min-height: 100vh;
   background: #f6f6f8;
   overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+}
+
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 button,
@@ -61,6 +71,14 @@ input,
 select,
 textarea {
   font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+svg,
+canvas {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .time-field {

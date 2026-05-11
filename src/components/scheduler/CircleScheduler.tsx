@@ -82,17 +82,21 @@ export const CircleScheduler = ({
 
       const minDurationAngle = 1.25;
       if (handle === 'start') {
-        const nextStart = Math.max(
-          current.endAngle - 360,
-          Math.min(current.endAngle - minDurationAngle, normalizeAngleNearReference(angle, current.startAngle)),
-        );
+        const nextStart = normalizeAngleNearReference(angle, current.startAngle);
+        if (hasPendingArcEnd && nextStart >= current.endAngle - minDurationAngle) {
+          arcDragHandleRef.current = 'end';
+          setActiveArcHandle('end');
+          return { startAngle: current.endAngle, endAngle: nextStart + minDurationAngle };
+        }
         return { startAngle: nextStart, endAngle: current.endAngle };
       }
 
-      const nextEnd = Math.max(
-        current.startAngle + minDurationAngle,
-        Math.min(current.startAngle + 360, normalizeAngleNearReference(angle, current.endAngle)),
-      );
+      const nextEnd = normalizeAngleNearReference(angle, current.endAngle);
+      if (nextEnd <= current.startAngle + minDurationAngle) {
+        arcDragHandleRef.current = 'start';
+        setActiveArcHandle('start');
+        return { startAngle: nextEnd - minDurationAngle, endAngle: current.startAngle };
+      }
       return { startAngle: current.startAngle, endAngle: nextEnd };
     });
   };

@@ -7,7 +7,7 @@ import TaskActionSheet from '../ui/TaskActionSheet';
 import RoutineActionModal from '../ui/RoutineActionModal';
 import DayTaskEditorModal from '../ui/DayTaskEditorModal';
 import CircleScheduler from '../scheduler/CircleScheduler';
-import { ChevronLeft, Plus, Settings, Clock, Lock, Zap } from 'lucide-react';
+import { ChevronLeft, Plus, Settings, Clock, Lock, Zap, Trash2 } from 'lucide-react';
 import { QuadrantBadge } from '../../utils/task';
 
 
@@ -39,6 +39,8 @@ export const DayScheduleView = ({
   const [editorOpen, setEditorOpen] = useState(false);
   const [pendingRoutineAction, setPendingRoutineAction] = useState<{ action: RoutineAction; task: Task } | null>(null);
   const [routineEditScope, setRoutineEditScope] = useState<RoutineScope>('single');
+  const [swipedTaskId, setSwipedTaskId] = useState<string | null>(null);
+  const swipeStartRef = useRef<{ id: string; x: number; y: number } | null>(null);
 
   const sortedTasks = tasks
     .filter((task) => showRoutines || !task.isRoutine)
@@ -88,6 +90,15 @@ export const DayScheduleView = ({
 
   const deleteTask = (id: string) => {
     onTasksChange(tasks.filter((task) => task.id !== id));
+  };
+
+  const requestDeleteTask = (task: Task) => {
+    setSwipedTaskId(null);
+    if (task.isRoutine) {
+      setPendingRoutineAction({ action: 'delete', task });
+      return;
+    }
+    deleteTask(task.id);
   };
 
   const startEditing = (task: Task) => {
@@ -258,35 +269,74 @@ export const DayScheduleView = ({
                   </div>
                 )}
                 {sortedTasks.map((task) => (
-                  <button
-                    key={task.id}
-                    onClick={() => setSheetTask(task)}
-                    className="task-card block w-full rounded-[0.75rem] bg-white px-4 py-3.5 text-left"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2.5">
-                          <QuadrantBadge task={task} />
-                          <span className={`truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
-                            {task.title}
+                  <div key={task.id} className="relative overflow-hidden rounded-[0.75rem]">
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        requestDeleteTask(task);
+                      }}
+                      className="absolute inset-y-0 right-0 flex w-20 items-center justify-center rounded-[0.75rem] bg-rose-500 text-white"
+                      aria-label={`${task.title} 삭제`}
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (swipedTaskId === task.id) {
+                          setSwipedTaskId(null);
+                          return;
+                        }
+                        setSheetTask(task);
+                      }}
+                      onPointerDown={(event) => {
+                        swipeStartRef.current = { id: task.id, x: event.clientX, y: event.clientY };
+                      }}
+                      onPointerUp={(event) => {
+                        const start = swipeStartRef.current;
+                        swipeStartRef.current = null;
+                        if (!start || start.id !== task.id) {
+                          return;
+                        }
+                        const deltaX = event.clientX - start.x;
+                        const deltaY = event.clientY - start.y;
+                        if (Math.abs(deltaX) < 36 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) {
+                          return;
+                        }
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setSwipedTaskId(deltaX < 0 ? task.id : null);
+                      }}
+                      onPointerCancel={() => {
+                        swipeStartRef.current = null;
+                      }}
+                      className={`task-card relative block w-full rounded-[0.75rem] bg-white px-4 py-3.5 text-left transition-transform duration-200 ${swipedTaskId === task.id ? '-translate-x-20' : 'translate-x-0'}`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2.5">
+                            <QuadrantBadge task={task} />
+                            <span className={`truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
+                              {task.title}
+                            </span>
+                          </div>
+                          <div className="mt-1.5 flex items-center gap-2 text-[12px] text-stone-400">
+                            <Clock size={12} className="shrink-0" />
+                            {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
+                          </div>
+                        </div>
+                        <div className="flex shrink-0 flex-col items-end gap-1.5">
+                          <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
+                            {getTaskToneLabel(task)}
                           </span>
-                        </div>
-                        <div className="mt-1.5 flex items-center gap-2 text-[12px] text-stone-400">
-                          <Clock size={12} className="shrink-0" />
-                          {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
-                        </div>
-                      </div>
-                      <div className="flex shrink-0 flex-col items-end gap-1.5">
-                        <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
-                          {getTaskToneLabel(task)}
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          {task.rating !== undefined && <span className="text-xs font-bold text-amber-500">⭐️ {task.rating}</span>}
-                          {task.isRoutine ? <Lock size={13} className="text-stone-300" /> : <Zap size={13} className="text-stone-300" />}
+                          <div className="flex items-center gap-1.5">
+                            {task.rating !== undefined && <span className="text-xs font-bold text-amber-500">⭐️ {task.rating}</span>}
+                            {task.isRoutine ? <Lock size={13} className="text-stone-300" /> : <Zap size={13} className="text-stone-300" />}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </button>
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
