@@ -23,6 +23,7 @@ export const CircleScheduler = ({
   const arcDragMovedRef = useRef(false);
   const [pendingArc, setPendingArc] = useState<{ startAngle: number; endAngle: number } | null>(null);
   const [hasPendingArcEnd, setHasPendingArcEnd] = useState(false);
+  const [activeArcHandle, setActiveArcHandle] = useState<'start' | 'end' | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [now, setNow] = useState(new Date());
   const [overlapIndex, setOverlapIndex] = useState(0);
@@ -96,12 +97,22 @@ export const CircleScheduler = ({
     });
   };
 
+  const getNearestArcHandle = (angle: number, arc: { startAngle: number; endAngle: number }) => {
+    if (!hasPendingArcEnd) {
+      return 'start';
+    }
+    const startDelta = Math.abs(normalizeAngleNearReference(angle, arc.startAngle) - arc.startAngle);
+    const endDelta = Math.abs(normalizeAngleNearReference(angle, arc.endAngle) - arc.endAngle);
+    return startDelta <= endDelta ? 'start' : 'end';
+  };
+
   const beginArcHandleDrag = (event: React.PointerEvent<SVGCircleElement>, handle: 'start' | 'end') => {
     event.preventDefault();
     event.stopPropagation();
     arcDragHandleRef.current = handle;
     arcDragPointerIdRef.current = event.pointerId;
     arcDragMovedRef.current = false;
+    setActiveArcHandle(handle);
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
@@ -117,14 +128,19 @@ export const CircleScheduler = ({
 
     if (pendingArc === null) {
       arcDragHandleRef.current = 'start';
+      setActiveArcHandle('start');
       setHasPendingArcEnd(false);
       setPendingArc({ startAngle: angle, endAngle: angle + 1.25 });
     } else if (!hasPendingArcEnd) {
       arcDragHandleRef.current = 'end';
+      setActiveArcHandle('end');
       setHasPendingArcEnd(true);
       setPendingArc((current) => current ? { ...current, endAngle: clampArcEnd(current.startAngle, angle) } : current);
     } else {
-      return;
+      const nearestHandle = getNearestArcHandle(angle, pendingArc);
+      arcDragHandleRef.current = nearestHandle;
+      setActiveArcHandle(nearestHandle);
+      updatePendingArcHandle(nearestHandle, angle);
     }
 
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -147,6 +163,7 @@ export const CircleScheduler = ({
     arcDragHandleRef.current = null;
     arcDragPointerIdRef.current = null;
     arcDragMovedRef.current = false;
+    setActiveArcHandle(null);
   };
 
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -206,6 +223,7 @@ export const CircleScheduler = ({
           setShowCreateModal(false);
           setPendingArc(null);
           setHasPendingArcEnd(false);
+          setActiveArcHandle(null);
         }}
         onSave={(title, tags) => {
           if (!pendingArc) {
@@ -217,6 +235,7 @@ export const CircleScheduler = ({
           setShowCreateModal(false);
           setPendingArc(null);
           setHasPendingArcEnd(false);
+          setActiveArcHandle(null);
         }}
       />
 
@@ -282,7 +301,7 @@ export const CircleScheduler = ({
             );
           })}
         </g>
-        <g>
+        <g className="pointer-events-none">
           {OUTER_HOUR_LABELS.map(({ value, angle, point }) => (
             (() => {
               const { blur, opacity } = getDirectionalTextVisuals(angle, minuteAngle);
@@ -342,15 +361,16 @@ export const CircleScheduler = ({
             {(hasPendingArcEnd ? ['start', 'end'] as const : ['start'] as const).map((handle) => {
               const angle = handle === 'start' ? pendingArc.startAngle : pendingArc.endAngle;
               const point = polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, angle);
+              const isActive = activeArcHandle === handle;
               return (
                 <circle
                   key={`pending-arc-${handle}`}
                   cx={point.x}
                   cy={point.y}
-                  r="10"
+                  r={isActive ? 14 : 10}
                   fill="#d90429"
                   stroke="#ffffff"
-                  strokeWidth="4"
+                  strokeWidth={isActive ? 5 : 4}
                   className="cursor-grab active:cursor-grabbing"
                   onPointerDown={(event) => beginArcHandleDrag(event, handle)}
                 />
@@ -379,6 +399,7 @@ export const CircleScheduler = ({
               onClick={() => {
                 setPendingArc(null);
                 setHasPendingArcEnd(false);
+                setActiveArcHandle(null);
               }}
               className="rounded-full border border-stone-300 bg-white/90 px-4 py-2 text-xs font-semibold text-stone-600 shadow-sm backdrop-blur"
             >
@@ -390,11 +411,15 @@ export const CircleScheduler = ({
                 onClick={() => setShowCreateModal(true)}
                 className="rounded-full bg-stone-900 px-5 py-2 text-xs font-semibold text-white shadow-sm"
               >
-                {minutesToTime(angleToMinutes(pendingArc.startAngle % 360))} - {minutesToTime(angleToMinutes(pendingArc.endAngle % 360))} 추가
+                {activeArcHandle
+                  ? `${activeArcHandle === 'start' ? '시작' : '종료'} ${minutesToTime(angleToMinutes((activeArcHandle === 'start' ? pendingArc.startAngle : pendingArc.endAngle) % 360))}`
+                  : `${minutesToTime(angleToMinutes(pendingArc.startAngle % 360))} - ${minutesToTime(angleToMinutes(pendingArc.endAngle % 360))} 추가`}
               </button>
             ) : (
               <div className="rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-stone-500 shadow-sm backdrop-blur">
-                종료 시간을 터치하세요
+                {activeArcHandle === 'start'
+                  ? `시작 ${minutesToTime(angleToMinutes(pendingArc.startAngle % 360))}`
+                  : '종료 시간을 터치하세요'}
               </div>
             )}
           </div>
