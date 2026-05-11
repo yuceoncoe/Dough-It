@@ -163,22 +163,35 @@ const AppShell = ({
 
     const checkEndedTasks = () => {
       const now = new Date();
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+      const actualTodayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      
+      const targetDates = [yesterdayStr, actualTodayStr];
+      const endedUnratedTasks: Task[] = [];
 
-      const todayTasks = tasksByDate[todayStr] ?? [];
-      const endedUnratedTasks = todayTasks.filter((task) => {
-        if (!task.startTime || !task.duration) {
-          return false;
-        }
-        if (task.rating !== undefined) {
-          return false;
-        }
-        if (skippedRatingTaskIds.has(task.id)) {
-          return false;
-        }
-
-        const taskEndMinutes = timeToMinutes(task.startTime) + task.duration;
-        return currentMinutes >= taskEndMinutes;
+      targetDates.forEach((dateStr) => {
+        const tasks = tasksByDate[dateStr] ?? [];
+        const [year, month, day] = dateStr.split('-').map(Number);
+        
+        tasks.forEach((task) => {
+          if (!task.startTime || !task.duration) return;
+          if (task.rating !== undefined) return;
+          if (skippedRatingTaskIds.has(task.id)) return;
+          
+          const [hours, minutes] = task.startTime.split(':').map(Number);
+          const startAt = new Date(year, month - 1, day, hours, minutes, 0);
+          const endAt = new Date(startAt.getTime() + task.duration * 60 * 1000);
+          
+          if (now.getTime() >= endAt.getTime()) {
+            if (!endedUnratedTasks.find((t) => t.id === task.id)) {
+              endedUnratedTasks.push(task);
+            }
+          }
+        });
       });
 
       setPendingRatingTasks(endedUnratedTasks);
@@ -191,9 +204,13 @@ const AppShell = ({
 
   const handleRateTask = (taskId: string, rating: number) => {
     setTasksByDate((current) => {
-      const todayTasks = current[todayStr] ?? [];
-      const nextTasks = todayTasks.map((task) => task.id === taskId ? { ...task, rating } : task);
-      return { ...current, [todayStr]: nextTasks };
+      const next = { ...current };
+      Object.entries(current).forEach(([dateStr, tasks]) => {
+        if (tasks.some((t) => t.id === taskId)) {
+          next[dateStr] = tasks.map((task) => task.id === taskId ? { ...task, rating } : task);
+        }
+      });
+      return next;
     });
   };
 
