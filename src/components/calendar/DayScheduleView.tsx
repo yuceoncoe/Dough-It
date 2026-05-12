@@ -96,7 +96,7 @@ export const DayScheduleView = ({
       isRoutine: false,
     };
     if (getMaxOverlap([...tasks, newTask]) > 3) {
-      showToast('동시에 겹치는 일정이 3개를 넘을 수 없습니다.');
+      showToast('알림은 한 번에 3개까지만 가능해요!');
       return false;
     }
     onTasksChange([...tasks, newTask]);
@@ -160,7 +160,7 @@ export const DayScheduleView = ({
         };
         const updatedTask = { ...current, ...nextValues };
         if (getMaxOverlap(tasks.map((task) => task.id === editingId ? updatedTask : task)) > 3) {
-          showToast('동시에 겹치는 일정이 3개를 넘을 수 없습니다.');
+          showToast('알림은 한 번에 3개까지만 가능해요!');
           return;
         }
         if (current.isRoutine && routineEditScope === 'future') {
@@ -440,7 +440,7 @@ export const DayScheduleView = ({
         </div>
       </div>
       {toastMessage && (
-        <div className="fixed bottom-24 left-1/2 z-[100] -translate-x-1/2 animate-[fade-in_200ms_ease-out] rounded-full bg-stone-800 px-4 py-2.5 text-sm font-medium text-white shadow-lg sm:bottom-8">
+        <div className="fixed bottom-24 left-1/2 z-[100] -translate-x-1/2 whitespace-nowrap animate-[fade-in_200ms_ease-out] rounded-full bg-stone-800 px-4 py-2.5 text-sm font-medium text-white shadow-lg sm:bottom-8">
           {toastMessage}
         </div>
       )}
