@@ -14,6 +14,48 @@ import AuthScreen from './components/auth/AuthScreen';
 import { AppStateSnapshot, createDefaultAppState, normalizeAppState } from './utils/appState';
 import { loadCachedAppState, loadRemoteAppState, persistCachedAppState, persistRemoteAppState } from './utils/cloudStorage';
 
+const collectEndedUnratedTasks = (
+  tasksByDate: Record<string, Task[]>,
+  skippedRatingTaskIds: Set<string>,
+  now: Date,
+) => {
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+  const actualTodayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const targetDates = [yesterdayStr, actualTodayStr];
+  const endedUnratedTasks: Task[] = [];
+  let nextEndAt: number | null = null;
+
+  targetDates.forEach((dateStr) => {
+    const tasks = tasksByDate[dateStr] ?? [];
+    const [year, month, day] = dateStr.split('-').map(Number);
+
+    tasks.forEach((task) => {
+      if (!task.startTime || !task.duration) return;
+      if (task.rating !== undefined) return;
+      if (skippedRatingTaskIds.has(task.id)) return;
+
+      const [hours, minutes] = task.startTime.split(':').map(Number);
+      const startAt = new Date(year, month - 1, day, hours, minutes, 0);
+      const endAt = new Date(startAt.getTime() + task.duration * 60 * 1000);
+      const endTime = endAt.getTime();
+
+      if (now.getTime() >= endTime) {
+        if (!endedUnratedTasks.find((endedTask) => endedTask.id === task.id)) {
+          endedUnratedTasks.push(task);
+        }
+        return;
+      }
+
+      nextEndAt = nextEndAt === null ? endTime : Math.min(nextEndAt, endTime);
+    });
+  });
+
+  return { endedUnratedTasks, nextEndAt };
+};
+
 const AppShell = ({
   user,
   onSignOut,
@@ -161,45 +203,38 @@ const AppShell = ({
       return;
     }
 
+    let nextEndTimeoutId: number | null = null;
+
     const checkEndedTasks = () => {
       const now = new Date();
-      
-      const yesterday = new Date(now);
-      yesterday.setDate(yesterday.getDate() - 1);
-      
-      const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
-      const actualTodayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-      
-      const targetDates = [yesterdayStr, actualTodayStr];
-      const endedUnratedTasks: Task[] = [];
-
-      targetDates.forEach((dateStr) => {
-        const tasks = tasksByDate[dateStr] ?? [];
-        const [year, month, day] = dateStr.split('-').map(Number);
-        
-        tasks.forEach((task) => {
-          if (!task.startTime || !task.duration) return;
-          if (task.rating !== undefined) return;
-          if (skippedRatingTaskIds.has(task.id)) return;
-          
-          const [hours, minutes] = task.startTime.split(':').map(Number);
-          const startAt = new Date(year, month - 1, day, hours, minutes, 0);
-          const endAt = new Date(startAt.getTime() + task.duration * 60 * 1000);
-          
-          if (now.getTime() >= endAt.getTime()) {
-            if (!endedUnratedTasks.find((t) => t.id === task.id)) {
-              endedUnratedTasks.push(task);
-            }
-          }
-        });
-      });
+      const { endedUnratedTasks, nextEndAt } = collectEndedUnratedTasks(tasksByDate, skippedRatingTaskIds, now);
 
       setPendingRatingTasks(endedUnratedTasks);
+
+      if (nextEndTimeoutId !== null) {
+        window.clearTimeout(nextEndTimeoutId);
+        nextEndTimeoutId = null;
+      }
+
+      if (nextEndAt !== null) {
+        const delay = Math.max(250, nextEndAt - now.getTime() + 250);
+        nextEndTimeoutId = window.setTimeout(checkEndedTasks, delay);
+      }
     };
 
     checkEndedTasks();
     const intervalId = window.setInterval(checkEndedTasks, 60000);
-    return () => window.clearInterval(intervalId);
+    document.addEventListener('visibilitychange', checkEndedTasks);
+    window.addEventListener('focus', checkEndedTasks);
+
+    return () => {
+      window.clearInterval(intervalId);
+      if (nextEndTimeoutId !== null) {
+        window.clearTimeout(nextEndTimeoutId);
+      }
+      document.removeEventListener('visibilitychange', checkEndedTasks);
+      window.removeEventListener('focus', checkEndedTasks);
+    };
   }, [tasksByDate, todayStr, skippedRatingTaskIds]);
 
   const handleRateTask = (taskId: string, rating: number) => {

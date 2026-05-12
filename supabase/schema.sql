@@ -55,7 +55,7 @@ create table if not exists public.scheduled_notifications (
   title text not null,
   body text not null,
   scheduled_at timestamptz not null,
-  status text not null default 'pending' check (status in ('pending', 'sent', 'failed')),
+  status text not null default 'pending' check (status in ('pending', 'processing', 'sent', 'failed')),
   sent_at timestamptz,
   error text,
   created_at timestamptz not null default timezone('utc', now())
@@ -63,6 +63,16 @@ create table if not exists public.scheduled_notifications (
 
 create index if not exists scheduled_notifications_due_idx
 on public.scheduled_notifications (status, scheduled_at);
+
+delete from public.scheduled_notifications older
+using public.scheduled_notifications newer
+where older.user_id = newer.user_id
+  and older.task_id = newer.task_id
+  and older.event_type = newer.event_type
+  and older.created_at < newer.created_at;
+
+create unique index if not exists scheduled_notifications_task_event_idx
+on public.scheduled_notifications (user_id, task_id, event_type);
 
 alter table public.scheduled_notifications enable row level security;
 

@@ -2,6 +2,7 @@ import { Task } from '../types';
 import { supabase } from '../lib/supabase';
 
 const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+let alarmSyncQueue = Promise.resolve();
 
 const getTodayKey = () => {
   const now = new Date();
@@ -109,7 +110,7 @@ export const requestNotificationPermissions = async (userId: string) => {
   return true;
 };
 
-export const syncTaskAlarms = async (tasksByDate: Record<string, Task[]>, userId: string) => {
+const syncTaskAlarmsNow = async (tasksByDate: Record<string, Task[]>, userId: string) => {
   if (!supabase) {
     return;
   }
@@ -144,6 +145,9 @@ export const syncTaskAlarms = async (tasksByDate: Record<string, Task[]>, userId
         title: '일정 시작',
         body: `지금부터 [${task.title}] 일정이 시작됩니다.`,
         scheduled_at: startAt.toISOString(),
+        status: 'pending',
+        sent_at: null,
+        error: null,
       });
     }
 
@@ -155,6 +159,9 @@ export const syncTaskAlarms = async (tasksByDate: Record<string, Task[]>, userId
         title: '일정 종료',
         body: `[${task.title}] 일정이 끝났습니다. 앱에서 평가를 남겨주세요.`,
         scheduled_at: endAt.toISOString(),
+        status: 'pending',
+        sent_at: null,
+        error: null,
       });
     }
 
@@ -177,9 +184,17 @@ export const syncTaskAlarms = async (tasksByDate: Record<string, Task[]>, userId
 
   const { error: insertError } = await supabase
     .from('scheduled_notifications')
-    .insert(notifications);
+    .upsert(notifications, { onConflict: 'user_id,task_id,event_type' });
 
   if (insertError) {
     throw insertError;
   }
+};
+
+export const syncTaskAlarms = async (tasksByDate: Record<string, Task[]>, userId: string) => {
+  alarmSyncQueue = alarmSyncQueue
+    .catch(() => undefined)
+    .then(() => syncTaskAlarmsNow(tasksByDate, userId));
+
+  return alarmSyncQueue;
 };
