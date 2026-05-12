@@ -8,16 +8,8 @@ export const CENTER = 300;
 export const RADIUS = 248;
 
 export const INITIAL_ROUTINES: RoutineState = {
-  weekday: [
-    { id: 'wd-1', title: '기상', tags: [], startTime: '07:00', duration: 30, completed: false, isRoutine: true },
-    { id: 'wd-2', title: '집중 작업', tags: ['important'], startTime: '09:00', duration: 180, completed: false, isRoutine: true },
-    { id: 'wd-3', title: '점심', tags: [], startTime: '13:00', duration: 60, completed: false, isRoutine: true },
-    { id: 'wd-4', title: '정리 업무', tags: ['urgent'], startTime: '15:00', duration: 60, completed: false, isRoutine: true },
-  ],
-  weekend: [
-    { id: 'we-1', title: '느린 아침', tags: [], startTime: '09:00', duration: 60, completed: false, isRoutine: true },
-    { id: 'we-2', title: '창작 시간', tags: ['important'], startTime: '14:00', duration: 120, completed: false, isRoutine: true },
-  ],
+  weekday: [],
+  weekend: [],
 };
 
 export const clampArcEnd = (startAngle: number, endAngle: number) => {
@@ -556,11 +548,7 @@ export function generateRoutinesForDate(dateStr: string, routines: RoutineState)
 }
 
 export const seedTasksForToday = (todayStr: string, routines: RoutineState): Record<string, Task[]> => ({
-  [todayStr]: [
-    { id: 'seed-1', title: '아침 산책', tags: [], startTime: '06:30', duration: 30, completed: false, isRoutine: false },
-    { id: 'seed-2', title: '우선순위 블록', tags: ['important'], startTime: '16:00', duration: 90, completed: false, isRoutine: false },
-    ...generateRoutinesForDate(todayStr, routines),
-  ],
+  [todayStr]: generateRoutinesForDate(todayStr, routines),
 });
 
 export const addOrReplaceDateTasks = (tasksByDate: Record<string, Task[]>, date: string, routines: RoutineState) => {
