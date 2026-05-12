@@ -24,6 +24,8 @@ export const CircleScheduler = ({
   const arcDragHandleRef = useRef<'start' | 'end' | null>(null);
   const arcDragPointerIdRef = useRef<number | null>(null);
   const arcDragMovedRef = useRef(false);
+  const dragPreviewFrameRef = useRef<number | null>(null);
+  const dragPreviewPointRef = useRef<{ x: number; y: number } | null>(null);
   const [pendingArc, setPendingArc] = useState<{ startAngle: number; endAngle: number } | null>(null);
   const [hasPendingArcEnd, setHasPendingArcEnd] = useState(false);
   const [activeArcHandle, setActiveArcHandle] = useState<'start' | 'end' | null>(null);
@@ -41,6 +43,9 @@ export const CircleScheduler = ({
   useEffect(() => () => {
     if (transitionResetRef.current !== null) {
       window.clearTimeout(transitionResetRef.current);
+    }
+    if (dragPreviewFrameRef.current !== null) {
+      window.cancelAnimationFrame(dragPreviewFrameRef.current);
     }
   }, []);
 
@@ -83,9 +88,16 @@ export const CircleScheduler = ({
     if (!rect) {
       return;
     }
-    setDragPreviewPoint({
+    dragPreviewPointRef.current = {
       x: clientX - rect.left,
       y: clientY - rect.top,
+    };
+    if (dragPreviewFrameRef.current !== null) {
+      return;
+    }
+    dragPreviewFrameRef.current = window.requestAnimationFrame(() => {
+      dragPreviewFrameRef.current = null;
+      setDragPreviewPoint(dragPreviewPointRef.current);
     });
   };
 
@@ -185,12 +197,18 @@ export const CircleScheduler = ({
     arcDragHandleRef.current = null;
     arcDragPointerIdRef.current = null;
     arcDragMovedRef.current = false;
+    dragPreviewPointRef.current = null;
+    if (dragPreviewFrameRef.current !== null) {
+      window.cancelAnimationFrame(dragPreviewFrameRef.current);
+      dragPreviewFrameRef.current = null;
+    }
     setActiveArcHandle(null);
     setDragPreviewPoint(null);
   };
 
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const minuteAngle = minutesToAngle(currentMinutes);
+  const canvasMinuteAngle = showCurrentTime ? minuteAngle : null;
   const overlappingActiveTasks = showCurrentTime ? tasks.filter((task) => isCurrentMinuteInsideTask(task, currentMinutes)) : [];
   const activeTask = overlappingActiveTasks[0] ?? null;
   const hasOverlapSlider = overlappingActiveTasks.length > 1;
@@ -430,7 +448,7 @@ export const CircleScheduler = ({
 
       <div ref={squareRef} className="relative aspect-square w-full max-w-[760px]">
         <div className="relative h-full w-full">
-        <CanvasClockSurface tasks={tasks} minuteAngle={minuteAngle} />
+        <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} />
 
         <svg
           ref={svgRef}
@@ -464,7 +482,7 @@ export const CircleScheduler = ({
               }}
             >
               <div className="relative h-full w-full">
-                <CanvasClockSurface tasks={tasks} minuteAngle={minuteAngle} />
+                <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} />
                 <svg
                   viewBox={`${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_SIZE} ${SVG_VIEWBOX_SIZE}`}
                   className="absolute inset-0 h-full w-full select-none pointer-events-none"

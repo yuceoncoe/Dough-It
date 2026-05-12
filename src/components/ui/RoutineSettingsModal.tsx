@@ -103,11 +103,9 @@ export const RoutineSettingsModal = ({
 
   const handleDelete = (id: string) => {
     const currentTab = activeTab === 'main' ? 'weekday' : activeTab;
-    setDraft((current) => {
-      const nextDraft = { ...current, [currentTab]: current[currentTab].filter((task) => task.id !== id) };
-      onSaveRoutines(nextDraft);
-      return nextDraft;
-    });
+    const nextDraft = { ...draft, [currentTab]: draft[currentTab].filter((task) => task.id !== id) };
+    setDraft(nextDraft);
+    onSaveRoutines(nextDraft);
   };
 
   const notificationLabel = {

@@ -473,7 +473,7 @@ export const getBlurProgress = (point: { x: number; y: number }, minuteAngle: nu
   return Math.min(1, easedDirectional * 0.72 + projected * 0.28);
 };
 
-export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAngle: number) => {
+export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAngle: number | null) => {
   const laneCount = getRequiredTrackLaneCount(tasks);
   const trackTasks = assignTasksToTrackLanes(tasks, laneCount);
 
@@ -490,10 +490,10 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
   ctx.restore();
 
   OUTER_RING_SEGMENTS.forEach(({ start, end, isCardinal }) => {
-    const progress = getBlurProgress(end, minuteAngle);
+    const progress = minuteAngle === null ? 0 : getBlurProgress(end, minuteAngle);
 
     ctx.save();
-    ctx.filter = `blur(${0.4 + progress * 1.6}px)`;
+    ctx.filter = minuteAngle === null ? 'none' : `blur(${0.4 + progress * 1.6}px)`;
     ctx.globalAlpha = 1;
     ctx.strokeStyle = '#aaa';
     ctx.lineWidth = isCardinal ? 1 : 0.8;
@@ -521,10 +521,10 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
       const laneStrokeWidth = outerRadius - innerRadius;
       const midAngle = startAngle + (endAngle - startAngle) / 2;
       const labelPoint = polarToCartesian(CENTER, CENTER, laneCenterRadius, midAngle);
-      const progress = getBlurProgress(labelPoint, minuteAngle);
+      const progress = minuteAngle === null ? 0 : getBlurProgress(labelPoint, minuteAngle);
 
       ctx.save();
-      ctx.filter = `blur(${0.8 + progress * 5.2}px)`;
+      ctx.filter = minuteAngle === null ? 'none' : `blur(${0.8 + progress * 5.2}px)`;
       ctx.globalAlpha = task.completed ? 0.42 : 0.92;
       ctx.strokeStyle = getClockTaskColor(task);
       ctx.lineWidth = laneStrokeWidth;

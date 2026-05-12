@@ -7,7 +7,7 @@ export const CanvasClockSurface = ({
   minuteAngle,
 }: {
   tasks: Task[];
-  minuteAngle: number;
+  minuteAngle: number | null;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
