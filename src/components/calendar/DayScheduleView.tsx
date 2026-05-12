@@ -44,6 +44,17 @@ export const DayScheduleView = ({
   const swipeStartRef = useRef<{ id: string; x: number; y: number; isHorizontal: boolean | null } | null>(null);
   const swipeCardRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toastTimeoutRef = useRef<number | null>(null);
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    if (toastTimeoutRef.current !== null) {
+      window.clearTimeout(toastTimeoutRef.current);
+    }
+    toastTimeoutRef.current = window.setTimeout(() => setToastMessage(null), 3000);
+  };
+
   const sortedTasks = tasks
     .filter((task) => showRoutines || !task.isRoutine)
     .sort((left, right) => {
@@ -85,7 +96,7 @@ export const DayScheduleView = ({
       isRoutine: false,
     };
     if (getMaxOverlap([...tasks, newTask]) > 3) {
-      alert('일정 추가 불가: 동시에 겹치는 일정이 3개를 넘을 수 없습니다.');
+      showToast('동시에 겹치는 일정이 3개를 넘을 수 없습니다.');
       return false;
     }
     onTasksChange([...tasks, newTask]);
@@ -149,7 +160,7 @@ export const DayScheduleView = ({
         };
         const updatedTask = { ...current, ...nextValues };
         if (getMaxOverlap(tasks.map((task) => task.id === editingId ? updatedTask : task)) > 3) {
-          alert('일정 수정 불가: 동시에 겹치는 일정이 3개를 넘을 수 없습니다.');
+          showToast('동시에 겹치는 일정이 3개를 넘을 수 없습니다.');
           return;
         }
         if (current.isRoutine && routineEditScope === 'future') {
@@ -428,6 +439,11 @@ export const DayScheduleView = ({
           </div>
         </div>
       </div>
+      {toastMessage && (
+        <div className="fixed bottom-24 left-1/2 z-[100] -translate-x-1/2 animate-[fade-in_200ms_ease-out] rounded-full bg-stone-800 px-4 py-2.5 text-sm font-medium text-white shadow-lg sm:bottom-8">
+          {toastMessage}
+        </div>
+      )}
     </section>
   );
 };

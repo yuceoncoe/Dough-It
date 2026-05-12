@@ -36,6 +36,16 @@ export const RoutineSettingsModal = ({
   const [endTime, setEndTime] = useState('');
   const [tags, setTags] = useState<Tag[]>([]);
   const [isEnabling, setIsEnabling] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toastTimeoutRef = useRef<number | null>(null);
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    if (toastTimeoutRef.current !== null) {
+      window.clearTimeout(toastTimeoutRef.current);
+    }
+    toastTimeoutRef.current = window.setTimeout(() => setToastMessage(null), 3000);
+  };
 
   useEffect(() => {
     if (!isOpen) {
@@ -73,7 +83,7 @@ export const RoutineSettingsModal = ({
       isRoutine: true,
     };
     if (getMaxOverlap([...draft[activeTab], nextTask]) > 3) {
-      alert('일정 추가 불가: 동시에 겹치는 일정이 3개를 넘을 수 없습니다.');
+      showToast('동시에 겹치는 일정이 3개를 넘을 수 없습니다.');
       return;
     }
     const nextTasks = [...draft[activeTab], nextTask].sort((left, right) => timeToMinutes(left.startTime ?? '00:00') - timeToMinutes(right.startTime ?? '00:00'));
@@ -264,6 +274,11 @@ export const RoutineSettingsModal = ({
           </button>
         </div>
       </div>
+      {toastMessage && (
+        <div className="fixed bottom-8 left-1/2 z-[100] -translate-x-1/2 animate-[fade-in_200ms_ease-out] rounded-full bg-stone-800 px-4 py-2.5 text-sm font-medium text-white shadow-lg">
+          {toastMessage}
+        </div>
+      )}
     </div>
   );
 };
