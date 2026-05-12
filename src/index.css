@@ -472,19 +472,6 @@ canvas {
   pointer-events: none;
 }
 
-.drag-preview-lens::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 16%;
-  bottom: 16%;
-  width: 4px;
-  transform: translateX(-50%);
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(236, 185, 34, 0.95) 0%, rgba(236, 185, 34, 0.7) 100%);
-  box-shadow: 0 0 14px rgba(236, 185, 34, 0.28);
-}
-
 .drag-preview-lens__scene {
   position: absolute;
   left: 0;

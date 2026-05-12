@@ -259,66 +259,66 @@ export const RoutineSettingsModal = ({
               ))}
             </div>
           </div>
-          <div className="min-h-0 overflow-y-auto bg-white p-5">
-            <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
-            <form 
+          <div className="flex min-h-0 flex-col bg-white">
+            <div className="min-h-0 flex-1 overflow-y-auto p-5">
+              <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
+              <form 
               className="mt-4 space-y-3"
               autoComplete="off"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleAdd();
               }}
-            >
-              <input
-                type="text"
-                name="routine-task-title"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="none"
-                spellCheck={false}
-                className="w-full rounded-[12px] border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
-                placeholder="일정 이름"
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-              />
-              <div className="space-y-3">
-                <label className="block rounded-[12px] border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
-                  <div className="mb-1">시작</div>
-                  <input type="time" className="time-field" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
-                </label>
-                <label className="block rounded-[12px] border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
-                  <div className="mb-1">종료</div>
-                  <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
-                </label>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <button type="button" onClick={() => handleTagSelect(getToneTags('urgent-important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-                  긴급+중요
-                </button>
-                <button type="button" onClick={() => handleTagSelect(getToneTags('urgent'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-yellow-400 bg-yellow-100 text-yellow-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-                  긴급
-                </button>
-                <button type="button" onClick={() => handleTagSelect(getToneTags('important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-                  중요
-                </button>
-                <button type="button" onClick={() => handleTagSelect(getToneTags('normal'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-                  일반
-                </button>
-              </div>
+              >
+                <input
+                  type="text"
+                  name="routine-task-title"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  className="w-full rounded-[12px] border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
+                  placeholder="일정 이름"
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                />
+                <div className="space-y-3">
+                  <label className="block rounded-[12px] border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
+                    <div className="mb-1">시작</div>
+                    <input type="time" className="time-field" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
+                  </label>
+                  <label className="block rounded-[12px] border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
+                    <div className="mb-1">종료</div>
+                    <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
+                  </label>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <button type="button" onClick={() => handleTagSelect(getToneTags('urgent-important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                    긴급+중요
+                  </button>
+                  <button type="button" onClick={() => handleTagSelect(getToneTags('urgent'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-yellow-400 bg-yellow-100 text-yellow-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                    긴급
+                  </button>
+                  <button type="button" onClick={() => handleTagSelect(getToneTags('important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                    중요
+                  </button>
+                  <button type="button" onClick={() => handleTagSelect(getToneTags('normal'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                    일반
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div className="shrink-0 border-t border-stone-200 bg-white p-5">
               <button
-                type="submit"
+                type="button"
+                onClick={handleAdd}
                 disabled={!title.trim() || !startTime || !endTime}
                 className="w-full rounded-[12px] bg-stone-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 블록 추가
               </button>
-            </form>
+            </div>
           </div>
-        </div>
-        <div className="grid shrink-0 grid-cols-1 gap-3 border-t border-stone-200 px-5 py-4 sm:flex sm:justify-end">
-          <button onClick={() => setActiveTab('main')} className="rounded-[12px] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700">
-            이전
-          </button>
         </div>
       </div>
       )}
