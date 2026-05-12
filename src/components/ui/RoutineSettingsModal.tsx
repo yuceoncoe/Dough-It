@@ -242,13 +242,6 @@ export const RoutineSettingsModal = ({
                   일반
                 </button>
               </div>
-              <button
-                type="submit"
-                disabled={!title.trim() || !startTime || !endTime}
-                className="w-full rounded-[12px] bg-stone-900 px-4 py-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                블록 추가
-              </button>
             </form>
           </div>
         </div>
