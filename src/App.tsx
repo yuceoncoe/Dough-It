@@ -207,7 +207,7 @@ const AppShell = ({
       const next = { ...current };
       Object.entries(current).forEach(([dateStr, tasks]) => {
         if (tasks.some((t) => t.id === taskId)) {
-          next[dateStr] = tasks.map((task) => task.id === taskId ? { ...task, rating } : task);
+          next[dateStr] = tasks.map((task) => task.id === taskId ? { ...task, rating, completed: true } : task);
         }
       });
       return next;

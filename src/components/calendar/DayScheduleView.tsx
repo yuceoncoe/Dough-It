@@ -182,11 +182,6 @@ export const DayScheduleView = ({
       <TaskActionSheet
         task={sheetTask}
         onClose={() => setSheetTask(null)}
-        onToggleComplete={(task) => {
-          const nextTask = { ...task, completed: !task.completed };
-          updateTask(nextTask);
-          setSheetTask(nextTask);
-        }}
         onEdit={(task) => {
           if (task.isRoutine) {
             setPendingRoutineAction({ action: 'edit', task });
