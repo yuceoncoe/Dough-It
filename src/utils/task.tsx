@@ -68,7 +68,7 @@ export const QuadrantBadge = ({ task }: { task: Task }) => {
 
 
 export const DEFAULT_TRACK_LANE_COUNT = 3;
-export const TRACK_INNER_RADIUS = 140;
+export const TRACK_INNER_RADIUS = 166;
 export const TRACK_OUTER_RADIUS = RADIUS + 10;
 export const TRACK_LANE_GAP = 10;
 export const getTrackLaneWidth = (laneCount: number) => (
