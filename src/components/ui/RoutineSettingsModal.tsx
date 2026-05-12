@@ -53,10 +53,11 @@ export const RoutineSettingsModal = ({
     return null;
   }
 
-  const handleAdd = () => {
+  const handleAdd = (explicitTags?: Tag[]) => {
     if (!title.trim() || !startTime || !endTime) {
       return;
     }
+    const finalTags = explicitTags ?? tags;
     const start = timeToMinutes(startTime);
     let duration = timeToMinutes(endTime) - start;
     if (duration <= 0) {
@@ -65,7 +66,7 @@ export const RoutineSettingsModal = ({
     const nextTask: Task = {
       id: `routine-editor-${Date.now()}`,
       title: title.trim(),
-      tags,
+      tags: finalTags,
       startTime,
       duration,
       completed: false,
@@ -77,6 +78,14 @@ export const RoutineSettingsModal = ({
     setStartTime('');
     setEndTime('');
     setTags([]);
+  };
+
+  const handleTagSelect = (selectedTags: Tag[]) => {
+    if (title.trim() && startTime && endTime) {
+      handleAdd(selectedTags);
+    } else {
+      setTags(selectedTags);
+    }
   };
 
   const handleDelete = (id: string) => {
@@ -220,16 +229,16 @@ export const RoutineSettingsModal = ({
                 </label>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <button type="button" onClick={() => setTags(getToneTags('urgent-important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-fuchsia-400 bg-fuchsia-100 text-fuchsia-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                <button type="button" onClick={() => handleTagSelect(getToneTags('urgent-important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-fuchsia-400 bg-fuchsia-100 text-fuchsia-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                   긴급+중요
                 </button>
-                <button type="button" onClick={() => setTags(getToneTags('urgent'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                <button type="button" onClick={() => handleTagSelect(getToneTags('urgent'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                   긴급
                 </button>
-                <button type="button" onClick={() => setTags(getToneTags('important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                <button type="button" onClick={() => handleTagSelect(getToneTags('important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                   중요
                 </button>
-                <button type="button" onClick={() => setTags(getToneTags('normal'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                <button type="button" onClick={() => handleTagSelect(getToneTags('normal'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                   일반
                 </button>
               </div>
