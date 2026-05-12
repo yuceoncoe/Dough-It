@@ -47,9 +47,15 @@ export const DayTaskEditorModal = ({
         </div>
         <p className="mb-4 mt-3 text-sm leading-relaxed text-stone-500">제목, 시간, 태그를 입력해서 하루 일정에 바로 반영합니다.</p>
 
-        <form onSubmit={onSubmit} className="space-y-3">
+        <form onSubmit={onSubmit} autoComplete="off" className="space-y-3">
           <input
             autoFocus
+            type="text"
+            name="task-title"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
             className="w-full rounded-[12px] border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
             placeholder="일정 이름"
             value={title}

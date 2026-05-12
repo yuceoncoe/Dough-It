@@ -96,11 +96,7 @@ export const RoutineSettingsModal = ({
   };
 
   const handleTagSelect = (selectedTags: Tag[]) => {
-    if (title.trim() && startTime && endTime) {
-      handleAdd(selectedTags);
-    } else {
-      setTags(selectedTags);
-    }
+    setTags(selectedTags);
   };
 
   const handleDelete = (id: string) => {
@@ -140,7 +136,7 @@ export const RoutineSettingsModal = ({
               </button>
             </div>
           </div>
-          <div className="overflow-y-auto bg-stone-50 p-5 space-y-6">
+          <div className="overflow-y-auto bg-white p-5 space-y-6">
             <section>
               <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">프로필 정보</h3>
               <div className="rounded-[16px] border border-stone-200 bg-white p-4 shadow-sm">
@@ -261,12 +257,19 @@ export const RoutineSettingsModal = ({
             <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
             <form 
               className="mt-4 space-y-3"
+              autoComplete="off"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleAdd();
               }}
             >
               <input
+                type="text"
+                name="routine-task-title"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
                 className="w-full rounded-[12px] border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
                 placeholder="일정 이름"
                 value={title}
@@ -296,6 +299,13 @@ export const RoutineSettingsModal = ({
                   일반
                 </button>
               </div>
+              <button
+                type="submit"
+                disabled={!title.trim() || !startTime || !endTime}
+                className="w-full rounded-[12px] bg-stone-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                블록 추가
+              </button>
             </form>
           </div>
         </div>

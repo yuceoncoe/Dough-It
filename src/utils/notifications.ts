@@ -44,6 +44,18 @@ const savePushSubscription = async (userId: string, subscription: PushSubscripti
     return;
   }
 
+  // Keep only the latest subscription for the same browser/device signature.
+  const { error: cleanupError } = await supabase
+    .from('push_subscriptions')
+    .delete()
+    .eq('user_id', userId)
+    .eq('user_agent', navigator.userAgent)
+    .neq('endpoint', subscription.endpoint);
+
+  if (cleanupError) {
+    throw cleanupError;
+  }
+
   const { error } = await supabase
     .from('push_subscriptions')
     .upsert({

@@ -136,9 +136,7 @@ canvas {
   width: min(100%, 42rem);
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 2rem;
-  background:
-    linear-gradient(180deg, rgba(255, 252, 246, 0.98), rgba(248, 242, 232, 0.98)),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  background: #ffffff;
   box-shadow: 0 24px 80px rgba(73, 54, 31, 0.18);
   padding: 1.5rem;
 }
@@ -311,8 +309,8 @@ canvas {
   top: 50%;
   width: 0;
   height: 0;
-  --center-lens-size: 11.8rem;
-  --center-gauge-size: calc(var(--center-lens-size) * 0.84);
+  --center-lens-size: 12.8rem;
+  --center-gauge-size: calc(var(--center-lens-size) * 0.83);
   transform-style: preserve-3d;
   pointer-events: none;
   z-index: 10;
@@ -460,8 +458,8 @@ canvas {
 
 @media (max-width: 640px) {
   .center-stack {
-    --center-lens-size: 9.8rem;
-    --center-gauge-size: calc(var(--center-lens-size) * 0.84);
+    --center-lens-size: 10.6rem;
+    --center-gauge-size: calc(var(--center-lens-size) * 0.83);
   }
 
   .center-lens__title {
@@ -472,8 +470,8 @@ canvas {
 
 @media (min-width: 1024px) {
   .center-stack {
-    --center-lens-size: 12.8rem;
-    --center-gauge-size: calc(var(--center-lens-size) * 0.84);
+    --center-lens-size: 13.8rem;
+    --center-gauge-size: calc(var(--center-lens-size) * 0.83);
   }
 }
 

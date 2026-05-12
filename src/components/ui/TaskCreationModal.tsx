@@ -46,6 +46,12 @@ export const TaskCreationModal = ({
         <p className="mb-6 mt-3 text-sm text-stone-500">이 시간 블록에 맞는 아이젠하워 태그를 선택하세요.</p>
         <input
           autoFocus
+          type="text"
+          name="task-title"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="none"
+          spellCheck={false}
           className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-xl text-stone-800 outline-none placeholder:text-stone-400 focus:border-stone-500"
           placeholder="일정 이름"
           value={title}

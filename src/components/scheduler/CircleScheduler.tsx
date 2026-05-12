@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Task, Tag } from '../../types';
 import { minutesToAngle, angleToMinutes, minutesToTime } from '../../utils/time';
-import { isCurrentMinuteInsideTask, getCenterTaskProgress, getClockTaskColor, getRequiredTrackLaneCount, assignTasksToTrackLanes, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, CENTER, RADIUS, OUTER_BACKGROUND_RADIUS, getTrackLaneCenterRadius, getDirectionalTextVisuals, OUTER_HOUR_LABELS, CURRENT_HAND_RADIUS, clampArcEnd, hexToRgba } from '../../utils/task';
+import { isCurrentMinuteInsideTask, getCenterTaskProgress, getClockTaskColor, getRequiredTrackLaneCount, assignTasksToTrackLanes, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, CENTER, RADIUS, OUTER_BACKGROUND_RADIUS, TRACK_INNER_RADIUS, getTrackLaneCenterRadius, getDirectionalTextVisuals, OUTER_HOUR_LABELS, CURRENT_HAND_RADIUS, clampArcEnd, hexToRgba } from '../../utils/task';
 import { polarToCartesian, describeArc } from '../../utils/geometry';
 import TaskCreationModal from '../ui/TaskCreationModal';
 import CanvasClockSurface from './CanvasClockSurface';
@@ -181,6 +181,8 @@ export const CircleScheduler = ({
   const activeTaskColor = displayTask ? getClockTaskColor(displayTask) : '#ff7a91';
   const laneCount = getRequiredTrackLaneCount(tasks);
   const trackTasks = assignTasksToTrackLanes(tasks, laneCount);
+  const interactionRingRadius = (TRACK_INNER_RADIUS + OUTER_BACKGROUND_RADIUS) / 2;
+  const interactionRingWidth = OUTER_BACKGROUND_RADIUS - TRACK_INNER_RADIUS + 28;
   const clampLabelCoordinate = (value: number, size: number) => (
     Math.max(SVG_VIEWBOX_MIN + size / 2 + 6, Math.min(SVG_VIEWBOX_MIN + SVG_VIEWBOX_SIZE - size / 2 - 6, value))
   );
@@ -246,7 +248,7 @@ export const CircleScheduler = ({
         }}
       />
 
-      <div className="relative aspect-square w-full max-w-[680px]">
+      <div className="relative aspect-square w-full max-w-[760px]">
         <div className="relative h-full w-full">
         <CanvasClockSurface tasks={tasks} minuteAngle={minuteAngle} />
 
@@ -259,7 +261,16 @@ export const CircleScheduler = ({
           onPointerUp={endArcHandleDrag}
           onPointerCancel={endArcHandleDrag}
         >
-        <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="transparent" onPointerDown={beginRingSelection} />
+        <circle
+          cx={CENTER}
+          cy={CENTER}
+          r={interactionRingRadius}
+          fill="none"
+          stroke="transparent"
+          strokeWidth={interactionRingWidth}
+          style={{ pointerEvents: 'stroke' }}
+          onPointerDown={beginRingSelection}
+        />
         <line
           x1={CENTER}
           y1={CENTER - (OUTER_BACKGROUND_RADIUS - 30)}

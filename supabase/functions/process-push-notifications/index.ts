@@ -39,7 +39,7 @@ Deno.serve(async (request) => {
   for (const notification of dueNotifications ?? []) {
     const { data: subscriptions, error: subscriptionError } = await supabase
       .from('push_subscriptions')
-      .select('id, subscription')
+      .select('id, subscription, user_agent, updated_at')
       .eq('user_id', notification.user_id);
 
     if (subscriptionError || !subscriptions?.length) {
@@ -54,6 +54,16 @@ Deno.serve(async (request) => {
       continue;
     }
 
+    const latestSubscriptionsByAgent = new Map<string, typeof subscriptions[number]>();
+    for (const subscription of subscriptions) {
+      const key = subscription.user_agent || `subscription:${subscription.id}`;
+      const previous = latestSubscriptionsByAgent.get(key);
+      if (!previous || new Date(subscription.updated_at).getTime() > new Date(previous.updated_at).getTime()) {
+        latestSubscriptionsByAgent.set(key, subscription);
+      }
+    }
+    const activeSubscriptions = [...latestSubscriptionsByAgent.values()];
+
     const payload = JSON.stringify({
       title: notification.title,
       body: notification.body,
@@ -62,7 +72,7 @@ Deno.serve(async (request) => {
     });
 
     const results = await Promise.allSettled(
-      subscriptions.map((subscription) => webpush.default.sendNotification(subscription.subscription, payload)),
+      activeSubscriptions.map((subscription) => webpush.default.sendNotification(subscription.subscription, payload)),
     );
 
     const hasSuccess = results.some((result) => result.status === 'fulfilled');
