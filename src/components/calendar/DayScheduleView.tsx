@@ -8,7 +8,7 @@ import RoutineActionModal from '../ui/RoutineActionModal';
 import DayTaskEditorModal from '../ui/DayTaskEditorModal';
 import CircleScheduler from '../scheduler/CircleScheduler';
 import { ChevronLeft, Plus, Settings, Clock, Lock, Zap, Trash2 } from 'lucide-react';
-import { QuadrantBadge } from '../../utils/task';
+import { QuadrantBadge, getMaxOverlap } from '../../utils/task';
 
 
 
@@ -74,8 +74,8 @@ export const DayScheduleView = ({
     setTags((current) => current.includes(tag) ? current.filter((item) => item !== tag) : [...current, tag]);
   };
 
-  const addTask = (nextTitle: string, nextTags: Tag[], nextStartTime: string, duration: number) => {
-    onTasksChange([...tasks, {
+  const addTask = (nextTitle: string, nextTags: Tag[], nextStartTime: string, duration: number): boolean => {
+    const newTask: Task = {
       id: `task-${Date.now()}`,
       title: nextTitle,
       tags: nextTags,
@@ -83,7 +83,13 @@ export const DayScheduleView = ({
       duration,
       completed: false,
       isRoutine: false,
-    }]);
+    };
+    if (getMaxOverlap([...tasks, newTask]) > 3) {
+      alert('일정 추가 불가: 동시에 겹치는 일정이 3개를 넘을 수 없습니다.');
+      return false;
+    }
+    onTasksChange([...tasks, newTask]);
+    return true;
   };
 
   const updateTask = (updatedTask: Task) => {
@@ -141,17 +147,20 @@ export const DayScheduleView = ({
           startTime,
           duration,
         };
+        const updatedTask = { ...current, ...nextValues };
+        if (getMaxOverlap(tasks.map((task) => task.id === editingId ? updatedTask : task)) > 3) {
+          alert('일정 수정 불가: 동시에 겹치는 일정이 3개를 넘을 수 없습니다.');
+          return;
+        }
         if (current.isRoutine && routineEditScope === 'future') {
           onApplyRoutineEdit(date, current, nextValues, 'future');
         } else {
-          updateTask({
-            ...current,
-            ...nextValues,
-          });
+          updateTask(updatedTask);
         }
       }
     } else {
-      addTask(title.trim(), tags, startTime, duration);
+      const added = addTask(title.trim(), tags, startTime, duration);
+      if (!added) return;
     }
     resetForm();
     setEditorOpen(false);

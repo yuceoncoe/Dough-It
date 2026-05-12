@@ -68,7 +68,7 @@ export const QuadrantBadge = ({ task }: { task: Task }) => {
 
 
 export const DEFAULT_TRACK_LANE_COUNT = 3;
-export const TRACK_INNER_RADIUS = 118;
+export const TRACK_INNER_RADIUS = 140;
 export const TRACK_OUTER_RADIUS = RADIUS + 10;
 export const TRACK_LANE_GAP = 10;
 export const getTrackLaneWidth = (laneCount: number) => (
@@ -281,7 +281,7 @@ export const segmentsOverlap = (
   right: { startMinute: number; endMinute: number },
 ) => left.startMinute < right.endMinute && right.startMinute < left.endMinute;
 
-export const getRequiredTrackLaneCount = (tasks: Task[]) => {
+export const getMaxOverlap = (tasks: Task[]) => {
   const events = tasks.flatMap((task) => (
     getTaskSegments(task).flatMap(({ startMinute, endMinute }) => ([
       { minute: startMinute, delta: 1 },
@@ -290,7 +290,7 @@ export const getRequiredTrackLaneCount = (tasks: Task[]) => {
   ));
 
   if (!events.length) {
-    return DEFAULT_TRACK_LANE_COUNT;
+    return 0;
   }
 
   events.sort((left, right) => (
@@ -305,7 +305,11 @@ export const getRequiredTrackLaneCount = (tasks: Task[]) => {
     maxOverlap = Math.max(maxOverlap, currentOverlap);
   });
 
-  return Math.max(DEFAULT_TRACK_LANE_COUNT, maxOverlap);
+  return maxOverlap;
+};
+
+export const getRequiredTrackLaneCount = (tasks: Task[]) => {
+  return DEFAULT_TRACK_LANE_COUNT;
 };
 
 export const assignTasksToTrackLanes = (tasks: Task[], laneCount: number) => {

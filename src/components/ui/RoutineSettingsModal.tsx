@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RoutineState, Tag, Task } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
-import { getTaskTonePillClass, getTaskToneLabel, QuadrantBadge, getToneSelectionKey, getToneTags } from '../../utils/task';
+import { getTaskTonePillClass, getTaskToneLabel, QuadrantBadge, getToneSelectionKey, getToneTags, getMaxOverlap } from '../../utils/task';
 import { Clock, LogOut, Trash2, X } from 'lucide-react';
 
 export const RoutineSettingsModal = ({
@@ -72,6 +72,10 @@ export const RoutineSettingsModal = ({
       completed: false,
       isRoutine: true,
     };
+    if (getMaxOverlap([...draft[activeTab], nextTask]) > 3) {
+      alert('일정 추가 불가: 동시에 겹치는 일정이 3개를 넘을 수 없습니다.');
+      return;
+    }
     const nextTasks = [...draft[activeTab], nextTask].sort((left, right) => timeToMinutes(left.startTime ?? '00:00') - timeToMinutes(right.startTime ?? '00:00'));
     setDraft({ ...draft, [activeTab]: nextTasks });
     setTitle('');

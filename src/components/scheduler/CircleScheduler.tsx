@@ -11,7 +11,7 @@ export const CircleScheduler = ({
   onAddTask,
 }: {
   tasks: Task[];
-  onAddTask: (title: string, tags: Tag[], startTime: string, duration: number) => void;
+  onAddTask: (title: string, tags: Tag[], startTime: string, duration: number) => boolean | void;
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const sliderDragStartRef = useRef<number | null>(null);
@@ -235,7 +235,10 @@ export const CircleScheduler = ({
           }
           const startTime = minutesToTime(angleToMinutes(pendingArc.startAngle % 360));
           const duration = Math.round(((pendingArc.endAngle - pendingArc.startAngle) / 360) * 1440);
-          onAddTask(title, tags, startTime, duration);
+          const success = onAddTask(title, tags, startTime, duration);
+          if (success === false) {
+            return;
+          }
           setShowCreateModal(false);
           setPendingArc(null);
           setHasPendingArcEnd(false);
