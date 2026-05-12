@@ -67,8 +67,7 @@ Deno.serve(async (request) => {
       }
 
       const activeSubscriptions = [...subscriptions]
-        .sort((left, right) => new Date(right.updated_at).getTime() - new Date(left.updated_at).getTime())
-        .slice(0, 1);
+        .sort((left, right) => new Date(right.updated_at).getTime() - new Date(left.updated_at).getTime());
 
       const payload = JSON.stringify({
         title: notification.title,

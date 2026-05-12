@@ -16,8 +16,13 @@ const urlBase64ToUint8Array = (base64String: string) => {
   return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
 };
 
+const getReadyPushRegistration = async () => {
+  await navigator.serviceWorker.register('/push-sw.js');
+  return navigator.serviceWorker.ready;
+};
+
 const getPushSubscription = async () => {
-  const registration = await navigator.serviceWorker.register('/push-sw.js');
+  const registration = await getReadyPushRegistration();
   const currentSubscription = await registration.pushManager.getSubscription();
   if (currentSubscription) {
     await currentSubscription.unsubscribe();
@@ -35,7 +40,7 @@ const getExistingPushSubscription = async () => {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     return null;
   }
-  const registration = await navigator.serviceWorker.register('/push-sw.js');
+  const registration = await getReadyPushRegistration();
   const subscription = await registration.pushManager.getSubscription();
   return subscription ? { registration, subscription } : null;
 };
@@ -45,12 +50,12 @@ const savePushSubscription = async (userId: string, subscription: PushSubscripti
     return;
   }
 
-  // Keep only the latest subscription for the same browser/device signature.
+  // Keep one active endpoint per account. Stale iOS/PWA endpoints can otherwise
+  // produce duplicate notifications or make the server choose a dead endpoint.
   const { error: cleanupError } = await supabase
     .from('push_subscriptions')
     .delete()
     .eq('user_id', userId)
-    .eq('user_agent', navigator.userAgent)
     .neq('endpoint', subscription.endpoint);
 
   if (cleanupError) {
