@@ -88,7 +88,9 @@ export const RoutineSettingsModal = ({
       return;
     }
     const nextTasks = [...draft[currentTab], nextTask].sort((left, right) => timeToMinutes(left.startTime ?? '00:00') - timeToMinutes(right.startTime ?? '00:00'));
-    setDraft({ ...draft, [currentTab]: nextTasks });
+    const nextDraft = { ...draft, [currentTab]: nextTasks };
+    setDraft(nextDraft);
+    onSaveRoutines(nextDraft);
     setTitle('');
     setStartTime('');
     setEndTime('');
@@ -101,7 +103,11 @@ export const RoutineSettingsModal = ({
 
   const handleDelete = (id: string) => {
     const currentTab = activeTab === 'main' ? 'weekday' : activeTab;
-    setDraft((current) => ({ ...current, [currentTab]: current[currentTab].filter((task) => task.id !== id) }));
+    setDraft((current) => {
+      const nextDraft = { ...current, [currentTab]: current[currentTab].filter((task) => task.id !== id) };
+      onSaveRoutines(nextDraft);
+      return nextDraft;
+    });
   };
 
   const notificationLabel = {
@@ -309,18 +315,9 @@ export const RoutineSettingsModal = ({
             </form>
           </div>
         </div>
-        <div className="grid shrink-0 grid-cols-2 gap-3 border-t border-stone-200 px-5 py-4 sm:flex sm:justify-end">
+        <div className="grid shrink-0 grid-cols-1 gap-3 border-t border-stone-200 px-5 py-4 sm:flex sm:justify-end">
           <button onClick={() => setActiveTab('main')} className="rounded-[12px] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700">
             이전
-          </button>
-          <button
-            onClick={() => {
-              onSaveRoutines(draft);
-              onClose();
-            }}
-            className="rounded-[12px] bg-amber-400 px-4 py-3 text-sm font-semibold text-stone-900"
-          >
-            루틴 저장
           </button>
         </div>
       </div>

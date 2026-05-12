@@ -13,6 +13,7 @@ export const CircleScheduler = ({
   tasks: Task[];
   onAddTask: (title: string, tags: Tag[], startTime: string, duration: number) => boolean | void;
 }) => {
+  const squareRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const sliderDragStartRef = useRef<number | null>(null);
   const sliderPointerIdRef = useRef<number | null>(null);
@@ -28,6 +29,7 @@ export const CircleScheduler = ({
   const [now, setNow] = useState(new Date());
   const [overlapIndex, setOverlapIndex] = useState(0);
   const [sliderTransitionDirection, setSliderTransitionDirection] = useState<'from-left' | 'from-right' | null>(null);
+  const [dragPreviewPoint, setDragPreviewPoint] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
@@ -74,6 +76,17 @@ export const CircleScheduler = ({
     return normalized;
   };
 
+  const updateDragPreviewPoint = (clientX: number, clientY: number) => {
+    const rect = squareRef.current?.getBoundingClientRect();
+    if (!rect) {
+      return;
+    }
+    setDragPreviewPoint({
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    });
+  };
+
   const updatePendingArcHandle = (handle: 'start' | 'end', angle: number) => {
     setPendingArc((current) => {
       if (!current) {
@@ -117,6 +130,7 @@ export const CircleScheduler = ({
     arcDragPointerIdRef.current = event.pointerId;
     arcDragMovedRef.current = false;
     setActiveArcHandle(handle);
+    updateDragPreviewPoint(event.clientX, event.clientY);
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
@@ -129,6 +143,7 @@ export const CircleScheduler = ({
     event.preventDefault();
     arcDragPointerIdRef.current = event.pointerId;
     arcDragMovedRef.current = false;
+    updateDragPreviewPoint(event.clientX, event.clientY);
 
     if (pendingArc === null) {
       arcDragHandleRef.current = 'start';
@@ -160,6 +175,7 @@ export const CircleScheduler = ({
       return;
     }
     arcDragMovedRef.current = true;
+    updateDragPreviewPoint(event.clientX, event.clientY);
     updatePendingArcHandle(handle, angle);
   };
 
@@ -168,6 +184,7 @@ export const CircleScheduler = ({
     arcDragPointerIdRef.current = null;
     arcDragMovedRef.current = false;
     setActiveArcHandle(null);
+    setDragPreviewPoint(null);
   };
 
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -190,6 +207,163 @@ export const CircleScheduler = ({
     const trimmed = title.trim();
     return trimmed.length > 8 ? `${trimmed.slice(0, 8)}...` : trimmed;
   };
+  const dragPreviewSize = 176;
+  const dragPreviewZoom = 1.9;
+  const dragPreviewHalf = dragPreviewSize / 2;
+  const schedulerSceneSize = squareRef.current?.getBoundingClientRect().width ?? 0;
+
+  const renderClockSvgLayers = (interactive: boolean) => (
+    <>
+      {interactive ? (
+        <circle
+          cx={CENTER}
+          cy={CENTER}
+          r={interactionRingRadius}
+          fill="none"
+          stroke="transparent"
+          strokeWidth={interactionRingWidth}
+          style={{ pointerEvents: 'stroke' }}
+          onPointerDown={beginRingSelection}
+        />
+      ) : null}
+      <line
+        x1={CENTER}
+        y1={CENTER - (OUTER_BACKGROUND_RADIUS - 30)}
+        x2={CENTER}
+        y2={CENTER + (OUTER_BACKGROUND_RADIUS - 30)}
+        stroke="rgba(20, 20, 20, 0.06)"
+        strokeWidth="0.9"
+      />
+      <g className="pointer-events-none">
+        {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
+          const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
+          const safeEndAngle = clampArcEnd(startAngle, endAngle);
+          const midAngle = startAngle + (safeEndAngle - startAngle) / 2;
+          const labelPoint = polarToCartesian(CENTER, CENTER, laneCenterRadius, midAngle);
+          const labelText = getTaskLabelText(task.title);
+          const labelWidth = Math.min(132, Math.max(52, labelText.length * 18 + 24));
+          const labelHeight = 30;
+          const labelX = clampLabelCoordinate(labelPoint.x, labelWidth);
+          const labelY = clampLabelCoordinate(labelPoint.y, labelHeight);
+          const isCompleted = task.completed;
+          const textColor = isCompleted ? 'rgba(120, 113, 108, 0.72)' : 'rgba(41, 37, 36, 0.88)';
+
+          return (
+            <g key={`${interactive ? 'main' : 'preview'}-${task.id}-label`} className="pointer-events-none">
+              <rect
+                x={labelX - labelWidth / 2}
+                y={labelY - labelHeight / 2}
+                width={labelWidth}
+                height={labelHeight}
+                rx="15"
+                fill="rgba(255,255,255,0.82)"
+                stroke="rgba(214,211,209,0.72)"
+                strokeWidth="1"
+              />
+              <text
+                x={labelX}
+                y={labelY + 1}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="text-[18px] font-semibold"
+                fill={textColor}
+              >
+                {labelText}
+              </text>
+            </g>
+          );
+        })}
+      </g>
+      <g className="pointer-events-none">
+        {OUTER_HOUR_LABELS.map(({ value, angle, point }) => {
+          const { blur, opacity } = getDirectionalTextVisuals(angle, minuteAngle);
+
+          return (
+            <text
+              key={`${interactive ? 'main' : 'preview'}-hour-label-${value}-${angle}`}
+              x={point.x}
+              y={point.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="fill-black text-[16px] font-semibold"
+              opacity={opacity}
+              style={{ filter: `blur(${blur}px)` }}
+            >
+              {value}
+            </text>
+          );
+        })}
+      </g>
+
+      {pendingArc !== null && (
+        <>
+          {hasPendingArcEnd && (
+            <path
+              d={describeArc(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle, pendingArc.endAngle)}
+              fill="rgba(217, 4, 41, 0.12)"
+              stroke="#d90429"
+              strokeWidth="2"
+              strokeDasharray="5 5"
+              pointerEvents="none"
+            />
+          )}
+          <line
+            x1={CENTER}
+            y1={CENTER}
+            x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle).x}
+            y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle).y}
+            stroke="#d90429"
+            strokeWidth="2"
+            strokeDasharray="5 5"
+            pointerEvents="none"
+          />
+          {hasPendingArcEnd && (
+            <line
+              x1={CENTER}
+              y1={CENTER}
+              x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.endAngle).x}
+              y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.endAngle).y}
+              stroke="#d90429"
+              strokeWidth="2"
+              strokeDasharray="5 5"
+              pointerEvents="none"
+            />
+          )}
+          {(hasPendingArcEnd ? ['start', 'end'] as const : ['start'] as const).map((handle) => {
+            const angle = handle === 'start' ? pendingArc.startAngle : pendingArc.endAngle;
+            const point = polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, angle);
+            const isActive = activeArcHandle === handle;
+            return (
+              <circle
+                key={`${interactive ? 'main' : 'preview'}-pending-arc-${handle}`}
+                cx={point.x}
+                cy={point.y}
+                r={isActive ? 14 : 10}
+                fill="#d90429"
+                stroke="#ffffff"
+                strokeWidth={isActive ? 5 : 4}
+                className={interactive ? 'cursor-grab active:cursor-grabbing' : undefined}
+                onPointerDown={interactive ? (event) => beginArcHandleDrag(event, handle) : undefined}
+                pointerEvents={interactive ? 'auto' : 'none'}
+              />
+            );
+          })}
+        </>
+      )}
+
+      <line
+        x1={CENTER}
+        y1={CENTER}
+        x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
+        y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
+        stroke="#d90429"
+        strokeWidth="2.8"
+        strokeLinecap="round"
+        opacity="0.96"
+        pointerEvents="none"
+      />
+    </>
+  );
 
   useEffect(() => {
     if (!overlappingActiveTasks.length) {
@@ -248,7 +422,7 @@ export const CircleScheduler = ({
         }}
       />
 
-      <div className="relative aspect-square w-full max-w-[760px]">
+      <div ref={squareRef} className="relative aspect-square w-full max-w-[760px]">
         <div className="relative h-full w-full">
         <CanvasClockSurface tasks={tasks} minuteAngle={minuteAngle} />
 
@@ -261,155 +435,40 @@ export const CircleScheduler = ({
           onPointerUp={endArcHandleDrag}
           onPointerCancel={endArcHandleDrag}
         >
-        <circle
-          cx={CENTER}
-          cy={CENTER}
-          r={interactionRingRadius}
-          fill="none"
-          stroke="transparent"
-          strokeWidth={interactionRingWidth}
-          style={{ pointerEvents: 'stroke' }}
-          onPointerDown={beginRingSelection}
-        />
-        <line
-          x1={CENTER}
-          y1={CENTER - (OUTER_BACKGROUND_RADIUS - 30)}
-          x2={CENTER}
-          y2={CENTER + (OUTER_BACKGROUND_RADIUS - 30)}
-          stroke="rgba(20, 20, 20, 0.06)"
-          strokeWidth="0.9"
-        />
-        <g className="pointer-events-none">
-          {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
-            const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
-            const safeEndAngle = clampArcEnd(startAngle, endAngle);
-            const midAngle = startAngle + (safeEndAngle - startAngle) / 2;
-            const labelPoint = polarToCartesian(CENTER, CENTER, laneCenterRadius, midAngle);
-            const labelText = getTaskLabelText(task.title);
-            const labelWidth = Math.min(132, Math.max(52, labelText.length * 18 + 24));
-            const labelHeight = 30;
-            const labelX = clampLabelCoordinate(labelPoint.x, labelWidth);
-            const labelY = clampLabelCoordinate(labelPoint.y, labelHeight);
-            const isCompleted = task.completed;
-            const textColor = isCompleted ? 'rgba(120, 113, 108, 0.72)' : 'rgba(41, 37, 36, 0.88)';
-
-            return (
-              <g key={`${task.id}-label`} className="pointer-events-none">
-                <rect
-                  x={labelX - labelWidth / 2}
-                  y={labelY - labelHeight / 2}
-                  width={labelWidth}
-                  height={labelHeight}
-                  rx="15"
-                  fill="rgba(255,255,255,0.82)"
-                  stroke="rgba(214,211,209,0.72)"
-                  strokeWidth="1"
-                />
-                <text
-                  x={labelX}
-                  y={labelY + 1}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  className="text-[18px] font-semibold"
-                  fill={textColor}
-                >
-                  {labelText}
-                </text>
-              </g>
-            );
-          })}
-        </g>
-        <g className="pointer-events-none">
-          {OUTER_HOUR_LABELS.map(({ value, angle, point }) => (
-            (() => {
-              const { blur, opacity } = getDirectionalTextVisuals(angle, minuteAngle);
-
-              return (
-                <text
-                  key={`hour-label-${value}-${angle}`}
-                  x={point.x}
-                  y={point.y}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  className="fill-black text-[16px] font-semibold"
-                  opacity={opacity}
-                  style={{ filter: `blur(${blur}px)` }}
-                >
-                  {value}
-                </text>
-              );
-            })()
-          ))}
-        </g>
-
-        {pendingArc !== null && (
-          <>
-            {hasPendingArcEnd && (
-              <path
-                d={describeArc(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle, pendingArc.endAngle)}
-                fill="rgba(217, 4, 41, 0.12)"
-                stroke="#d90429"
-                strokeWidth="2"
-                strokeDasharray="5 5"
-                pointerEvents="none"
-              />
-            )}
-            <line
-              x1={CENTER}
-              y1={CENTER}
-              x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle).x}
-              y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle).y}
-              stroke="#d90429"
-              strokeWidth="2"
-              strokeDasharray="5 5"
-              pointerEvents="none"
-            />
-            {hasPendingArcEnd && (
-              <line
-                x1={CENTER}
-                y1={CENTER}
-                x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.endAngle).x}
-                y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.endAngle).y}
-                stroke="#d90429"
-                strokeWidth="2"
-                strokeDasharray="5 5"
-                pointerEvents="none"
-              />
-            )}
-            {(hasPendingArcEnd ? ['start', 'end'] as const : ['start'] as const).map((handle) => {
-              const angle = handle === 'start' ? pendingArc.startAngle : pendingArc.endAngle;
-              const point = polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, angle);
-              const isActive = activeArcHandle === handle;
-              return (
-                <circle
-                  key={`pending-arc-${handle}`}
-                  cx={point.x}
-                  cy={point.y}
-                  r={isActive ? 14 : 10}
-                  fill="#d90429"
-                  stroke="#ffffff"
-                  strokeWidth={isActive ? 5 : 4}
-                  className="cursor-grab active:cursor-grabbing"
-                  onPointerDown={(event) => beginArcHandleDrag(event, handle)}
-                />
-              );
-            })}
-          </>
-        )}
-
-        <line
-          x1={CENTER}
-          y1={CENTER}
-          x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
-          y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
-          stroke="#d90429"
-          strokeWidth="2.8"
-          strokeLinecap="round"
-          opacity="0.96"
-          pointerEvents="none"
-        />
+        {renderClockSvgLayers(true)}
         </svg>
         </div>
+        {dragPreviewPoint && schedulerSceneSize > 0 ? (
+          <div
+            className="drag-preview-lens"
+            style={{
+              width: `${dragPreviewSize}px`,
+              height: `${dragPreviewSize}px`,
+              left: `clamp(${dragPreviewHalf}px, ${dragPreviewPoint.x}px, calc(100% - ${dragPreviewHalf}px))`,
+              top: `clamp(${dragPreviewHalf}px, calc(${dragPreviewPoint.y}px - 118px), calc(100% - ${dragPreviewHalf}px))`,
+            }}
+            aria-hidden="true"
+          >
+            <div
+              className="drag-preview-lens__scene"
+              style={{
+                width: `${schedulerSceneSize}px`,
+                height: `${schedulerSceneSize}px`,
+                transform: `translate(${dragPreviewHalf - dragPreviewPoint.x * dragPreviewZoom}px, ${dragPreviewHalf - dragPreviewPoint.y * dragPreviewZoom}px) scale(${dragPreviewZoom})`,
+              }}
+            >
+              <div className="relative h-full w-full">
+                <CanvasClockSurface tasks={tasks} minuteAngle={minuteAngle} />
+                <svg
+                  viewBox={`${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_SIZE} ${SVG_VIEWBOX_SIZE}`}
+                  className="absolute inset-0 h-full w-full select-none pointer-events-none"
+                >
+                  {renderClockSvgLayers(false)}
+                </svg>
+              </div>
+            </div>
+          </div>
+        ) : null}
         {pendingArc !== null && !showCreateModal && (
           <div className="absolute inset-x-4 bottom-4 z-30 flex items-center justify-center gap-2">
             <button

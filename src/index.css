@@ -456,6 +456,42 @@ canvas {
   background: linear-gradient(180deg, rgba(255, 122, 145, 0.8) 0%, rgba(255, 122, 145, 0.12) 100%);
 }
 
+.drag-preview-lens {
+  position: absolute;
+  z-index: 45;
+  border-radius: 9999px;
+  overflow: hidden;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.12),
+    0 2px 0 rgba(255, 255, 255, 0.88) inset;
+  backdrop-filter: blur(12px) saturate(1.04);
+  -webkit-backdrop-filter: blur(12px) saturate(1.04);
+  pointer-events: none;
+}
+
+.drag-preview-lens::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 16%;
+  bottom: 16%;
+  width: 4px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(236, 185, 34, 0.95) 0%, rgba(236, 185, 34, 0.7) 100%);
+  box-shadow: 0 0 14px rgba(236, 185, 34, 0.28);
+}
+
+.drag-preview-lens__scene {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: top left;
+}
+
 @media (max-width: 640px) {
   .center-stack {
     --center-lens-size: 10.6rem;
