@@ -59,7 +59,7 @@ export const TaskCreationModal = ({
         <div className="mt-6 grid grid-cols-2 gap-3">
           <button
             onClick={() => setTags(getToneTags('urgent-important'))}
-            className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-fuchsia-400 bg-fuchsia-100 text-fuchsia-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
+            className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
           >
             <div className="flex items-center gap-2 font-medium">
               긴급+중요
