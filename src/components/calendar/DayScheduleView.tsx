@@ -198,6 +198,15 @@ export const DayScheduleView = ({
             setSheetTask(null);
           }
         }}
+        onSetRating={(task, rating) => {
+          const nextTask = {
+            ...task,
+            rating,
+            completed: rating !== undefined,
+          };
+          updateTask(nextTask);
+          setSheetTask(nextTask);
+        }}
       />
       <RoutineActionModal
         isOpen={pendingRoutineAction !== null}
