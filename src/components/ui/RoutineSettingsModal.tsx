@@ -196,7 +196,13 @@ export const RoutineSettingsModal = ({
           </div>
           <div className="min-h-0 overflow-y-auto bg-white p-5">
             <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
-            <div className="mt-4 space-y-3">
+            <form 
+              className="mt-4 space-y-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAdd();
+              }}
+            >
               <input
                 className="w-full rounded-[12px] border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
                 placeholder="일정 이름"
@@ -214,27 +220,27 @@ export const RoutineSettingsModal = ({
                 </label>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => setTags(getToneTags('urgent-important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-fuchsia-400 bg-fuchsia-100 text-fuchsia-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                <button type="button" onClick={() => setTags(getToneTags('urgent-important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-fuchsia-400 bg-fuchsia-100 text-fuchsia-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                   긴급+중요
                 </button>
-                <button onClick={() => setTags(getToneTags('urgent'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                <button type="button" onClick={() => setTags(getToneTags('urgent'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                   긴급
                 </button>
-                <button onClick={() => setTags(getToneTags('important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                <button type="button" onClick={() => setTags(getToneTags('important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                   중요
                 </button>
-                <button onClick={() => setTags(getToneTags('normal'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                <button type="button" onClick={() => setTags(getToneTags('normal'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                   일반
                 </button>
               </div>
               <button
-                onClick={handleAdd}
+                type="submit"
                 disabled={!title.trim() || !startTime || !endTime}
                 className="w-full rounded-[12px] bg-stone-900 px-4 py-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
               >
                 블록 추가
               </button>
-            </div>
+            </form>
           </div>
         </div>
         <div className="grid shrink-0 grid-cols-2 gap-3 border-t border-stone-200 px-5 py-4 sm:flex sm:justify-end">
