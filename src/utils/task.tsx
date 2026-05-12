@@ -60,7 +60,7 @@ export const QuadrantBadge = ({ task }: { task: Task }) => {
     <div className="grid h-[14px] w-[14px] shrink-0 grid-cols-2 grid-rows-2 gap-[2px]">
       <div className={`rounded-tl-[3px] ${isQ1 ? 'bg-rose-500' : 'bg-stone-200'}`} />
       <div className={`rounded-tr-[3px] ${isQ2 ? 'bg-sky-500' : 'bg-stone-200'}`} />
-      <div className={`rounded-bl-[3px] ${isQ3 ? 'bg-amber-400' : 'bg-stone-200'}`} />
+      <div className={`rounded-bl-[3px] ${isQ3 ? 'bg-yellow-400' : 'bg-stone-200'}`} />
       <div className={`rounded-br-[3px] ${isQ4 ? 'bg-emerald-400' : 'bg-stone-200'}`} />
     </div>
   );
@@ -344,7 +344,7 @@ export const getTaskColor = (tags: Tag[]) => {
     return '#ff5f57';
   }
   if (urgent) {
-    return '#ff9f0a';
+    return '#facc15';
   }
   if (important) {
     return '#0a84ff';
@@ -383,7 +383,7 @@ export const getTaskBorderClass = (tags: Tag[]) => {
     return 'border-rose-500';
   }
   if (urgent) {
-    return 'border-amber-400';
+    return 'border-yellow-400';
   }
   if (important) {
     return 'border-sky-500';
@@ -415,7 +415,7 @@ export const getTaskTonePillClass = (task: Task) => {
     return 'bg-rose-50 text-rose-600';
   }
   if (task.tags.includes('urgent')) {
-    return 'bg-amber-50 text-amber-700';
+    return 'bg-yellow-50 text-yellow-700';
   }
   if (task.tags.includes('important')) {
     return 'bg-sky-50 text-sky-600';
@@ -432,7 +432,7 @@ export const getTaskIcon = (task: Task) => {
     return <Sparkles size={30} className="text-orange-500" />;
   }
   if (task.tags.includes('urgent')) {
-    return <AlertCircle size={30} className="text-rose-500" />;
+    return <AlertCircle size={30} className="text-yellow-500" />;
   }
   if (task.tags.includes('important')) {
     return <Star size={30} className="text-sky-500" />;
