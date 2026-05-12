@@ -341,15 +341,15 @@ export const getTaskColor = (tags: Tag[]) => {
   const urgent = tags.includes('urgent');
   const important = tags.includes('important');
   if (urgent && important) {
-    return '#ff5f57';
+    return '#f43f5e';
   }
   if (urgent) {
     return '#facc15';
   }
   if (important) {
-    return '#0a84ff';
+    return '#0ea5e9';
   }
-  return '#30d158';
+  return '#34d399';
 };
 
 export const getClockTaskColor = (task: Task) => {
@@ -429,10 +429,10 @@ export const getTaskIcon = (task: Task) => {
     return <RefreshCw size={30} className="text-stone-600" />;
   }
   if (task.tags.includes('urgent') && task.tags.includes('important')) {
-    return <Sparkles size={30} className="text-orange-500" />;
+    return <Sparkles size={30} className="text-rose-500" />;
   }
   if (task.tags.includes('urgent')) {
-    return <AlertCircle size={30} className="text-yellow-500" />;
+    return <AlertCircle size={30} className="text-yellow-400" />;
   }
   if (task.tags.includes('important')) {
     return <Star size={30} className="text-sky-500" />;
@@ -443,7 +443,7 @@ export const getTaskIcon = (task: Task) => {
   if (title.includes('studio') || title.includes('art')) {
     return <Paintbrush size={30} className="text-amber-600" />;
   }
-  return <SunMedium size={30} className="text-yellow-500" />;
+  return <SunMedium size={30} className="text-emerald-400" />;
 };
 
 export const getTodayString = () => {
