@@ -9,9 +9,11 @@ import CanvasClockSurface from './CanvasClockSurface';
 export const CircleScheduler = ({
   tasks,
   onAddTask,
+  showCurrentTime = true,
 }: {
   tasks: Task[];
   onAddTask: (title: string, tags: Tag[], startTime: string, duration: number) => boolean | void;
+  showCurrentTime?: boolean;
 }) => {
   const squareRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -189,12 +191,12 @@ export const CircleScheduler = ({
 
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const minuteAngle = minutesToAngle(currentMinutes);
-  const overlappingActiveTasks = tasks.filter((task) => isCurrentMinuteInsideTask(task, currentMinutes));
+  const overlappingActiveTasks = showCurrentTime ? tasks.filter((task) => isCurrentMinuteInsideTask(task, currentMinutes)) : [];
   const activeTask = overlappingActiveTasks[0] ?? null;
   const hasOverlapSlider = overlappingActiveTasks.length > 1;
   const safeOverlapIndex = hasOverlapSlider ? overlapIndex % overlappingActiveTasks.length : 0;
   const displayTask = hasOverlapSlider ? overlappingActiveTasks[safeOverlapIndex] : activeTask;
-  const activeTaskProgress = getCenterTaskProgress(displayTask, currentMinutes);
+  const activeTaskProgress = showCurrentTime ? getCenterTaskProgress(displayTask, currentMinutes) : 0;
   const activeTaskColor = displayTask ? getClockTaskColor(displayTask) : '#ff7a91';
   const laneCount = getRequiredTrackLaneCount(tasks);
   const trackTasks = assignTasksToTrackLanes(tasks, laneCount);
@@ -276,7 +278,9 @@ export const CircleScheduler = ({
       </g>
       <g className="pointer-events-none">
         {OUTER_HOUR_LABELS.map(({ value, angle, point }) => {
-          const { blur, opacity } = getDirectionalTextVisuals(angle, minuteAngle);
+          const { blur, opacity } = showCurrentTime
+            ? getDirectionalTextVisuals(angle, minuteAngle)
+            : { blur: 0, opacity: 0.88 };
 
           return (
             <text
@@ -351,17 +355,19 @@ export const CircleScheduler = ({
         </>
       )}
 
-      <line
-        x1={CENTER}
-        y1={CENTER}
-        x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
-        y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
-        stroke="#d90429"
-        strokeWidth="2.8"
-        strokeLinecap="round"
-        opacity="0.96"
-        pointerEvents="none"
-      />
+      {showCurrentTime ? (
+        <line
+          x1={CENTER}
+          y1={CENTER}
+          x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
+          y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
+          stroke="#d90429"
+          strokeWidth="2.8"
+          strokeLinecap="round"
+          opacity="0.96"
+          pointerEvents="none"
+        />
+      ) : null}
     </>
   );
 

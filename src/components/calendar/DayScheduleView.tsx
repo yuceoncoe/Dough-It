@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Task, Tag, RoutineScope, RoutineAction } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
 import { getTaskColor, getTaskTonePillClass, getTaskToneLabel } from '../../utils/task';
-import { formatDateLabel } from '../../utils/task';
+import { formatDateLabel, getTodayString } from '../../utils/task';
 import TaskActionSheet from '../ui/TaskActionSheet';
 import RoutineActionModal from '../ui/RoutineActionModal';
 import DayTaskEditorModal from '../ui/DayTaskEditorModal';
@@ -46,6 +46,7 @@ export const DayScheduleView = ({
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
+  const isToday = date === getTodayString();
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -312,6 +313,7 @@ export const DayScheduleView = ({
           <CircleScheduler
             tasks={tasks}
             onAddTask={addTask}
+            showCurrentTime={isToday}
           />
         </div>
 
