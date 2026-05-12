@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { RoutineState, Tag, Task } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
 import { getTaskTonePillClass, getTaskToneLabel, QuadrantBadge, getToneSelectionKey, getToneTags, getMaxOverlap } from '../../utils/task';
-import { Clock, LogOut, Trash2, X } from 'lucide-react';
+import { Clock, LogOut, Trash2, X, ChevronRight, ChevronLeft } from 'lucide-react';
 
 export const RoutineSettingsModal = ({
   isOpen,
@@ -29,7 +29,7 @@ export const RoutineSettingsModal = ({
   onSignOut: () => Promise<void>;
   onEnableNotifications: () => Promise<void>;
 }) => {
-  const [activeTab, setActiveTab] = useState<'weekday' | 'weekend'>('weekday');
+  const [activeTab, setActiveTab] = useState<'main' | 'weekday' | 'weekend'>('main');
   const [draft, setDraft] = useState<RoutineState>(routines);
   const [title, setTitle] = useState('');
   const [startTime, setStartTime] = useState('');
@@ -56,7 +56,7 @@ export const RoutineSettingsModal = ({
     setStartTime('');
     setEndTime('');
     setTags([]);
-    setActiveTab('weekday');
+    setActiveTab('main');
   }, [isOpen, routines]);
 
   if (!isOpen) {
@@ -82,12 +82,13 @@ export const RoutineSettingsModal = ({
       completed: false,
       isRoutine: true,
     };
-    if (getMaxOverlap([...draft[activeTab], nextTask]) > 3) {
+    const currentTab = activeTab === 'main' ? 'weekday' : activeTab;
+    if (getMaxOverlap([...draft[currentTab], nextTask]) > 3) {
       showToast('알림은 한 번에 3개까지만 가능해요!');
       return;
     }
-    const nextTasks = [...draft[activeTab], nextTask].sort((left, right) => timeToMinutes(left.startTime ?? '00:00') - timeToMinutes(right.startTime ?? '00:00'));
-    setDraft({ ...draft, [activeTab]: nextTasks });
+    const nextTasks = [...draft[currentTab], nextTask].sort((left, right) => timeToMinutes(left.startTime ?? '00:00') - timeToMinutes(right.startTime ?? '00:00'));
+    setDraft({ ...draft, [currentTab]: nextTasks });
     setTitle('');
     setStartTime('');
     setEndTime('');
@@ -103,7 +104,8 @@ export const RoutineSettingsModal = ({
   };
 
   const handleDelete = (id: string) => {
-    setDraft((current) => ({ ...current, [activeTab]: current[activeTab].filter((task) => task.id !== id) }));
+    const currentTab = activeTab === 'main' ? 'weekday' : activeTab;
+    setDraft((current) => ({ ...current, [currentTab]: current[currentTab].filter((task) => task.id !== id) }));
   };
 
   const notificationLabel = {
@@ -126,61 +128,99 @@ export const RoutineSettingsModal = ({
 
   return (
     <div className="modal-backdrop items-center" onClick={onClose}>
-      <div className="action-sheet flex h-[min(92dvh,46rem)] !w-full !max-w-4xl flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
-        <div className="shrink-0 border-b border-stone-200 px-5 py-4">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0 pr-3">
-              <h2 className="font-hand truncate text-2xl text-stone-800 sm:text-3xl">루틴 보관함</h2>
-              <p className="mt-1 text-xs leading-relaxed text-stone-500 sm:text-sm">평일과 주말의 기본 루틴을 관리합니다.</p>
-            </div>
-            <button onClick={onClose} className="sheet-icon-button shrink-0" aria-label="닫기">
-              <X size={20} />
-            </button>
-          </div>
-          <div className="mt-3 rounded-[14px] border border-stone-200 bg-white px-4 py-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">계정</div>
-                <div className="truncate text-sm text-stone-600">{userEmail ?? '로그인됨'}</div>
-                {saveError ? <div className="mt-1 text-xs text-rose-600">{saveError}</div> : null}
-                {isSaving ? <div className="mt-1 text-xs text-stone-400">저장 중...</div> : null}
-                {notificationMessage ? <div className="mt-1 text-xs text-stone-500">{notificationMessage}</div> : null}
+      {activeTab === 'main' ? (
+        <div className="action-sheet mx-auto flex h-auto w-full max-w-md flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
+          <div className="shrink-0 border-b border-stone-200 px-5 py-4">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 pr-3">
+                <h2 className="font-hand truncate text-2xl text-stone-800">설정</h2>
               </div>
-              <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={() => void handleEnableNotifications()}
-                  disabled={notificationStatus === 'unsupported' || notificationStatus === 'enabled' || isEnabling}
-                  className={`inline-flex items-center justify-center rounded-full border px-3 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${notificationStatus === 'enabled' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-stone-300 bg-white text-stone-600 hover:bg-stone-50'}`}
-                >
-                  {isEnabling ? '설정 중...' : notificationLabel}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void onSignOut()}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-stone-50"
-                >
-                  <LogOut size={16} />
-                  로그아웃
-                </button>
-              </div>
+              <button onClick={onClose} className="sheet-icon-button shrink-0" aria-label="닫기">
+                <X size={20} />
+              </button>
             </div>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-2 rounded-[14px] bg-stone-100 p-1">
-            <button
-              onClick={() => setActiveTab('weekday')}
-              className={`rounded-[12px] px-4 py-2 text-sm font-medium ${activeTab === 'weekday' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500'}`}
-            >
-              평일
-            </button>
-            <button
-              onClick={() => setActiveTab('weekend')}
-              className={`rounded-[12px] px-4 py-2 text-sm font-medium ${activeTab === 'weekend' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500'}`}
-            >
-              주말
-            </button>
+          <div className="overflow-y-auto bg-stone-50 p-5 space-y-6">
+            <section>
+              <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">프로필 정보</h3>
+              <div className="rounded-[16px] border border-stone-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div className="truncate text-sm font-medium text-stone-700">{userEmail ?? '로그인됨'}</div>
+                  <button
+                    type="button"
+                    onClick={() => void onSignOut()}
+                    className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-800"
+                  >
+                    <LogOut size={14} />
+                    로그아웃
+                  </button>
+                </div>
+                {saveError && <div className="mt-2 text-xs text-rose-600">{saveError}</div>}
+                {isSaving && <div className="mt-2 text-xs text-stone-400">저장 중...</div>}
+              </div>
+            </section>
+
+            <section>
+              <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">푸시 알림</h3>
+              <div className="rounded-[16px] border border-stone-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-medium text-stone-700">앱 푸시 알림</div>
+                  <button
+                    type="button"
+                    onClick={() => void handleEnableNotifications()}
+                    disabled={notificationStatus === 'unsupported' || notificationStatus === 'enabled' || isEnabling}
+                    className={`inline-flex items-center justify-center rounded-full border px-3 py-1.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${notificationStatus === 'enabled' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-stone-300 bg-white text-stone-600 hover:bg-stone-50'}`}
+                  >
+                    {isEnabling ? '설정 중...' : notificationLabel}
+                  </button>
+                </div>
+                {notificationMessage && <div className="mt-2 text-xs text-stone-500">{notificationMessage}</div>}
+              </div>
+            </section>
+
+            <section>
+              <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">루틴 설정 리스트</h3>
+              <div className="overflow-hidden rounded-[16px] border border-stone-200 bg-white shadow-sm">
+                <button 
+                  onClick={() => setActiveTab('weekday')}
+                  className="flex w-full items-center justify-between border-b border-stone-100 p-4 transition-colors hover:bg-stone-50"
+                >
+                  <span className="text-sm font-medium text-stone-700">평일 루틴 설정</span>
+                  <ChevronRight size={18} className="text-stone-400" />
+                </button>
+                <button 
+                  onClick={() => setActiveTab('weekend')}
+                  className="flex w-full items-center justify-between p-4 transition-colors hover:bg-stone-50"
+                >
+                  <span className="text-sm font-medium text-stone-700">주말 루틴 설정</span>
+                  <ChevronRight size={18} className="text-stone-400" />
+                </button>
+              </div>
+            </section>
           </div>
         </div>
+      ) : (
+        <div className="action-sheet flex h-[min(92dvh,46rem)] !w-full !max-w-4xl flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
+          <div className="shrink-0 border-b border-stone-200 px-5 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <button onClick={() => setActiveTab('main')} className="sheet-icon-button shrink-0" aria-label="이전">
+                  <ChevronLeft size={20} />
+                </button>
+                <div className="min-w-0 pr-3">
+                  <h2 className="font-hand truncate text-2xl text-stone-800 sm:text-3xl">
+                    {activeTab === 'weekday' ? '평일 루틴 보관함' : '주말 루틴 보관함'}
+                  </h2>
+                  <p className="mt-1 text-xs leading-relaxed text-stone-500 sm:text-sm">
+                    {activeTab === 'weekday' ? '평일의 기본 루틴을 관리합니다.' : '주말의 기본 루틴을 관리합니다.'}
+                  </p>
+                </div>
+              </div>
+              <button onClick={onClose} className="sheet-icon-button shrink-0" aria-label="닫기">
+                <X size={20} />
+              </button>
+            </div>
+          </div>
         <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
           <div className="min-h-0 overflow-y-auto border-b border-stone-200 p-5 md:border-b-0 md:border-r">
             <div className="space-y-2.5">
@@ -260,8 +300,8 @@ export const RoutineSettingsModal = ({
           </div>
         </div>
         <div className="grid shrink-0 grid-cols-2 gap-3 border-t border-stone-200 px-5 py-4 sm:flex sm:justify-end">
-          <button onClick={onClose} className="rounded-[12px] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700">
-            취소
+          <button onClick={() => setActiveTab('main')} className="rounded-[12px] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700">
+            이전
           </button>
           <button
             onClick={() => {
@@ -274,6 +314,7 @@ export const RoutineSettingsModal = ({
           </button>
         </div>
       </div>
+      )}
       {toastMessage && (
         <div className="fixed bottom-8 left-1/2 z-[100] -translate-x-1/2 whitespace-nowrap animate-[fade-in_200ms_ease-out] rounded-full bg-stone-800 px-4 py-2.5 text-sm font-medium text-white shadow-lg">
           {toastMessage}
