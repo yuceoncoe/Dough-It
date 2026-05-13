@@ -121,6 +121,8 @@ const AppShell = ({
       setRoutines(cachedState.routines);
       setTasksByDate(cachedState.tasksByDate);
       setSkippedRatingTaskIds(new Set(cachedState.skippedRatingTaskIds));
+      isHydratedRef.current = true;
+      setIsBootstrapping(false);
     } else if (isActive) {
       const defaultState = createDefaultAppState(todayStr);
       setRoutines(defaultState.routines);
