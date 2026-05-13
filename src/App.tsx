@@ -473,6 +473,7 @@ const App = () => {
   const [authError, setAuthError] = useState<string | null>(null);
   const [authNotice, setAuthNotice] = useState<string | null>(null);
   const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
+  const getAuthRedirectUrl = () => `${window.location.origin}/?auth=confirmed`;
 
   useEffect(() => {
     if (!supabase) {
@@ -552,7 +553,7 @@ const App = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/?auth=confirmed`,
+          emailRedirectTo: getAuthRedirectUrl(),
         },
       });
       if (error) {
@@ -568,6 +569,30 @@ const App = () => {
       return false;
     } finally {
       setIsAuthSubmitting(false);
+    }
+  };
+
+  const handleResendConfirmation = async (email: string) => {
+    if (!supabase) {
+      return;
+    }
+
+    try {
+      setAuthError(null);
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: getAuthRedirectUrl(),
+        },
+      });
+      if (error) {
+        throw error;
+      }
+      setAuthNotice(`${email}로 인증 메일을 다시 보냈습니다. 스팸함도 함께 확인해 주세요.`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '인증 메일을 다시 보내지 못했습니다.';
+      setAuthError(message);
     }
   };
 
@@ -600,6 +625,7 @@ const App = () => {
     return (
       <AuthScreen
         onSubmit={handleAuthSubmit}
+        onResendConfirmation={handleResendConfirmation}
         isSubmitting={isAuthSubmitting}
         errorMessage={authError}
         noticeMessage={authNotice}

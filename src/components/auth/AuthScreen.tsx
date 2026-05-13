@@ -3,11 +3,13 @@ import { Loader2, LockKeyhole, LogIn, UserPlus } from 'lucide-react';
 
 export const AuthScreen = ({
   onSubmit,
+  onResendConfirmation,
   isSubmitting,
   errorMessage,
   noticeMessage,
 }: {
   onSubmit: (mode: 'sign-in' | 'sign-up', email: string, password: string) => Promise<boolean>;
+  onResendConfirmation: (email: string) => Promise<void>;
   isSubmitting: boolean;
   errorMessage: string | null;
   noticeMessage: string | null;
@@ -15,6 +17,7 @@ export const AuthScreen = ({
   const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [lastSignUpEmail, setLastSignUpEmail] = useState('');
 
   return (
     <div className="min-h-screen bg-[#f6f6f8] px-6 py-10 text-stone-900">
@@ -49,8 +52,10 @@ export const AuthScreen = ({
             className="space-y-3"
             onSubmit={async (event) => {
               event.preventDefault();
-              const wasSuccessful = await onSubmit(mode, email.trim(), password);
+              const nextEmail = email.trim();
+              const wasSuccessful = await onSubmit(mode, nextEmail, password);
               if (wasSuccessful && mode === 'sign-up') {
+                setLastSignUpEmail(nextEmail);
                 setEmail('');
                 setPassword('');
               }
@@ -91,6 +96,15 @@ export const AuthScreen = ({
             {noticeMessage ? (
               <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                 {noticeMessage}
+                {mode === 'sign-up' && lastSignUpEmail ? (
+                  <button
+                    type="button"
+                    onClick={() => void onResendConfirmation(lastSignUpEmail)}
+                    className="mt-3 inline-flex rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white"
+                  >
+                    인증 메일 다시 보내기
+                  </button>
+                ) : null}
               </div>
             ) : null}
 
