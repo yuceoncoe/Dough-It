@@ -14,7 +14,13 @@
     <title>circle day</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="initial-loader" role="status" aria-live="polite">
+        <div class="initial-loader__mark" aria-hidden="true"></div>
+        <div class="initial-loader__title">circle day</div>
+        <div class="initial-loader__text">데이터를 불러오는 중...</div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
