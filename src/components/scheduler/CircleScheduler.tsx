@@ -614,9 +614,9 @@ export const CircleScheduler = ({
                 </div>
               )}
               <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`} aria-hidden="true">
-                {displayTask && clampedActiveTaskProgress > 0 ? (
-                  <svg className="center-progress-arc" viewBox="0 0 120 120">
-                    <circle className="center-progress-arc__track" cx="60" cy="60" r="50" />
+                <svg className="center-progress-arc" viewBox="0 0 120 120">
+                  <circle className="center-progress-arc__track" cx="60" cy="60" r="50" />
+                  {displayTask && clampedActiveTaskProgress > 0 ? (
                     <circle
                       className="center-progress-arc__value"
                       cx="60"
@@ -626,8 +626,8 @@ export const CircleScheduler = ({
                       stroke={hexToRgba(activeTaskColor, 0.86)}
                       strokeDasharray={`${clampedActiveTaskProgress * 100} 100`}
                     />
-                  </svg>
-                ) : null}
+                  ) : null}
+                </svg>
                 <div
                   className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
                   style={{ color: displayTask ? activeTaskColor : 'rgba(214, 211, 209, 0.92)' }}
