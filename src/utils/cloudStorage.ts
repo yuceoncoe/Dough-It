@@ -109,22 +109,21 @@ export const persistRemoteAppState = async (userId: string, snapshot: AppStateSn
   if (!supabase) {
     return null;
   }
+  const updatedAt = new Date().toISOString();
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('user_app_state')
     .upsert({
       user_id: userId,
       routines: snapshot.routines,
       tasks_by_date: snapshot.tasksByDate,
       skipped_rating_task_ids: snapshot.skippedRatingTaskIds,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'user_id' })
-    .select('updated_at')
-    .single();
+      updated_at: updatedAt,
+    }, { onConflict: 'user_id' });
 
   if (error) {
     throw error;
   }
 
-  return data?.updated_at ?? null;
+  return updatedAt;
 };
