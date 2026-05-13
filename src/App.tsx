@@ -532,7 +532,7 @@ const App = () => {
 
   const handleAuthSubmit = async (mode: 'sign-in' | 'sign-up', email: string, password: string) => {
     if (!supabase) {
-      return;
+      return false;
     }
 
     try {
@@ -545,7 +545,7 @@ const App = () => {
         if (error) {
           throw error;
         }
-        return;
+        return true;
       }
 
       const { data, error } = await supabase.auth.signUp({
@@ -559,11 +559,13 @@ const App = () => {
         throw error;
       }
       if (!data.session) {
-        setAuthNotice('인증 메일을 보냈습니다. 메일의 확인 링크를 누르면 Circle Day로 돌아와 인증 완료 안내가 표시됩니다.');
+        setAuthNotice('가입 신청이 완료되었습니다. 인증 메일을 보냈으니 메일의 확인 링크를 눌러 주세요.');
       }
+      return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : '로그인을 처리하지 못했습니다.';
       setAuthError(message);
+      return false;
     } finally {
       setIsAuthSubmitting(false);
     }

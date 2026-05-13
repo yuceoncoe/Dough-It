@@ -7,7 +7,7 @@ export const AuthScreen = ({
   errorMessage,
   noticeMessage,
 }: {
-  onSubmit: (mode: 'sign-in' | 'sign-up', email: string, password: string) => Promise<void>;
+  onSubmit: (mode: 'sign-in' | 'sign-up', email: string, password: string) => Promise<boolean>;
   isSubmitting: boolean;
   errorMessage: string | null;
   noticeMessage: string | null;
@@ -47,9 +47,13 @@ export const AuthScreen = ({
 
           <form
             className="space-y-3"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
-              void onSubmit(mode, email.trim(), password);
+              const wasSuccessful = await onSubmit(mode, email.trim(), password);
+              if (wasSuccessful && mode === 'sign-up') {
+                setEmail('');
+                setPassword('');
+              }
             }}
           >
             <label className="block">
