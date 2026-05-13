@@ -414,12 +414,12 @@ export const DayScheduleView = ({
                         touchAction: 'pan-y',
                       }}
                     >
-                      <div className="flex items-start gap-3.5">
-                        <div className="pt-1">
-                          <QuadrantBadge task={task} sizeClassName="h-[22px] w-[22px]" />
+                      <div className="flex items-center gap-3.5">
+                        <div className="flex shrink-0 items-center">
+                          <QuadrantBadge task={task} sizeClassName="h-[28px] w-[28px]" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center justify-between gap-3">
                             <span className={`min-w-0 flex-1 truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
                               {task.title}
                             </span>
