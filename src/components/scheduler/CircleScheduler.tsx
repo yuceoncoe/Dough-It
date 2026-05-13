@@ -273,6 +273,18 @@ export const CircleScheduler = ({
         stroke="rgba(20, 20, 20, 0.06)"
         strokeWidth="0.9"
       />
+      {!centerAction ? (
+        <g className="center-progress-surface pointer-events-none">
+          <circle className="center-progress-surface__track" cx={CENTER} cy={CENTER} r={TRACK_INNER_RADIUS} />
+          {displayTask && clampedActiveTaskProgress > 0 ? (
+            <path
+              className="center-progress-surface__value"
+              d={describeArc(CENTER, CENTER, TRACK_INNER_RADIUS, 0, clampedActiveTaskProgress * 360)}
+              fill={hexToRgba(activeTaskColor, 0.28)}
+            />
+          ) : null}
+        </g>
+      ) : null}
       <g className="pointer-events-none">
         {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
           const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
@@ -614,16 +626,6 @@ export const CircleScheduler = ({
                 </div>
               )}
               <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`} aria-hidden="true">
-                <svg className="center-progress-arc" viewBox="0 0 120 120">
-                  <circle className="center-progress-arc__track" cx="60" cy="60" r="60" />
-                  {displayTask && clampedActiveTaskProgress > 0 ? (
-                    <path
-                      className="center-progress-arc__value"
-                      d={describeArc(60, 60, 60, 0, clampedActiveTaskProgress * 360)}
-                      fill={hexToRgba(activeTaskColor, 0.28)}
-                    />
-                  ) : null}
-                </svg>
                 <div
                   className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
                   style={{ color: displayTask ? activeTaskColor : 'rgba(214, 211, 209, 0.92)' }}

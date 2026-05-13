@@ -442,22 +442,16 @@ canvas {
   animation-name: center-slide-right;
 }
 
-.center-progress-arc {
-  position: absolute;
-  inset: 0;
-  overflow: visible;
-}
-
-.center-progress-arc__track,
-.center-progress-arc__value {
+.center-progress-surface__track,
+.center-progress-surface__value {
   stroke: none;
 }
 
-.center-progress-arc__track {
+.center-progress-surface__track {
   fill: rgba(170, 170, 170, 0.08);
 }
 
-.center-progress-arc__value {
+.center-progress-surface__value {
   transition: d 240ms ease;
 }
 
