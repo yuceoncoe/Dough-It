@@ -87,6 +87,7 @@ const AppShell = ({
   const hydrationTokenRef = useRef(0);
   const isHydratedRef = useRef(false);
   const remoteUpdatedAtRef = useRef<string | null>(null);
+  const saveRequestIdRef = useRef(0);
 
   useEffect(() => {
     const checkNotificationStatus = async () => {
@@ -188,6 +189,10 @@ const AppShell = ({
       return;
     }
 
+    const saveRequestId = saveRequestIdRef.current + 1;
+    saveRequestIdRef.current = saveRequestId;
+    setSaveError(null);
+
     const snapshot: AppStateSnapshot = {
       routines,
       tasksByDate,
@@ -199,17 +204,26 @@ const AppShell = ({
 
     const timeoutId = window.setTimeout(async () => {
       try {
-        setIsSaving(true);
-        setSaveError(null);
+        if (saveRequestIdRef.current === saveRequestId) {
+          setIsSaving(true);
+        }
         const remoteUpdatedAt = await persistRemoteAppState(user.id, snapshot);
+        if (saveRequestIdRef.current !== saveRequestId) {
+          return;
+        }
         remoteUpdatedAtRef.current = remoteUpdatedAt;
         persistCachedAppState(user.id, snapshot, remoteUpdatedAt);
         setSaveError(null);
       } catch (error) {
+        if (saveRequestIdRef.current !== saveRequestId) {
+          return;
+        }
         const message = error instanceof Error ? error.message : '변경사항을 저장하지 못했습니다.';
         setSaveError(message);
       } finally {
-        setIsSaving(false);
+        if (saveRequestIdRef.current === saveRequestId) {
+          setIsSaving(false);
+        }
       }
     }, 500);
 
