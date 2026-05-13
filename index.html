@@ -12,6 +12,58 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
     <title>circle day</title>
+    <style>
+      html,
+      body,
+      #root {
+        min-height: 100%;
+        margin: 0;
+        background: #f6f6f8;
+      }
+
+      body {
+        min-height: 100vh;
+      }
+
+      .initial-loader {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.65rem;
+        background: #f6f6f8;
+        color: #57534e;
+        font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+      }
+
+      .initial-loader__mark {
+        width: 2.75rem;
+        height: 2.75rem;
+        border: 3px solid rgba(245, 158, 11, 0.22);
+        border-top-color: #d97706;
+        border-radius: 999px;
+        animation: initial-loader-spin 900ms linear infinite;
+      }
+
+      .initial-loader__title {
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: #292524;
+      }
+
+      .initial-loader__text {
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      @keyframes initial-loader-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root">
