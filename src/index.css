@@ -445,24 +445,20 @@ canvas {
 .center-progress-arc {
   position: absolute;
   inset: 0;
-  transform: rotate(-90deg);
   overflow: visible;
 }
 
 .center-progress-arc__track,
 .center-progress-arc__value {
-  fill: none;
-  stroke-width: 12;
-  vector-effect: non-scaling-stroke;
+  stroke: none;
 }
 
 .center-progress-arc__track {
-  stroke: rgba(31, 30, 30, 0.06);
+  fill: rgba(170, 170, 170, 0.14);
 }
 
 .center-progress-arc__value {
-  stroke-linecap: round;
-  transition: stroke-dasharray 240ms ease;
+  transition: d 240ms ease;
 }
 
 .drag-preview-lens {

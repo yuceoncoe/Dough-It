@@ -617,14 +617,10 @@ export const CircleScheduler = ({
                 <svg className="center-progress-arc" viewBox="0 0 120 120">
                   <circle className="center-progress-arc__track" cx="60" cy="60" r="50" />
                   {displayTask && clampedActiveTaskProgress > 0 ? (
-                    <circle
+                    <path
                       className="center-progress-arc__value"
-                      cx="60"
-                      cy="60"
-                      r="50"
-                      pathLength="100"
-                      stroke={hexToRgba(activeTaskColor, 0.86)}
-                      strokeDasharray={`${clampedActiveTaskProgress * 100} 100`}
+                      d={describeArc(60, 60, 50, 0, clampedActiveTaskProgress * 360)}
+                      fill={hexToRgba(activeTaskColor, 0.28)}
                     />
                   ) : null}
                 </svg>
