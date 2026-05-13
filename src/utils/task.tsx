@@ -31,7 +31,7 @@ export const getDirectionalTextVisuals = (angle: number, minuteAngle: number) =>
   };
 };
 
-export const QuadrantBadge = ({ task }: { task: Task }) => {
+export const QuadrantBadge = ({ task, sizeClassName = 'h-[14px] w-[14px]' }: { task: Task; sizeClassName?: string }) => {
   const isQ1 = task.tags.includes('urgent') && task.tags.includes('important');
   const isQ2 = task.tags.includes('urgent') && !task.tags.includes('important');
   const isQ3 = !task.tags.includes('urgent') && task.tags.includes('important');
@@ -39,7 +39,7 @@ export const QuadrantBadge = ({ task }: { task: Task }) => {
 
   if (task.completed) {
     return (
-      <div className="grid h-[14px] w-[14px] shrink-0 grid-cols-2 grid-rows-2 gap-[2px] opacity-60">
+      <div className={`grid ${sizeClassName} shrink-0 grid-cols-2 grid-rows-2 gap-[2px] opacity-60`}>
         <div className={`rounded-tl-[3px] ${isQ1 ? 'bg-stone-400' : 'bg-stone-200'}`} />
         <div className={`rounded-tr-[3px] ${isQ2 ? 'bg-stone-400' : 'bg-stone-200'}`} />
         <div className={`rounded-bl-[3px] ${isQ3 ? 'bg-stone-400' : 'bg-stone-200'}`} />
@@ -49,7 +49,7 @@ export const QuadrantBadge = ({ task }: { task: Task }) => {
   }
 
   return (
-    <div className="grid h-[14px] w-[14px] shrink-0 grid-cols-2 grid-rows-2 gap-[2px]">
+    <div className={`grid ${sizeClassName} shrink-0 grid-cols-2 grid-rows-2 gap-[2px]`}>
       <div className={`rounded-tl-[3px] ${isQ1 ? 'bg-rose-500' : 'bg-stone-200'}`} />
       <div className={`rounded-tr-[3px] ${isQ2 ? 'bg-yellow-400' : 'bg-stone-200'}`} />
       <div className={`rounded-bl-[3px] ${isQ3 ? 'bg-sky-500' : 'bg-stone-200'}`} />

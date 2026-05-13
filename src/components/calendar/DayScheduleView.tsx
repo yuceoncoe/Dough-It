@@ -7,7 +7,7 @@ import TaskActionSheet from '../ui/TaskActionSheet';
 import RoutineActionModal from '../ui/RoutineActionModal';
 import DayTaskEditorModal from '../ui/DayTaskEditorModal';
 import CircleScheduler from '../scheduler/CircleScheduler';
-import { ChevronLeft, Plus, Settings, Clock, Lock, Zap, Trash2 } from 'lucide-react';
+import { ChevronLeft, Plus, Settings, Clock, Trash2 } from 'lucide-react';
 import { QuadrantBadge, getMaxOverlap } from '../../utils/task';
 
 
@@ -414,26 +414,25 @@ export const DayScheduleView = ({
                         touchAction: 'pan-y',
                       }}
                     >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2.5">
-                            <QuadrantBadge task={task} />
-                            <span className={`truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
+                      <div className="flex items-start gap-3.5">
+                        <div className="pt-1">
+                          <QuadrantBadge task={task} sizeClassName="h-[22px] w-[22px]" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-3">
+                            <span className={`min-w-0 flex-1 truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
                               {task.title}
                             </span>
+                            <div className="flex shrink-0 items-center gap-2">
+                              <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
+                                {getTaskToneLabel(task)}
+                              </span>
+                              {task.rating !== undefined && <span className="whitespace-nowrap text-xs font-bold text-amber-500">⭐️ {task.rating}</span>}
+                            </div>
                           </div>
                           <div className="mt-1.5 flex items-center gap-2 text-[12px] text-stone-400">
                             <Clock size={12} className="shrink-0" />
                             {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
-                          </div>
-                        </div>
-                        <div className="flex shrink-0 flex-col items-end gap-1.5">
-                          <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
-                            {getTaskToneLabel(task)}
-                          </span>
-                          <div className="flex items-center gap-1.5">
-                            {task.rating !== undefined && <span className="text-xs font-bold text-amber-500">⭐️ {task.rating}</span>}
-                            {task.isRoutine ? <Lock size={13} className="text-stone-300" /> : <Zap size={13} className="text-stone-300" />}
                           </div>
                         </div>
                       </div>
