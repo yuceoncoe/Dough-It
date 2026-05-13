@@ -31,11 +31,16 @@ export const getDirectionalTextVisuals = (angle: number, minuteAngle: number) =>
   };
 };
 
+const getSafeTags = (tags: Task['tags'] | undefined | null) => (
+  Array.isArray(tags) ? tags : []
+);
+
 export const QuadrantBadge = ({ task, sizeClassName = 'h-[14px] w-[14px]' }: { task: Task; sizeClassName?: string }) => {
-  const isQ1 = task.tags.includes('urgent') && task.tags.includes('important');
-  const isQ2 = task.tags.includes('urgent') && !task.tags.includes('important');
-  const isQ3 = !task.tags.includes('urgent') && task.tags.includes('important');
-  const isQ4 = !task.tags.includes('urgent') && !task.tags.includes('important');
+  const tags = getSafeTags(task.tags);
+  const isQ1 = tags.includes('urgent') && tags.includes('important');
+  const isQ2 = tags.includes('urgent') && !tags.includes('important');
+  const isQ3 = !tags.includes('urgent') && tags.includes('important');
+  const isQ4 = !tags.includes('urgent') && !tags.includes('important');
 
   if (task.completed) {
     return (
@@ -330,8 +335,9 @@ export const assignTasksToTrackLanes = (tasks: Task[], laneCount: number) => {
 };
 
 export const getTaskColor = (tags: Tag[]) => {
-  const urgent = tags.includes('urgent');
-  const important = tags.includes('important');
+  const safeTags = getSafeTags(tags);
+  const urgent = safeTags.includes('urgent');
+  const important = safeTags.includes('important');
   if (urgent && important) {
     return '#f43f5e';
   }
@@ -348,7 +354,7 @@ export const getClockTaskColor = (task: Task) => {
   if (task.completed) {
     return '#d4d4d4';
   }
-  return getTaskColor(task.tags);
+  return getTaskColor(getSafeTags(task.tags));
 };
 
 export const hexToRgba = (hex: string, alpha: number) => {
@@ -369,8 +375,9 @@ export const hexToRgba = (hex: string, alpha: number) => {
 };
 
 export const getTaskBorderClass = (tags: Tag[]) => {
-  const urgent = tags.includes('urgent');
-  const important = tags.includes('important');
+  const safeTags = getSafeTags(tags);
+  const urgent = safeTags.includes('urgent');
+  const important = safeTags.includes('important');
   if (urgent && important) {
     return 'border-rose-500';
   }
@@ -384,32 +391,34 @@ export const getTaskBorderClass = (tags: Tag[]) => {
 };
 
 export const getTaskToneLabel = (task: Task) => {
+  const tags = getSafeTags(task.tags);
   if (task.completed) {
     return '완료';
   }
-  if (task.tags.includes('urgent') && task.tags.includes('important')) {
+  if (tags.includes('urgent') && tags.includes('important')) {
     return '긴급 · 중요';
   }
-  if (task.tags.includes('urgent')) {
+  if (tags.includes('urgent')) {
     return '긴급';
   }
-  if (task.tags.includes('important')) {
+  if (tags.includes('important')) {
     return '중요';
   }
   return task.isRoutine ? '루틴' : '일반';
 };
 
 export const getTaskTonePillClass = (task: Task) => {
+  const tags = getSafeTags(task.tags);
   if (task.completed) {
     return 'bg-stone-100 text-stone-500';
   }
-  if (task.tags.includes('urgent') && task.tags.includes('important')) {
+  if (tags.includes('urgent') && tags.includes('important')) {
     return 'bg-rose-50 text-rose-600';
   }
-  if (task.tags.includes('urgent')) {
+  if (tags.includes('urgent')) {
     return 'bg-yellow-50 text-yellow-700';
   }
-  if (task.tags.includes('important')) {
+  if (tags.includes('important')) {
     return 'bg-sky-50 text-sky-600';
   }
   return task.isRoutine ? 'bg-stone-100 text-stone-600' : 'bg-emerald-50 text-emerald-600';
@@ -417,16 +426,17 @@ export const getTaskTonePillClass = (task: Task) => {
 
 export const getTaskIcon = (task: Task) => {
   const title = task.title.toLowerCase();
+  const tags = getSafeTags(task.tags);
   if (task.isRoutine) {
     return <RefreshCw size={30} className="text-stone-600" />;
   }
-  if (task.tags.includes('urgent') && task.tags.includes('important')) {
+  if (tags.includes('urgent') && tags.includes('important')) {
     return <Sparkles size={30} className="text-rose-500" />;
   }
-  if (task.tags.includes('urgent')) {
+  if (tags.includes('urgent')) {
     return <AlertCircle size={30} className="text-yellow-400" />;
   }
-  if (task.tags.includes('important')) {
+  if (tags.includes('important')) {
     return <Star size={30} className="text-sky-500" />;
   }
   if (title.includes('sleep') || title.includes('rest')) {

@@ -15,8 +15,9 @@ export const REPORT_QUADRANTS: Array<{
 ];
 
 export const getTaskReportQuadrant = (task: Task): ReportQuadrantKey => {
-  const isUrgent = task.tags.includes('urgent');
-  const isImportant = task.tags.includes('important');
+  const tags = Array.isArray(task.tags) ? task.tags : [];
+  const isUrgent = tags.includes('urgent');
+  const isImportant = tags.includes('important');
 
   if (isUrgent && isImportant) return 'urgentImportant';
   if (isUrgent) return 'urgent';
