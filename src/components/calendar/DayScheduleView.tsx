@@ -416,7 +416,7 @@ export const DayScheduleView = ({
                     >
                       <div className="flex items-center gap-3.5">
                         <div className="flex shrink-0 items-center">
-                          <QuadrantBadge task={task} sizeClassName="h-[28px] w-[28px]" />
+                          <QuadrantBadge task={task} sizeClassName="h-[32px] w-[32px]" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-3">
@@ -430,7 +430,7 @@ export const DayScheduleView = ({
                               {task.rating !== undefined && <span className="whitespace-nowrap text-xs font-bold text-amber-500">⭐️ {task.rating}</span>}
                             </div>
                           </div>
-                          <div className="mt-1.5 flex items-center gap-2 text-[12px] text-stone-400">
+                          <div className="mt-1 flex items-center gap-2 text-[12px] text-stone-400">
                             <Clock size={12} className="shrink-0" />
                             {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
                           </div>
