@@ -188,7 +188,7 @@ const AppShell = ({
     };
 
     persistCachedAppState(user.id, snapshot, remoteUpdatedAtRef.current);
-    void syncTaskAlarms(tasksByDate, user.id);
+    void syncTaskAlarms(tasksByDate, user.id).catch(() => undefined);
 
     const timeoutId = window.setTimeout(async () => {
       try {
@@ -197,6 +197,7 @@ const AppShell = ({
         const remoteUpdatedAt = await persistRemoteAppState(user.id, snapshot);
         remoteUpdatedAtRef.current = remoteUpdatedAt;
         persistCachedAppState(user.id, snapshot, remoteUpdatedAt);
+        setSaveError(null);
       } catch (error) {
         const message = error instanceof Error ? error.message : '변경사항을 저장하지 못했습니다.';
         setSaveError(message);
@@ -207,13 +208,6 @@ const AppShell = ({
 
     return () => window.clearTimeout(timeoutId);
   }, [routines, tasksByDate, skippedRatingTaskIds, user.id]);
-
-  useEffect(() => {
-    if (!isHydratedRef.current) {
-      return;
-    }
-    setTasksByDate((current) => addOrReplaceDateTasks(current, todayStr, routines));
-  }, [todayStr, routines]);
 
   useEffect(() => {
     if (!isHydratedRef.current) {
@@ -273,6 +267,11 @@ const AppShell = ({
 
   const updateTasksForDate = (date: string, nextTasks: Task[]) => {
     setTasksByDate((current) => ({ ...current, [date]: nextTasks }));
+  };
+
+  const updateRoutines = (nextRoutines: RoutineState) => {
+    setRoutines(nextRoutines);
+    setTasksByDate((current) => addOrReplaceDateTasks(current, todayStr, nextRoutines));
   };
 
   const applyRoutineEdit = (
@@ -375,7 +374,7 @@ const AppShell = ({
         notificationStatus={notificationStatus}
         notificationMessage={notificationMessage}
         onClose={() => setSettingsOpen(false)}
-        onSaveRoutines={setRoutines}
+        onSaveRoutines={updateRoutines}
         onSignOut={onSignOut}
         onEnableNotifications={async () => {
           try {
