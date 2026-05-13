@@ -38,6 +38,7 @@ export const RoutineSettingsModal = ({
   const [tags, setTags] = useState<Tag[]>([]);
   const [isEnabling, setIsEnabling] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [pendingDeleteTask, setPendingDeleteTask] = useState<Task | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
   const wasOpenRef = useRef(false);
   useBodyScrollLock(isOpen);
@@ -65,6 +66,7 @@ export const RoutineSettingsModal = ({
     setEndTime('');
     setTags([]);
     setActiveTab('main');
+    setPendingDeleteTask(null);
   }, [isOpen, routines]);
 
   if (!isOpen) {
@@ -116,6 +118,7 @@ export const RoutineSettingsModal = ({
     const nextDraft = { ...draft, [currentTab]: draft[currentTab].filter((task) => task.id !== id) };
     setDraft(nextDraft);
     onSaveRoutines(nextDraft);
+    setPendingDeleteTask(null);
   };
 
   const notificationLabel = {
@@ -258,7 +261,7 @@ export const RoutineSettingsModal = ({
                           {getTaskToneLabel(task)}
                         </span>
                       </div>
-                      <button onClick={() => handleDelete(task.id)} className="rounded-full p-1 text-stone-300 transition-colors hover:bg-rose-50 hover:text-rose-500">
+                      <button onClick={() => setPendingDeleteTask(task)} className="rounded-full p-1 text-stone-300 transition-colors hover:bg-rose-50 hover:text-rose-500">
                         <Trash2 size={15} />
                       </button>
                     </div>
@@ -335,6 +338,36 @@ export const RoutineSettingsModal = ({
           {toastMessage}
         </div>
       )}
+      {pendingDeleteTask ? (
+        <div className="modal-backdrop z-[110]" onClick={(event) => {
+          event.stopPropagation();
+          setPendingDeleteTask(null);
+        }}>
+          <div className="action-sheet max-w-md" onClick={(event) => event.stopPropagation()}>
+            <h2 className="font-hand text-2xl text-stone-800">루틴 삭제</h2>
+            <p className="mt-3 text-sm leading-6 text-stone-500">
+              <span className="font-semibold text-stone-700">{pendingDeleteTask.title}</span>
+              {' '}루틴 일정을 삭제할까요?
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setPendingDeleteTask(null)}
+                className="rounded-[12px] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDelete(pendingDeleteTask.id)}
+                className="rounded-[12px] bg-rose-500 px-4 py-3 text-sm font-semibold text-white"
+              >
+                삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };
