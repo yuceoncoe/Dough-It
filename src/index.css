@@ -370,6 +370,16 @@ canvas {
   pointer-events: none;
 }
 
+.center-lens--button {
+  border: 0;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.center-lens--button:active {
+  transform: translate(-50%, -50%) scale(0.98);
+}
+
 .center-lens::before {
   content: "";
   position: absolute;
@@ -413,6 +423,11 @@ canvas {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   pointer-events: none;
+}
+
+.center-lens__title--button {
+  color: #292524;
+  max-width: 132px;
 }
 
 .center-progress-shell {

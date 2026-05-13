@@ -10,10 +10,15 @@ export const CircleScheduler = ({
   tasks,
   onAddTask,
   showCurrentTime = true,
+  centerAction,
 }: {
   tasks: Task[];
   onAddTask: (title: string, tags: Tag[], startTime: string, duration: number) => boolean | void;
   showCurrentTime?: boolean;
+  centerAction?: {
+    label: string;
+    onClick: () => void;
+  };
 }) => {
   const squareRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -540,84 +545,94 @@ export const CircleScheduler = ({
         <div
           className="center-stack"
         >
-          {hasOverlapSlider && (
-            <div
-              className="center-carousel"
-              onPointerDown={(event) => {
-                sliderDragStartRef.current = event.clientX;
-                sliderPointerIdRef.current = event.pointerId;
-                sliderDidSwipeRef.current = false;
-                event.currentTarget.setPointerCapture(event.pointerId);
-              }}
-              onPointerMove={(event) => {
-                if (sliderDragStartRef.current === null || sliderDidSwipeRef.current) {
-                  return;
-                }
-                if (sliderPointerIdRef.current !== event.pointerId) {
-                  return;
-                }
-                const delta = event.clientX - sliderDragStartRef.current;
-                if (Math.abs(delta) < 24) {
-                  return;
-                }
-                sliderDidSwipeRef.current = true;
-                sliderDragStartRef.current = null;
-                moveOverlapSlider(delta < 0 ? 1 : -1);
-              }}
-              onPointerUp={(event) => {
-                if (sliderDragStartRef.current === null) {
-                  sliderPointerIdRef.current = null;
-                  return;
-                }
-                const delta = event.clientX - sliderDragStartRef.current;
-                sliderDragStartRef.current = null;
-                sliderPointerIdRef.current = null;
-                if (sliderDidSwipeRef.current) {
-                  sliderDidSwipeRef.current = false;
-                  return;
-                }
-                if (Math.abs(delta) < 28) {
-                  return;
-                }
-                moveOverlapSlider(delta < 0 ? 1 : -1);
-              }}
-              onPointerCancel={() => {
-                sliderDragStartRef.current = null;
-                sliderPointerIdRef.current = null;
-                sliderDidSwipeRef.current = false;
-              }}
-              onPointerLeave={() => {
-                if (sliderDidSwipeRef.current) {
-                  sliderDragStartRef.current = null;
-                  sliderPointerIdRef.current = null;
-                  sliderDidSwipeRef.current = false;
-                }
-              }}
-            >
-              <div className="center-carousel__pager" aria-hidden="true">
-                {overlappingActiveTasks.map((task, index) => (
-                  <span key={task.id} className={`center-carousel__dot ${index === safeOverlapIndex ? 'is-active' : ''}`} />
-                ))}
+          {centerAction ? (
+            <button type="button" className="center-lens center-lens--button" onClick={centerAction.onClick}>
+              <span className="center-lens__title center-lens__title--button">
+                {centerAction.label}
+              </span>
+            </button>
+          ) : (
+            <>
+              {hasOverlapSlider && (
+                <div
+                  className="center-carousel"
+                  onPointerDown={(event) => {
+                    sliderDragStartRef.current = event.clientX;
+                    sliderPointerIdRef.current = event.pointerId;
+                    sliderDidSwipeRef.current = false;
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                  }}
+                  onPointerMove={(event) => {
+                    if (sliderDragStartRef.current === null || sliderDidSwipeRef.current) {
+                      return;
+                    }
+                    if (sliderPointerIdRef.current !== event.pointerId) {
+                      return;
+                    }
+                    const delta = event.clientX - sliderDragStartRef.current;
+                    if (Math.abs(delta) < 24) {
+                      return;
+                    }
+                    sliderDidSwipeRef.current = true;
+                    sliderDragStartRef.current = null;
+                    moveOverlapSlider(delta < 0 ? 1 : -1);
+                  }}
+                  onPointerUp={(event) => {
+                    if (sliderDragStartRef.current === null) {
+                      sliderPointerIdRef.current = null;
+                      return;
+                    }
+                    const delta = event.clientX - sliderDragStartRef.current;
+                    sliderDragStartRef.current = null;
+                    sliderPointerIdRef.current = null;
+                    if (sliderDidSwipeRef.current) {
+                      sliderDidSwipeRef.current = false;
+                      return;
+                    }
+                    if (Math.abs(delta) < 28) {
+                      return;
+                    }
+                    moveOverlapSlider(delta < 0 ? 1 : -1);
+                  }}
+                  onPointerCancel={() => {
+                    sliderDragStartRef.current = null;
+                    sliderPointerIdRef.current = null;
+                    sliderDidSwipeRef.current = false;
+                  }}
+                  onPointerLeave={() => {
+                    if (sliderDidSwipeRef.current) {
+                      sliderDragStartRef.current = null;
+                      sliderPointerIdRef.current = null;
+                      sliderDidSwipeRef.current = false;
+                    }
+                  }}
+                >
+                  <div className="center-carousel__pager" aria-hidden="true">
+                    {overlappingActiveTasks.map((task, index) => (
+                      <span key={task.id} className={`center-carousel__dot ${index === safeOverlapIndex ? 'is-active' : ''}`} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`} aria-hidden="true">
+                <div
+                  className="center-progress-fill"
+                  style={{
+                    transform: `scaleY(${activeTaskProgress})`,
+                    background: `linear-gradient(180deg, ${hexToRgba(activeTaskColor, 0.84)} 0%, ${hexToRgba(activeTaskColor, 0.18)} 100%)`,
+                  }}
+                />
               </div>
-            </div>
+              <div className="center-lens" aria-hidden="true">
+                <div
+                  className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
+                  style={{ color: displayTask ? activeTaskColor : 'rgba(214, 211, 209, 0.92)' }}
+                >
+                  {displayTask ? displayTask.title : '비어 있음'}
+                </div>
+              </div>
+            </>
           )}
-          <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`} aria-hidden="true">
-            <div
-              className="center-progress-fill"
-              style={{
-                transform: `scaleY(${activeTaskProgress})`,
-                background: `linear-gradient(180deg, ${hexToRgba(activeTaskColor, 0.84)} 0%, ${hexToRgba(activeTaskColor, 0.18)} 100%)`,
-              }}
-            />
-          </div>
-          <div className="center-lens" aria-hidden="true">
-            <div
-              className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
-              style={{ color: displayTask ? activeTaskColor : 'rgba(214, 211, 209, 0.92)' }}
-            >
-              {displayTask ? displayTask.title : '비어 있음'}
-            </div>
-          </div>
         </div>
       </div>
 

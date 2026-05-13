@@ -7,8 +7,10 @@ import TaskActionSheet from '../ui/TaskActionSheet';
 import RoutineActionModal from '../ui/RoutineActionModal';
 import DayTaskEditorModal from '../ui/DayTaskEditorModal';
 import CircleScheduler from '../scheduler/CircleScheduler';
+import TaskReportModal from '../ui/TaskReportModal';
 import { ChevronLeft, Plus, Settings, Clock, Trash2 } from 'lucide-react';
 import { QuadrantBadge, getMaxOverlap } from '../../utils/task';
+import { getTaskReport } from '../../utils/report';
 
 
 
@@ -41,12 +43,16 @@ export const DayScheduleView = ({
   const [pendingDeleteTask, setPendingDeleteTask] = useState<Task | null>(null);
   const [routineEditScope, setRoutineEditScope] = useState<RoutineScope>('single');
   const [swipedTaskId, setSwipedTaskId] = useState<string | null>(null);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [now, setNow] = useState(() => new Date());
   const swipeStartRef = useRef<{ id: string; x: number; y: number; isHorizontal: boolean | null } | null>(null);
   const swipeCardRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
   const isToday = date === getTodayString();
+  const isPastDate = date < getTodayString();
+  const report = getTaskReport(tasks);
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -67,6 +73,41 @@ export const DayScheduleView = ({
       }
       return timeToMinutes(left.startTime) - timeToMinutes(right.startTime);
     });
+
+  useEffect(() => {
+    if (!isToday) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => setNow(new Date()), 60000);
+    return () => window.clearInterval(intervalId);
+  }, [isToday]);
+
+  useEffect(() => {
+    if (!isToday || report.completedCount === 0) {
+      return;
+    }
+
+    const scheduledTasks = tasks.filter((task) => task.startTime && task.duration);
+    if (!scheduledTasks.length) {
+      return;
+    }
+
+    const [year, month, day] = date.split('-').map(Number);
+    const hasReachedEndOfDayTasks = scheduledTasks.every((task) => {
+      const [hours, minutes] = (task.startTime ?? '00:00').split(':').map(Number);
+      const endAt = new Date(year, month - 1, day, hours, minutes, 0).getTime() + (task.duration ?? 0) * 60 * 1000;
+      return now.getTime() >= endAt;
+    });
+    const storageKey = `circle-day:report-shown:${date}`;
+
+    if (!hasReachedEndOfDayTasks || window.localStorage.getItem(storageKey) === 'true') {
+      return;
+    }
+
+    window.localStorage.setItem(storageKey, 'true');
+    setReportOpen(true);
+  }, [date, isToday, now, report.completedCount, tasks]);
 
   const resetForm = () => {
     setTitle('');
@@ -217,6 +258,12 @@ export const DayScheduleView = ({
           setSheetTask(nextTask);
         }}
       />
+      <TaskReportModal
+        isOpen={reportOpen}
+        date={date}
+        tasks={tasks}
+        onClose={() => setReportOpen(false)}
+      />
       <RoutineActionModal
         isOpen={pendingRoutineAction !== null}
         action={pendingRoutineAction?.action ?? null}
@@ -322,6 +369,10 @@ export const DayScheduleView = ({
             tasks={tasks}
             onAddTask={addTask}
             showCurrentTime={isToday}
+            centerAction={isPastDate ? {
+              label: '보고서 보기',
+              onClick: () => setReportOpen(true),
+            } : undefined}
           />
         </div>
 
