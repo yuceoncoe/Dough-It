@@ -615,11 +615,11 @@ export const CircleScheduler = ({
               )}
               <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`} aria-hidden="true">
                 <svg className="center-progress-arc" viewBox="0 0 120 120">
-                  <circle className="center-progress-arc__track" cx="60" cy="60" r="56" />
+                  <circle className="center-progress-arc__track" cx="60" cy="60" r="60" />
                   {displayTask && clampedActiveTaskProgress > 0 ? (
                     <path
                       className="center-progress-arc__value"
-                      d={describeArc(60, 60, 56, 0, clampedActiveTaskProgress * 360)}
+                      d={describeArc(60, 60, 60, 0, clampedActiveTaskProgress * 360)}
                       fill={hexToRgba(activeTaskColor, 0.28)}
                     />
                   ) : null}
