@@ -11,6 +11,7 @@ import TaskReportModal from '../ui/TaskReportModal';
 import { ChevronLeft, Plus, Settings, Clock, Trash2 } from 'lucide-react';
 import { QuadrantBadge, getMaxOverlap } from '../../utils/task';
 import { getTaskReport } from '../../utils/report';
+import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 
 
@@ -53,6 +54,8 @@ export const DayScheduleView = ({
   const isToday = date === getTodayString();
   const isPastDate = date < getTodayString();
   const report = getTaskReport(tasks);
+  const hasOpenOverlay = Boolean(sheetTask || editorOpen || pendingRoutineAction || pendingDeleteTask || reportOpen);
+  useBodyScrollLock(hasOpenOverlay);
 
   const showToast = (message: string) => {
     setToastMessage(message);

@@ -3,6 +3,7 @@ import { RoutineState, Tag, Task } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
 import { getTaskTonePillClass, getTaskToneLabel, QuadrantBadge, getToneSelectionKey, getToneTags, getMaxOverlap } from '../../utils/task';
 import { Clock, LogOut, Trash2, X, ChevronRight, ChevronLeft } from 'lucide-react';
+import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 export const RoutineSettingsModal = ({
   isOpen,
@@ -38,6 +39,7 @@ export const RoutineSettingsModal = ({
   const [isEnabling, setIsEnabling] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
+  useBodyScrollLock(isOpen);
 
   const showToast = (message: string) => {
     setToastMessage(message);

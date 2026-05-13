@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RoutineAction, RoutineScope } from '../../types';
+import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 export const RoutineActionModal = ({
   isOpen,
@@ -14,6 +15,8 @@ export const RoutineActionModal = ({
   onClose: () => void;
   onSelectScope: (scope: RoutineScope) => void;
 }) => {
+  useBodyScrollLock(isOpen && Boolean(action));
+
   if (!isOpen || !action) {
     return null;
   }

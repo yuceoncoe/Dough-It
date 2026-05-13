@@ -2,6 +2,7 @@ import React from 'react';
 import { Task } from '../../types';
 import { formatDateLabel } from '../../utils/task';
 import { getTaskReport, REPORT_QUADRANTS } from '../../utils/report';
+import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 export const TaskReportModal = ({
   isOpen,
@@ -14,6 +15,8 @@ export const TaskReportModal = ({
   tasks: Task[];
   onClose: () => void;
 }) => {
+  useBodyScrollLock(isOpen);
+
   if (!isOpen) {
     return null;
   }

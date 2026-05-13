@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Tag } from '../../types';
 import { getToneTags, getToneSelectionKey } from '../../utils/task';
 import { X } from 'lucide-react';
+import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 export const DayTaskEditorModal = ({
   isOpen,
@@ -30,6 +31,8 @@ export const DayTaskEditorModal = ({
   onSetTags: (tags: Tag[]) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 }) => {
+  useBodyScrollLock(isOpen);
+
   if (!isOpen) {
     return null;
   }

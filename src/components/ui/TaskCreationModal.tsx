@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Tag } from '../../types';
 import { getToneTags, getToneSelectionKey } from '../../utils/task';
 import { X } from 'lucide-react';
+import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 export const TaskCreationModal = ({
   isOpen,
@@ -16,6 +17,7 @@ export const TaskCreationModal = ({
 }) => {
   const [title, setTitle] = useState('');
   const [tags, setTags] = useState<Tag[]>([]);
+  useBodyScrollLock(isOpen);
 
   useEffect(() => {
     if (!isOpen) {

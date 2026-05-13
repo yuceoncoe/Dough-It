@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Task } from '../../types';
 import { Star } from 'lucide-react';
+import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 export const TaskRatingCarousel = ({
   tasks,
@@ -13,6 +14,7 @@ export const TaskRatingCarousel = ({
 }) => {
   const [ratedTaskIds, setRatedTaskIds] = useState<Set<string>>(new Set());
   const [notesByTaskId, setNotesByTaskId] = useState<Record<string, string>>({});
+  useBodyScrollLock(tasks.length > 0);
 
   if (tasks.length === 0) return null;
 

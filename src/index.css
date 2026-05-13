@@ -127,6 +127,8 @@ canvas {
   align-items: center;
   justify-content: center;
   padding: clamp(16px, 5vw, 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: rgba(23, 18, 14, 0.16);
   backdrop-filter: blur(16px);
 }

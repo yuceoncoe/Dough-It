@@ -3,6 +3,7 @@ import { Task } from '../../types';
 import { minutesToTime } from '../../utils/time';
 import { timeToMinutes } from '../../utils/time';
 import { Pencil, Star, Trash2 } from 'lucide-react';
+import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 export const TaskActionSheet = ({
   task,
@@ -20,6 +21,7 @@ export const TaskActionSheet = ({
   onUpdateNote: (task: Task, note: string) => void;
 }) => {
   const [note, setNote] = useState('');
+  useBodyScrollLock(Boolean(task));
 
   useEffect(() => {
     setNote(task?.note ?? '');
