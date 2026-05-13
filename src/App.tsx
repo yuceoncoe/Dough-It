@@ -56,6 +56,13 @@ const collectEndedUnratedTasks = (
   return { endedUnratedTasks, nextEndAt };
 };
 
+const getTaskList = (tasks: unknown): Task[] => Array.isArray(tasks) ? tasks : [];
+const getSafeTags = (tags: unknown): Task['tags'] => (
+  Array.isArray(tags)
+    ? tags.filter((tag): tag is Task['tags'][number] => tag === 'urgent' || tag === 'important')
+    : []
+);
+
 const AppShell = ({
   user,
   onSignOut,
@@ -280,10 +287,15 @@ const AppShell = ({
     updates: Pick<Task, 'title' | 'tags' | 'startTime' | 'duration'>,
     scope: RoutineScope,
   ) => {
+    const safeUpdates = {
+      ...updates,
+      tags: getSafeTags(updates.tags),
+    };
+
     if (scope === 'single') {
       setTasksByDate((current) => ({
         ...current,
-        [date]: (current[date] ?? []).map((item) => item.id === task.id ? { ...item, ...updates } : item),
+        [date]: getTaskList(current[date]).map((item) => item.id === task.id ? { ...item, ...safeUpdates } : item),
       }));
       return;
     }
@@ -294,20 +306,24 @@ const AppShell = ({
     }
     const bucket = getRoutineBucketForDate(date);
 
-    setRoutines((current) => ({
-      ...current,
-      [bucket]: current[bucket].map((item) => item.id === baseId ? { ...item, ...updates } : item),
-    }));
+    setRoutines((current) => {
+      const bucketRoutines = getTaskList(current[bucket]);
+
+      return {
+        ...current,
+        [bucket]: bucketRoutines.map((item) => item.id === baseId ? { ...item, ...safeUpdates } : item),
+      };
+    });
 
     setTasksByDate((current) => {
       const next = { ...current };
-      (Object.entries(current) as [string, Task[]][]).forEach(([entryDate, entryTasks]) => {
+      Object.entries(current).forEach(([entryDate, entryTasks]) => {
         if (entryDate < date || getRoutineBucketForDate(entryDate) !== bucket) {
           return;
         }
-        next[entryDate] = entryTasks.map((item) => {
+        next[entryDate] = getTaskList(entryTasks).map((item) => {
           const entryBaseId = getRoutineBaseId(item.id, entryDate);
-          return entryBaseId === baseId ? { ...item, ...updates } : item;
+          return entryBaseId === baseId ? { ...item, ...safeUpdates } : item;
         });
       });
       return next;
@@ -318,7 +334,7 @@ const AppShell = ({
     if (scope === 'single') {
       setTasksByDate((current) => ({
         ...current,
-        [date]: (current[date] ?? []).filter((item) => item.id !== task.id),
+        [date]: getTaskList(current[date]).filter((item) => item.id !== task.id),
       }));
       return;
     }
@@ -329,18 +345,22 @@ const AppShell = ({
     }
     const bucket = getRoutineBucketForDate(date);
 
-    setRoutines((current) => ({
-      ...current,
-      [bucket]: current[bucket].filter((item) => item.id !== baseId),
-    }));
+    setRoutines((current) => {
+      const bucketRoutines = getTaskList(current[bucket]);
+
+      return {
+        ...current,
+        [bucket]: bucketRoutines.filter((item) => item.id !== baseId),
+      };
+    });
 
     setTasksByDate((current) => {
       const next = { ...current };
-      (Object.entries(current) as [string, Task[]][]).forEach(([entryDate, entryTasks]) => {
+      Object.entries(current).forEach(([entryDate, entryTasks]) => {
         if (entryDate < date || getRoutineBucketForDate(entryDate) !== bucket) {
           return;
         }
-        next[entryDate] = entryTasks.filter((item) => getRoutineBaseId(item.id, entryDate) !== baseId);
+        next[entryDate] = getTaskList(entryTasks).filter((item) => getRoutineBaseId(item.id, entryDate) !== baseId);
       });
       return next;
     });

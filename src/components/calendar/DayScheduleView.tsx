@@ -171,12 +171,13 @@ export const DayScheduleView = ({
     card.style.transform = `translateX(${offset}px)`;
   };
 
-  const startEditing = (task: Task) => {
+  const startEditing = (task: Task, scope: RoutineScope = 'single') => {
     setEditingId(task.id);
     setTitle(task.title);
-    setTags(task.tags);
+    setTags(Array.isArray(task.tags) ? task.tags : []);
     setStartTime(task.startTime ?? '');
     setEndTime(task.startTime && task.duration ? minutesToTime(timeToMinutes(task.startTime) + task.duration) : '');
+    setRoutineEditScope(scope);
     setEditorOpen(true);
   };
 
@@ -277,8 +278,7 @@ export const DayScheduleView = ({
           setPendingRoutineAction(null);
           setSheetTask(null);
           if (action === 'edit') {
-            setRoutineEditScope(scope);
-            startEditing(task);
+            startEditing(task, scope);
             return;
           }
           if (action === 'delete') {

@@ -27,26 +27,31 @@ const normalizeTags = (tags: unknown): Tag[] => (
     : []
 );
 
-const normalizeTask = (task: Task): Task => ({
-  ...task,
-  title: task.title ?? '',
-  tags: normalizeTags(task.tags),
-  completed: Boolean(task.completed),
+const normalizeTask = (task: Partial<Task> | null | undefined, fallbackId: string): Task => ({
+  id: typeof task?.id === 'string' && task.id ? task.id : fallbackId,
+  title: typeof task?.title === 'string' ? task.title : '',
+  tags: normalizeTags(task?.tags),
+  startTime: typeof task?.startTime === 'string' ? task.startTime : null,
+  duration: typeof task?.duration === 'number' ? task.duration : null,
+  completed: Boolean(task?.completed),
+  isRoutine: Boolean(task?.isRoutine) || undefined,
+  rating: typeof task?.rating === 'number' ? task.rating : undefined,
+  note: typeof task?.note === 'string' ? task.note : undefined,
 });
 
 const normalizeTasksByDate = (tasksByDate: Record<string, Task[]>) =>
   Object.fromEntries(
     Object.entries(tasksByDate).map(([date, tasks]) => [
       date,
-      Array.isArray(tasks) ? tasks.map(normalizeTask) : [],
+      Array.isArray(tasks) ? tasks.map((task, index) => normalizeTask(task, `task-${date}-${index}`)) : [],
     ]),
   );
 
 export const normalizeAppState = (snapshot: AppStateSnapshot, todayStr: string): AppStateSnapshot => {
   const sourceRoutines = snapshot.routines ?? INITIAL_ROUTINES;
   const routines = {
-    weekday: Array.isArray(sourceRoutines.weekday) ? sourceRoutines.weekday.map(normalizeTask) : [],
-    weekend: Array.isArray(sourceRoutines.weekend) ? sourceRoutines.weekend.map(normalizeTask) : [],
+    weekday: Array.isArray(sourceRoutines.weekday) ? sourceRoutines.weekday.map((task, index) => normalizeTask(task, `weekday-routine-${index}`)) : [],
+    weekend: Array.isArray(sourceRoutines.weekend) ? sourceRoutines.weekend.map((task, index) => normalizeTask(task, `weekend-routine-${index}`)) : [],
   };
   const skippedRatingTaskIds = snapshot.skippedRatingTaskIds ?? [];
   const hasCompletedPastCleanup = skippedRatingTaskIds.includes(ONE_TIME_PAST_CLEANUP_MARKER);

@@ -548,7 +548,9 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
 export function generateRoutinesForDate(dateStr: string, routines: RoutineState) {
   const date = new Date(`${dateStr}T00:00:00`);
   const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-  const base = isWeekend ? routines.weekend : routines.weekday;
+  const source = isWeekend ? routines.weekend : routines.weekday;
+  const base = Array.isArray(source) ? source : [];
+
   return base.map((task) => ({
     ...task,
     id: `routine-${dateStr}-${task.id}`,
@@ -562,7 +564,7 @@ export const seedTasksForToday = (todayStr: string, routines: RoutineState): Rec
 });
 
 export const addOrReplaceDateTasks = (tasksByDate: Record<string, Task[]>, date: string, routines: RoutineState) => {
-  const existingTasks = tasksByDate[date] ?? [];
+  const existingTasks = Array.isArray(tasksByDate[date]) ? tasksByDate[date] : [];
   const existingRoutineById = new Map(existingTasks.filter((task) => task.isRoutine).map((task) => [task.id, task]));
   const manualTasks = existingTasks.filter((task) => !task.isRoutine);
   const routineTasks = generateRoutinesForDate(date, routines).map((task) => {
