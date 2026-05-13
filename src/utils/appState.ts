@@ -1,4 +1,4 @@
-import { RoutineState, Task } from '../types';
+import { RoutineState, Task, Tag } from '../types';
 import { INITIAL_ROUTINES, addOrReplaceDateTasks, seedTasksForToday } from './task';
 
 export interface AppStateSnapshot {
@@ -21,11 +21,36 @@ const removePastDateTasks = (tasksByDate: Record<string, Task[]>, cutoffDate: st
     Object.entries(tasksByDate).filter(([date]) => date >= cutoffDate),
   );
 
+const normalizeTags = (tags: unknown): Tag[] => (
+  Array.isArray(tags)
+    ? tags.filter((tag): tag is Tag => tag === 'urgent' || tag === 'important')
+    : []
+);
+
+const normalizeTask = (task: Task): Task => ({
+  ...task,
+  title: task.title ?? '',
+  tags: normalizeTags(task.tags),
+  completed: Boolean(task.completed),
+});
+
+const normalizeTasksByDate = (tasksByDate: Record<string, Task[]>) =>
+  Object.fromEntries(
+    Object.entries(tasksByDate).map(([date, tasks]) => [
+      date,
+      Array.isArray(tasks) ? tasks.map(normalizeTask) : [],
+    ]),
+  );
+
 export const normalizeAppState = (snapshot: AppStateSnapshot, todayStr: string): AppStateSnapshot => {
-  const routines = snapshot.routines ?? INITIAL_ROUTINES;
+  const sourceRoutines = snapshot.routines ?? INITIAL_ROUTINES;
+  const routines = {
+    weekday: Array.isArray(sourceRoutines.weekday) ? sourceRoutines.weekday.map(normalizeTask) : [],
+    weekend: Array.isArray(sourceRoutines.weekend) ? sourceRoutines.weekend.map(normalizeTask) : [],
+  };
   const skippedRatingTaskIds = snapshot.skippedRatingTaskIds ?? [];
   const hasCompletedPastCleanup = skippedRatingTaskIds.includes(ONE_TIME_PAST_CLEANUP_MARKER);
-  const sourceTasksByDate = snapshot.tasksByDate ?? {};
+  const sourceTasksByDate = normalizeTasksByDate(snapshot.tasksByDate ?? {});
   const tasksAfterOneTimeCleanup = hasCompletedPastCleanup
     ? sourceTasksByDate
     : removePastDateTasks(sourceTasksByDate, ONE_TIME_PAST_CLEANUP_CUTOFF);
