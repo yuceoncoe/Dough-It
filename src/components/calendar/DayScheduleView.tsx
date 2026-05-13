@@ -419,21 +419,19 @@ export const DayScheduleView = ({
                           <QuadrantBadge task={task} sizeClassName="h-[32px] w-[32px]" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-3">
-                            <span className={`min-w-0 flex-1 truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
-                              {task.title}
-                            </span>
-                            <div className="flex shrink-0 items-center gap-2">
-                              <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
-                                {getTaskToneLabel(task)}
-                              </span>
-                              {task.rating !== undefined && <span className="whitespace-nowrap text-xs font-bold text-amber-500">⭐️ {task.rating}</span>}
-                            </div>
-                          </div>
+                          <span className={`block truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
+                            {task.title}
+                          </span>
                           <div className="mt-1 flex items-center gap-2 text-[12px] text-stone-400">
                             <Clock size={12} className="shrink-0" />
                             {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
                           </div>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
+                            {getTaskToneLabel(task)}
+                          </span>
+                          {task.rating !== undefined && <span className="whitespace-nowrap text-xs font-bold text-amber-500">⭐️ {task.rating}</span>}
                         </div>
                       </div>
                     </button>
