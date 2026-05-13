@@ -483,6 +483,30 @@ const App = () => {
     let isMounted = true;
 
     const bootstrapSession = async () => {
+      const authUrl = new URL(window.location.href);
+      const authCode = authUrl.searchParams.get('code');
+      const authStatus = authUrl.searchParams.get('auth');
+      const authErrorDescription = authUrl.searchParams.get('error_description') ?? authUrl.searchParams.get('error');
+
+      if (authErrorDescription) {
+        setAuthError(decodeURIComponent(authErrorDescription).replace(/\+/g, ' '));
+      }
+
+      if (authCode) {
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(authCode);
+        if (exchangeError) {
+          setAuthError(exchangeError.message);
+        }
+      }
+
+      if (authStatus === 'confirmed' && !authErrorDescription) {
+        setAuthNotice('이메일 인증이 완료되었습니다. 이제 Circle Day에 로그인할 수 있어요.');
+      }
+
+      if (authCode || authStatus || authErrorDescription) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
       const { data, error } = await supabase.auth.getSession();
       if (!isMounted) {
         return;
@@ -524,12 +548,18 @@ const App = () => {
         return;
       }
 
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/?auth=confirmed`,
+        },
+      });
       if (error) {
         throw error;
       }
       if (!data.session) {
-        setAuthNotice('회원가입이 완료되었습니다. 이메일 확인이 필요하면 메일함에서 인증을 완료한 뒤 로그인해 주세요.');
+        setAuthNotice('인증 메일을 보냈습니다. 메일의 확인 링크를 누르면 Circle Day로 돌아와 인증 완료 안내가 표시됩니다.');
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : '로그인을 처리하지 못했습니다.';
