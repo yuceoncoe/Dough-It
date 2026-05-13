@@ -441,9 +441,11 @@ export const DayScheduleView = ({
                           ) : null}
                         </div>
                         <div className="flex shrink-0 items-center gap-2">
-                          <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
-                            {getTaskToneLabel(task)}
-                          </span>
+                          {!task.completed ? (
+                            <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
+                              {getTaskToneLabel(task)}
+                            </span>
+                          ) : null}
                           {task.rating !== undefined && <span className="whitespace-nowrap text-xs font-bold text-amber-500">⭐️ {task.rating}</span>}
                         </div>
                       </div>
