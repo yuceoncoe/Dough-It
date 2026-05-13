@@ -312,7 +312,7 @@ canvas {
   width: 0;
   height: 0;
   --center-lens-size: 12.8rem;
-  --center-gauge-size: calc(var(--center-lens-size) * 0.83);
+  --center-gauge-size: calc(var(--center-lens-size) * 0.95);
   transform-style: preserve-3d;
   pointer-events: none;
   z-index: 10;
@@ -454,7 +454,7 @@ canvas {
 }
 
 .center-progress-arc__track {
-  fill: rgba(170, 170, 170, 0.14);
+  fill: rgba(170, 170, 170, 0.08);
 }
 
 .center-progress-arc__value {
@@ -487,7 +487,7 @@ canvas {
 @media (max-width: 640px) {
   .center-stack {
     --center-lens-size: 10.6rem;
-    --center-gauge-size: calc(var(--center-lens-size) * 0.83);
+    --center-gauge-size: calc(var(--center-lens-size) * 0.95);
   }
 
   .center-lens__title {
@@ -499,7 +499,7 @@ canvas {
 @media (min-width: 1024px) {
   .center-stack {
     --center-lens-size: 13.8rem;
-    --center-gauge-size: calc(var(--center-lens-size) * 0.83);
+    --center-gauge-size: calc(var(--center-lens-size) * 0.95);
   }
 }
 
