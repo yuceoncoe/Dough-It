@@ -573,12 +573,14 @@ export const getRoutineBaseId = (taskId: string, dateStr: string) => {
   return taskId.startsWith(prefix) ? taskId.slice(prefix.length) : null;
 };
 
-export const formatDateLabel = (date: string) =>
-  new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  });
+export const formatDateLabel = (date: string) => {
+  const parsedDate = new Date(`${date}T00:00:00`);
+  const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+  const day = String(parsedDate.getDate()).padStart(2, '0');
+  const weekday = ['일', '월', '화', '수', '목', '금', '토'][parsedDate.getDay()];
+
+  return `${month}월 ${day}일 (${weekday})`;
+};
 
 export const getToneSelectionKey = (tags: Tag[]) => {
   const hasUrgent = tags.includes('urgent');

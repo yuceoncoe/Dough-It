@@ -288,7 +288,7 @@ export const DayScheduleView = ({
             </button>
           )}
           <div>
-            <h1 className="font-hand text-3xl text-stone-800 md:text-4xl">{formatDateLabel(date)}</h1>
+            <h1 className="font-hand text-2xl text-stone-800 md:text-3xl">{formatDateLabel(date)}</h1>
           </div>
         </div>
         <div className="flex items-center gap-2">
