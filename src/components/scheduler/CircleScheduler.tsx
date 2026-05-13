@@ -211,7 +211,7 @@ export const CircleScheduler = ({
     setDragPreviewPoint(null);
   };
 
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes() + Math.floor(now.getSeconds() / 10) / 6;
   const minuteAngle = minutesToAngle(currentMinutes);
   const canvasMinuteAngle = showCurrentTime ? minuteAngle : null;
   const overlappingActiveTasks = showCurrentTime ? tasks.filter((task) => isCurrentMinuteInsideTask(task, currentMinutes)) : [];
@@ -615,21 +615,18 @@ export const CircleScheduler = ({
                 </div>
               )}
               <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`} aria-hidden="true">
-                <div
-                  className="center-progress-fill"
-                  style={{
-                    '--center-progress': `${Math.max(0, Math.min(1, activeTaskProgress)) * 100}%`,
-                    '--center-progress-color': hexToRgba(activeTaskColor, 0.82),
-                    '--center-progress-soft-color': hexToRgba(activeTaskColor, 0.22),
-                  } as React.CSSProperties}
-                >
-                  <div
-                    className="center-progress-fill__inner"
-                    style={{
-                      background: `linear-gradient(180deg, rgba(255,255,255,0.74) 0%, ${hexToRgba(activeTaskColor, 0.08)} 100%)`,
-                    }}
+                <svg className="center-progress-arc" viewBox="0 0 120 120">
+                  <circle className="center-progress-arc__track" cx="60" cy="60" r="50" />
+                  <circle
+                    className="center-progress-arc__value"
+                    cx="60"
+                    cy="60"
+                    r="50"
+                    pathLength="100"
+                    stroke={hexToRgba(activeTaskColor, 0.86)}
+                    strokeDasharray={`${Math.max(0, Math.min(1, activeTaskProgress)) * 100} 100`}
                   />
-                </div>
+                </svg>
                 <div
                   className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
                   style={{ color: displayTask ? activeTaskColor : 'rgba(214, 211, 209, 0.92)' }}

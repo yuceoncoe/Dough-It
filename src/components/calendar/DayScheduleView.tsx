@@ -18,7 +18,6 @@ import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 export const DayScheduleView = ({
   date,
   tasks,
-  onBack,
   onOpenSettings,
   onPreviousDate,
   onNextDate,
@@ -28,7 +27,6 @@ export const DayScheduleView = ({
 }: {
   date: string;
   tasks: Task[];
-  onBack?: () => void;
   onOpenSettings: () => void;
   onPreviousDate: () => void;
   onNextDate: () => void;
@@ -345,11 +343,6 @@ export const DayScheduleView = ({
 
       <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-stone-200/0 bg-[#f6f6f8]/95 px-4 pb-3 pt-4 backdrop-blur md:px-6">
         <div className="flex items-center gap-3">
-          {onBack && (
-            <button onClick={onBack} className="rounded-full border border-stone-300 bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
-              <ChevronLeft size={20} />
-            </button>
-          )}
           <div className="flex min-w-0 items-center gap-2">
             <button
               type="button"

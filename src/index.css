@@ -365,8 +365,8 @@ canvas {
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%);
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  background: transparent;
+  box-shadow: none;
   pointer-events: none;
 }
 
@@ -378,24 +378,6 @@ canvas {
 
 .center-lens--button:active {
   transform: translate(-50%, -50%) scale(0.98);
-}
-
-.center-lens::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 9999px;
-  padding: 2px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.18) 100%);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
 }
 
 .center-lens__title {
@@ -420,8 +402,6 @@ canvas {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   pointer-events: none;
 }
 
@@ -439,11 +419,9 @@ canvas {
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%);
   border-radius: 9999px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.78) inset,
-    0 4px 16px rgba(0, 0, 0, 0.12);
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
   pointer-events: none;
 }
 
@@ -464,34 +442,27 @@ canvas {
   animation-name: center-slide-right;
 }
 
-.center-progress-fill {
+.center-progress-arc {
   position: absolute;
   inset: 0;
-  background:
-    conic-gradient(
-      from -90deg,
-      var(--center-progress-color, rgba(255, 122, 145, 0.82)) 0 var(--center-progress, 0%),
-      rgba(255, 255, 255, 0.4) var(--center-progress, 0%) 100%
-    );
+  transform: rotate(-90deg);
+  overflow: visible;
 }
 
-.center-progress-fill::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 9999px;
-  background: radial-gradient(circle at 50% 50%, transparent 56%, var(--center-progress-soft-color, rgba(255, 122, 145, 0.22)) 57%, transparent 72%);
-  pointer-events: none;
+.center-progress-arc__track,
+.center-progress-arc__value {
+  fill: none;
+  stroke-width: 12;
+  vector-effect: non-scaling-stroke;
 }
 
-.center-progress-fill__inner {
-  position: absolute;
-  inset: 12%;
-  z-index: 1;
-  border-radius: 9999px;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.8) inset,
-    0 0 0 1px rgba(255, 255, 255, 0.48);
+.center-progress-arc__track {
+  stroke: rgba(255, 255, 255, 0.72);
+}
+
+.center-progress-arc__value {
+  stroke-linecap: round;
+  transition: stroke-dasharray 240ms ease;
 }
 
 .drag-preview-lens {

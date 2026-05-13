@@ -11,6 +11,15 @@ export interface CachedAppState {
   remoteUpdatedAt: string | null;
 }
 
+const throwSupabaseError = (error: { message?: string; details?: string; hint?: string }) => {
+  const message = [
+    error.message,
+    error.details,
+    error.hint,
+  ].filter(Boolean).join(' ');
+  throw new Error(message || 'Supabase 요청에 실패했습니다.');
+};
+
 export const loadCachedAppState = (userId: string, todayStr: string): CachedAppState | null => {
   try {
     const raw = window.localStorage.getItem(getCacheKey(userId));
@@ -64,7 +73,7 @@ export const loadRemoteAppStateUpdatedAt = async (userId: string): Promise<strin
     .maybeSingle();
 
   if (error) {
-    throw error;
+    throwSupabaseError(error);
   }
 
   return data?.updated_at ?? null;
@@ -85,7 +94,7 @@ export const loadRemoteAppState = async (userId: string, todayStr: string): Prom
     .maybeSingle();
 
   if (error) {
-    throw error;
+    throwSupabaseError(error);
   }
 
   if (!data) {
@@ -111,7 +120,7 @@ export const persistRemoteAppState = async (userId: string, snapshot: AppStateSn
   }
   const updatedAt = new Date().toISOString();
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('user_app_state')
     .upsert({
       user_id: userId,
@@ -119,13 +128,11 @@ export const persistRemoteAppState = async (userId: string, snapshot: AppStateSn
       tasks_by_date: snapshot.tasksByDate,
       skipped_rating_task_ids: snapshot.skippedRatingTaskIds,
       updated_at: updatedAt,
-    }, { onConflict: 'user_id' })
-    .select('updated_at')
-    .single();
+    }, { onConflict: 'user_id' });
 
   if (error) {
-    throw error;
+    throwSupabaseError(error);
   }
 
-  return data?.updated_at ?? updatedAt;
+  return updatedAt;
 };
