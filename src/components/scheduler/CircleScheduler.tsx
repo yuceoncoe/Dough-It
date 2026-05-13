@@ -231,6 +231,19 @@ export const CircleScheduler = ({
   const dragPreviewZoom = 1.9;
   const dragPreviewHalf = dragPreviewSize / 2;
   const schedulerSceneSize = squareRef.current?.getBoundingClientRect().width ?? 0;
+  const normalizeClockAngle = (angle: number) => ((angle % 360) + 360) % 360;
+  const getPendingSelectionRange = (arc: { startAngle: number; endAngle: number }) => {
+    const startMinutes = angleToMinutes(normalizeClockAngle(arc.startAngle));
+    const endMinutes = angleToMinutes(normalizeClockAngle(arc.endAngle));
+    const duration = (endMinutes - startMinutes + 1440) % 1440 || 5;
+
+    return {
+      startTime: minutesToTime(startMinutes),
+      endTime: minutesToTime(startMinutes + duration),
+      duration,
+    };
+  };
+  const pendingSelectionRange = pendingArc ? getPendingSelectionRange(pendingArc) : null;
 
   const renderClockSvgLayers = (interactive: boolean) => (
     <>
@@ -420,8 +433,8 @@ export const CircleScheduler = ({
       <TaskCreationModal
         isOpen={showCreateModal}
         initialTimeRange={{
-          start: pendingArc ? minutesToTime(angleToMinutes(pendingArc.startAngle % 360)) : '',
-          end: pendingArc ? minutesToTime(angleToMinutes(pendingArc.endAngle % 360)) : '',
+          start: pendingSelectionRange?.startTime ?? '',
+          end: pendingSelectionRange?.endTime ?? '',
         }}
         onClose={() => {
           setShowCreateModal(false);
@@ -433,8 +446,7 @@ export const CircleScheduler = ({
           if (!pendingArc) {
             return;
           }
-          const startTime = minutesToTime(angleToMinutes(pendingArc.startAngle % 360));
-          const duration = Math.round(((pendingArc.endAngle - pendingArc.startAngle) / 360) * 1440);
+          const { startTime, duration } = getPendingSelectionRange(pendingArc);
           const success = onAddTask(title, tags, startTime, duration);
           if (success === false) {
             return;
@@ -513,13 +525,13 @@ export const CircleScheduler = ({
                 className="rounded-full bg-stone-900 px-5 py-2 text-xs font-semibold text-white shadow-sm"
               >
                 {activeArcHandle
-                  ? `${activeArcHandle === 'start' ? '시작' : '종료'} ${minutesToTime(angleToMinutes((activeArcHandle === 'start' ? pendingArc.startAngle : pendingArc.endAngle) % 360))}`
-                  : `${minutesToTime(angleToMinutes(pendingArc.startAngle % 360))} - ${minutesToTime(angleToMinutes(pendingArc.endAngle % 360))} 추가`}
+                  ? `${activeArcHandle === 'start' ? '시작' : '종료'} ${minutesToTime(angleToMinutes(normalizeClockAngle(activeArcHandle === 'start' ? pendingArc.startAngle : pendingArc.endAngle)))}`
+                  : `${pendingSelectionRange?.startTime} - ${pendingSelectionRange?.endTime} 추가`}
               </button>
             ) : (
               <div className="rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-stone-500 shadow-sm backdrop-blur">
                 {activeArcHandle === 'start'
-                  ? `시작 ${minutesToTime(angleToMinutes(pendingArc.startAngle % 360))}`
+                  ? `시작 ${minutesToTime(angleToMinutes(normalizeClockAngle(pendingArc.startAngle)))}`
                   : '종료 시간을 터치하세요'}
               </div>
             )}
