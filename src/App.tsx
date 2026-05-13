@@ -12,7 +12,7 @@ import { timeToMinutes } from './utils/time';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 import AuthScreen from './components/auth/AuthScreen';
 import { AppStateSnapshot, createDefaultAppState, normalizeAppState } from './utils/appState';
-import { loadCachedAppState, loadRemoteAppState, persistCachedAppState, persistRemoteAppState } from './utils/cloudStorage';
+import { loadCachedAppState, loadRemoteAppState, loadRemoteAppStateUpdatedAt, persistCachedAppState, persistRemoteAppState } from './utils/cloudStorage';
 
 const collectEndedUnratedTasks = (
   tasksByDate: Record<string, Task[]>,
@@ -79,6 +79,7 @@ const AppShell = ({
   const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
   const hydrationTokenRef = useRef(0);
   const isHydratedRef = useRef(false);
+  const remoteUpdatedAtRef = useRef<string | null>(null);
 
   useEffect(() => {
     const checkNotificationStatus = async () => {
@@ -118,10 +119,12 @@ const AppShell = ({
 
     const cachedState = loadCachedAppState(user.id, todayStr);
     if (cachedState && isActive) {
-      setRoutines(cachedState.routines);
-      setTasksByDate(cachedState.tasksByDate);
-      setSkippedRatingTaskIds(new Set(cachedState.skippedRatingTaskIds));
+      remoteUpdatedAtRef.current = cachedState.remoteUpdatedAt;
+      setRoutines(cachedState.snapshot.routines);
+      setTasksByDate(cachedState.snapshot.tasksByDate);
+      setSkippedRatingTaskIds(new Set(cachedState.snapshot.skippedRatingTaskIds));
     } else if (isActive) {
+      remoteUpdatedAtRef.current = null;
       const defaultState = createDefaultAppState(todayStr);
       setRoutines(defaultState.routines);
       setTasksByDate(defaultState.tasksByDate);
@@ -130,15 +133,27 @@ const AppShell = ({
 
     const hydrate = async () => {
       try {
+        if (cachedState?.remoteUpdatedAt) {
+          const remoteUpdatedAt = await loadRemoteAppStateUpdatedAt(user.id);
+          if (!isActive || hydrationTokenRef.current !== hydrationToken) {
+            return;
+          }
+          if (remoteUpdatedAt === cachedState.remoteUpdatedAt) {
+            remoteUpdatedAtRef.current = remoteUpdatedAt;
+            return;
+          }
+        }
+
         const remoteState = await loadRemoteAppState(user.id, todayStr);
         if (!isActive || hydrationTokenRef.current !== hydrationToken) {
           return;
         }
-        const normalizedState = normalizeAppState(remoteState, todayStr);
+        const normalizedState = normalizeAppState(remoteState.snapshot, todayStr);
+        remoteUpdatedAtRef.current = remoteState.remoteUpdatedAt;
         setRoutines(normalizedState.routines);
         setTasksByDate(normalizedState.tasksByDate);
         setSkippedRatingTaskIds(new Set(normalizedState.skippedRatingTaskIds));
-        persistCachedAppState(user.id, normalizedState);
+        persistCachedAppState(user.id, normalizedState, remoteState.remoteUpdatedAt);
       } catch (error) {
         if (!isActive || hydrationTokenRef.current !== hydrationToken) {
           return;
@@ -172,14 +187,16 @@ const AppShell = ({
       skippedRatingTaskIds: Array.from(skippedRatingTaskIds),
     };
 
-    persistCachedAppState(user.id, snapshot);
+    persistCachedAppState(user.id, snapshot, remoteUpdatedAtRef.current);
     void syncTaskAlarms(tasksByDate, user.id);
 
     const timeoutId = window.setTimeout(async () => {
       try {
         setIsSaving(true);
         setSaveError(null);
-        await persistRemoteAppState(user.id, snapshot);
+        const remoteUpdatedAt = await persistRemoteAppState(user.id, snapshot);
+        remoteUpdatedAtRef.current = remoteUpdatedAt;
+        persistCachedAppState(user.id, snapshot, remoteUpdatedAt);
       } catch (error) {
         const message = error instanceof Error ? error.message : '변경사항을 저장하지 못했습니다.';
         setSaveError(message);
