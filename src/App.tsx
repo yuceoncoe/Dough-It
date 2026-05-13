@@ -291,6 +291,7 @@ const AppShell = ({
   };
 
   const updateRoutines = (nextRoutines: RoutineState) => {
+    setSaveError(null);
     setRoutines(nextRoutines);
     setTasksByDate((current) => addOrReplaceDateTasks(current, todayStr, nextRoutines));
   };
@@ -386,6 +387,13 @@ const AppShell = ({
     setActiveTab('calendar');
   };
 
+  const moveToDate = (date: string, offsetDays: number) => {
+    const nextDate = new Date(`${date}T00:00:00`);
+    nextDate.setDate(nextDate.getDate() + offsetDays);
+    const nextDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+    openDate(nextDateStr);
+  };
+
   if (isBootstrapping) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f6f6f8] text-stone-500">
@@ -442,6 +450,8 @@ const AppShell = ({
             date={todayStr}
             tasks={tasksByDate[todayStr] ?? []}
             onOpenSettings={() => setSettingsOpen(true)}
+            onPreviousDate={() => moveToDate(todayStr, -1)}
+            onNextDate={() => moveToDate(todayStr, 1)}
             onTasksChange={(nextTasks) => updateTasksForDate(todayStr, nextTasks)}
             onApplyRoutineEdit={applyRoutineEdit}
             onApplyRoutineDelete={applyRoutineDelete}
@@ -454,6 +464,8 @@ const AppShell = ({
             tasks={tasksByDate[selectedDate] ?? []}
             onBack={() => setSelectedDate(null)}
             onOpenSettings={() => setSettingsOpen(true)}
+            onPreviousDate={() => moveToDate(selectedDate, -1)}
+            onNextDate={() => moveToDate(selectedDate, 1)}
             onTasksChange={(nextTasks) => updateTasksForDate(selectedDate, nextTasks)}
             onApplyRoutineEdit={applyRoutineEdit}
             onApplyRoutineDelete={applyRoutineDelete}

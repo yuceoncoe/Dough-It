@@ -13,12 +13,17 @@ export const TaskRatingCarousel = ({
   onClose: () => void;
 }) => {
   const [ratedTaskIds, setRatedTaskIds] = useState<Set<string>>(new Set());
+  const [ratingsByTaskId, setRatingsByTaskId] = useState<Record<string, number>>({});
   const [notesByTaskId, setNotesByTaskId] = useState<Record<string, string>>({});
   useBodyScrollLock(tasks.length > 0);
 
   if (tasks.length === 0) return null;
 
-  const handleRate = (taskId: string, rating: number) => {
+  const handleConfirm = (taskId: string) => {
+    const rating = ratingsByTaskId[taskId];
+    if (!rating) {
+      return;
+    }
     const note = notesByTaskId[taskId]?.trim();
     onRateTask(taskId, rating, note || undefined);
     setRatedTaskIds(prev => new Set(prev).add(taskId));
@@ -51,8 +56,9 @@ export const TaskRatingCarousel = ({
                 {[1, 2, 3, 4, 5].map((score) => (
                   <button
                     key={score}
-                    onClick={() => handleRate(task.id, score)}
-                    className="p-2 text-stone-200 transition-transform hover:scale-110 hover:text-amber-400 active:scale-95"
+                    onClick={() => setRatingsByTaskId((current) => ({ ...current, [task.id]: score }))}
+                    className={`p-2 transition-transform hover:scale-110 active:scale-95 ${(ratingsByTaskId[task.id] ?? 0) >= score ? 'text-amber-400' : 'text-stone-200 hover:text-amber-300'}`}
+                    aria-label={`${score}점 선택`}
                   >
                     <Star size={36} className="fill-current" />
                   </button>
@@ -72,6 +78,14 @@ export const TaskRatingCarousel = ({
                   className="mt-2 w-full resize-none rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm leading-5 text-stone-700 outline-none transition-colors placeholder:text-stone-400 focus:border-stone-400 focus:bg-white"
                 />
               </label>
+              <button
+                type="button"
+                onClick={() => handleConfirm(task.id)}
+                disabled={!ratingsByTaskId[task.id]}
+                className="mt-5 w-full rounded-2xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                확인
+              </button>
             </div>
           ))}
         </div>

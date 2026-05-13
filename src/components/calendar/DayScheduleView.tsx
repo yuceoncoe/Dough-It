@@ -8,7 +8,7 @@ import RoutineActionModal from '../ui/RoutineActionModal';
 import DayTaskEditorModal from '../ui/DayTaskEditorModal';
 import CircleScheduler from '../scheduler/CircleScheduler';
 import TaskReportModal from '../ui/TaskReportModal';
-import { ChevronLeft, Plus, Settings, Clock, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Settings, Clock, Trash2 } from 'lucide-react';
 import { QuadrantBadge, getMaxOverlap } from '../../utils/task';
 import { getTaskReport } from '../../utils/report';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
@@ -20,6 +20,8 @@ export const DayScheduleView = ({
   tasks,
   onBack,
   onOpenSettings,
+  onPreviousDate,
+  onNextDate,
   onTasksChange,
   onApplyRoutineEdit,
   onApplyRoutineDelete,
@@ -28,6 +30,8 @@ export const DayScheduleView = ({
   tasks: Task[];
   onBack?: () => void;
   onOpenSettings: () => void;
+  onPreviousDate: () => void;
+  onNextDate: () => void;
   onTasksChange: (tasks: Task[]) => void;
   onApplyRoutineEdit: (date: string, task: Task, updates: Pick<Task, 'title' | 'tags' | 'startTime' | 'duration'>, scope: RoutineScope) => void;
   onApplyRoutineDelete: (date: string, task: Task, scope: RoutineScope) => void;
@@ -190,9 +194,10 @@ export const DayScheduleView = ({
       return;
     }
     const start = timeToMinutes(startTime);
-    let duration = timeToMinutes(endTime) - start;
+    const duration = timeToMinutes(endTime) - start;
     if (duration <= 0) {
-      duration += 1440;
+      showToast('종료 시간이 시작 시간보다 더 뒤여야 해요.');
+      return;
     }
 
     if (editingId) {
@@ -345,8 +350,24 @@ export const DayScheduleView = ({
               <ChevronLeft size={20} />
             </button>
           )}
-          <div>
-            <h1 className="font-hand text-2xl text-stone-800 md:text-3xl">{formatDateLabel(date)}</h1>
+          <div className="flex min-w-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={onPreviousDate}
+              className="rounded-full border border-stone-300 bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
+              aria-label="전일로 이동"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <h1 className="font-hand min-w-0 whitespace-nowrap text-2xl text-stone-800 md:text-3xl">{formatDateLabel(date)}</h1>
+            <button
+              type="button"
+              onClick={onNextDate}
+              className="rounded-full border border-stone-300 bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
+              aria-label="후일로 이동"
+            >
+              <ChevronRight size={18} />
+            </button>
           </div>
         </div>
         <div className="flex items-center gap-2">

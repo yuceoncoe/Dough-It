@@ -618,12 +618,18 @@ export const CircleScheduler = ({
                 <div
                   className="center-progress-fill"
                   style={{
-                    transform: `scaleY(${activeTaskProgress})`,
-                    background: `linear-gradient(180deg, ${hexToRgba(activeTaskColor, 0.84)} 0%, ${hexToRgba(activeTaskColor, 0.18)} 100%)`,
-                  }}
-                />
-              </div>
-              <div className="center-lens" aria-hidden="true">
+                    '--center-progress': `${Math.max(0, Math.min(1, activeTaskProgress)) * 100}%`,
+                    '--center-progress-color': hexToRgba(activeTaskColor, 0.82),
+                    '--center-progress-soft-color': hexToRgba(activeTaskColor, 0.22),
+                  } as React.CSSProperties}
+                >
+                  <div
+                    className="center-progress-fill__inner"
+                    style={{
+                      background: `linear-gradient(180deg, rgba(255,255,255,0.74) 0%, ${hexToRgba(activeTaskColor, 0.08)} 100%)`,
+                    }}
+                  />
+                </div>
                 <div
                   className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
                   style={{ color: displayTask ? activeTaskColor : 'rgba(214, 211, 209, 0.92)' }}

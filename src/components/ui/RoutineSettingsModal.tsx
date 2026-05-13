@@ -39,6 +39,7 @@ export const RoutineSettingsModal = ({
   const [isEnabling, setIsEnabling] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
+  const wasOpenRef = useRef(false);
   useBodyScrollLock(isOpen);
 
   const showToast = (message: string) => {
@@ -51,8 +52,13 @@ export const RoutineSettingsModal = ({
 
   useEffect(() => {
     if (!isOpen) {
+      wasOpenRef.current = false;
       return;
     }
+    if (wasOpenRef.current) {
+      return;
+    }
+    wasOpenRef.current = true;
     setDraft(routines);
     setTitle('');
     setStartTime('');
@@ -71,9 +77,10 @@ export const RoutineSettingsModal = ({
     }
     const finalTags = explicitTags ?? tags;
     const start = timeToMinutes(startTime);
-    let duration = timeToMinutes(endTime) - start;
+    const duration = timeToMinutes(endTime) - start;
     if (duration <= 0) {
-      duration += 1440;
+      showToast('종료 시간이 시작 시간보다 더 뒤여야 해요.');
+      return;
     }
     const nextTask: Task = {
       id: `routine-editor-${Date.now()}`,

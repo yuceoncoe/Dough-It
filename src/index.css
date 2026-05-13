@@ -365,10 +365,8 @@ canvas {
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%);
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
-  backdrop-filter: blur(3px) saturate(1.04);
-  -webkit-backdrop-filter: blur(3px) saturate(1.04);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   pointer-events: none;
 }
 
@@ -436,16 +434,16 @@ canvas {
   position: absolute;
   left: 0;
   top: 0;
-  z-index: 11;
+  z-index: 12;
   width: var(--center-gauge-size);
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%);
   border-radius: 9999px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.78);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
-    0 4px 16px rgba(0, 0, 0, 0.15);
+    0 0 0 1px rgba(255, 255, 255, 0.78) inset,
+    0 4px 16px rgba(0, 0, 0, 0.12);
   pointer-events: none;
 }
 
@@ -469,8 +467,31 @@ canvas {
 .center-progress-fill {
   position: absolute;
   inset: 0;
-  transform-origin: bottom center;
-  background: linear-gradient(180deg, rgba(255, 122, 145, 0.8) 0%, rgba(255, 122, 145, 0.12) 100%);
+  background:
+    conic-gradient(
+      from -90deg,
+      var(--center-progress-color, rgba(255, 122, 145, 0.82)) 0 var(--center-progress, 0%),
+      rgba(255, 255, 255, 0.4) var(--center-progress, 0%) 100%
+    );
+}
+
+.center-progress-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 50% 50%, transparent 56%, var(--center-progress-soft-color, rgba(255, 122, 145, 0.22)) 57%, transparent 72%);
+  pointer-events: none;
+}
+
+.center-progress-fill__inner {
+  position: absolute;
+  inset: 12%;
+  z-index: 1;
+  border-radius: 9999px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.48);
 }
 
 .drag-preview-lens {

@@ -38,7 +38,7 @@ export const CalendarView = ({
           <ChevronLeft size={18} />
         </button>
         <div className="text-center text-lg font-medium text-stone-800 md:text-2xl">
-          {currentMonth.toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+          {`${currentMonth.getFullYear()} ${currentMonth.getMonth() + 1}월`}
         </div>
         <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))} className="rounded-full p-2 text-stone-600 transition-colors hover:bg-stone-100">
           <ChevronRight size={18} />
