@@ -8,6 +8,7 @@ export interface Task {
   completed: boolean;
   isRoutine?: boolean;
   rating?: number; // 1 to 5 scale
+  note?: string;
 }
 
 export interface RoutineState {

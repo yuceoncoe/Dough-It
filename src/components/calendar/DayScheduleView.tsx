@@ -208,6 +208,14 @@ export const DayScheduleView = ({
           updateTask(nextTask);
           setSheetTask(nextTask);
         }}
+        onUpdateNote={(task, note) => {
+          const nextTask = {
+            ...task,
+            note: note.trim() ? note : undefined,
+          };
+          updateTask(nextTask);
+          setSheetTask(nextTask);
+        }}
       />
       <RoutineActionModal
         isOpen={pendingRoutineAction !== null}
@@ -426,6 +434,11 @@ export const DayScheduleView = ({
                             <Clock size={12} className="shrink-0" />
                             {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
                           </div>
+                          {task.note ? (
+                            <div className="mt-1 truncate text-[12px] font-medium text-stone-400">
+                              {task.note}
+                            </div>
+                          ) : null}
                         </div>
                         <div className="flex shrink-0 items-center gap-2">
                           <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>

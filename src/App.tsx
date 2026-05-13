@@ -254,12 +254,12 @@ const AppShell = ({
     };
   }, [tasksByDate, todayStr, skippedRatingTaskIds]);
 
-  const handleRateTask = (taskId: string, rating: number) => {
+  const handleRateTask = (taskId: string, rating: number, note?: string) => {
     setTasksByDate((current) => {
       const next = { ...current };
       Object.entries(current).forEach(([dateStr, tasks]) => {
         if (tasks.some((t) => t.id === taskId)) {
-          next[dateStr] = tasks.map((task) => task.id === taskId ? { ...task, rating, completed: true } : task);
+          next[dateStr] = tasks.map((task) => task.id === taskId ? { ...task, rating, note: note ?? task.note, completed: true } : task);
         }
       });
       return next;

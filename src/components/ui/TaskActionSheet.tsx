@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Task } from '../../types';
 import { minutesToTime } from '../../utils/time';
 import { timeToMinutes } from '../../utils/time';
@@ -10,13 +10,21 @@ export const TaskActionSheet = ({
   onEdit,
   onDelete,
   onSetRating,
+  onUpdateNote,
 }: {
   task: Task | null;
   onClose: () => void;
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
   onSetRating: (task: Task, rating?: number) => void;
+  onUpdateNote: (task: Task, note: string) => void;
 }) => {
+  const [note, setNote] = useState('');
+
+  useEffect(() => {
+    setNote(task?.note ?? '');
+  }, [task?.id, task?.note]);
+
   if (!task) {
     return null;
   }
@@ -68,6 +76,21 @@ export const TaskActionSheet = ({
             })}
           </div>
         </div>
+        <label className="mt-5 block">
+          <span className="text-sm font-semibold tracking-[-0.02em] text-stone-700">메모</span>
+          <textarea
+            value={note}
+            onChange={(event) => {
+              const nextNote = event.target.value;
+              setNote(nextNote);
+              onUpdateNote(task, nextNote);
+            }}
+            rows={3}
+            maxLength={240}
+            placeholder="짧은 메모를 남겨보세요"
+            className="mt-2 w-full resize-none rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm leading-5 text-stone-700 outline-none transition-colors placeholder:text-stone-400 focus:border-stone-400 focus:bg-white"
+          />
+        </label>
         <button onClick={onClose} className="mt-4 w-full rounded-[8px] bg-stone-900 px-4 py-3 text-white transition-colors hover:bg-stone-800">
           닫기
         </button>

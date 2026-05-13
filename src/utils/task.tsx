@@ -557,7 +557,7 @@ export const addOrReplaceDateTasks = (tasksByDate: Record<string, Task[]>, date:
   const manualTasks = existingTasks.filter((task) => !task.isRoutine);
   const routineTasks = generateRoutinesForDate(date, routines).map((task) => {
     const existing = existingRoutineById.get(task.id);
-    return existing ? { ...task, completed: existing.completed, rating: existing.rating } : task;
+    return existing ? { ...task, completed: existing.completed, rating: existing.rating, note: existing.note } : task;
   });
 
   return { ...tasksByDate, [date]: [...manualTasks, ...routineTasks] };

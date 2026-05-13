@@ -8,15 +8,17 @@ export const TaskRatingCarousel = ({
   onClose,
 }: {
   tasks: Task[];
-  onRateTask: (taskId: string, rating: number) => void;
+  onRateTask: (taskId: string, rating: number, note?: string) => void;
   onClose: () => void;
 }) => {
   const [ratedTaskIds, setRatedTaskIds] = useState<Set<string>>(new Set());
+  const [notesByTaskId, setNotesByTaskId] = useState<Record<string, string>>({});
 
   if (tasks.length === 0) return null;
 
   const handleRate = (taskId: string, rating: number) => {
-    onRateTask(taskId, rating);
+    const note = notesByTaskId[taskId]?.trim();
+    onRateTask(taskId, rating, note || undefined);
     setRatedTaskIds(prev => new Set(prev).add(taskId));
   };
 
@@ -54,6 +56,20 @@ export const TaskRatingCarousel = ({
                   </button>
                 ))}
               </div>
+              <label className="w-full text-left">
+                <span className="text-sm font-semibold tracking-[-0.02em] text-stone-700">메모</span>
+                <textarea
+                  value={notesByTaskId[task.id] ?? task.note ?? ''}
+                  onChange={(event) => {
+                    const nextNote = event.target.value;
+                    setNotesByTaskId((current) => ({ ...current, [task.id]: nextNote }));
+                  }}
+                  rows={3}
+                  maxLength={240}
+                  placeholder="오늘 이 일정에 대해 짧게 남겨보세요"
+                  className="mt-2 w-full resize-none rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm leading-5 text-stone-700 outline-none transition-colors placeholder:text-stone-400 focus:border-stone-400 focus:bg-white"
+                />
+              </label>
             </div>
           ))}
         </div>
