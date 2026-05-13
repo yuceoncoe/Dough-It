@@ -1,4 +1,4 @@
-import { AppStateSnapshot, createDefaultAppState, normalizeAppState } from './appState';
+import { AppStateSnapshot, createDefaultAppState, normalizeAppState, toSerializableAppState } from './appState';
 import { supabase } from '../lib/supabase';
 
 const CACHE_PREFIX = 'circle-day:user-cache:';
@@ -50,11 +50,12 @@ export const loadCachedAppState = (userId: string, todayStr: string): CachedAppS
 
 export const persistCachedAppState = (userId: string, snapshot: AppStateSnapshot, remoteUpdatedAt: string | null = null) => {
   try {
+    const serializableSnapshot = toSerializableAppState(snapshot);
     window.localStorage.setItem(getCacheKey(userId), JSON.stringify({
       version: CACHE_VERSION,
       cachedAt: Date.now(),
       remoteUpdatedAt,
-      snapshot,
+      snapshot: serializableSnapshot,
     }));
   } catch {
     // Ignore local cache failures.
@@ -118,15 +119,16 @@ export const persistRemoteAppState = async (userId: string, snapshot: AppStateSn
   if (!supabase) {
     return null;
   }
+  const serializableSnapshot = toSerializableAppState(snapshot);
   const updatedAt = new Date().toISOString();
 
   const { error } = await supabase
     .from('user_app_state')
     .upsert({
       user_id: userId,
-      routines: snapshot.routines,
-      tasks_by_date: snapshot.tasksByDate,
-      skipped_rating_task_ids: snapshot.skippedRatingTaskIds,
+      routines: serializableSnapshot.routines,
+      tasks_by_date: serializableSnapshot.tasksByDate,
+      skipped_rating_task_ids: serializableSnapshot.skippedRatingTaskIds,
       updated_at: updatedAt,
     }, { onConflict: 'user_id' });
 

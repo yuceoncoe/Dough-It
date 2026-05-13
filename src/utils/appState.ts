@@ -41,21 +41,35 @@ const normalizeTask = (task: Partial<Task> | null | undefined, fallbackId: strin
 
 const normalizeTasksByDate = (tasksByDate: Record<string, Task[]>) =>
   Object.fromEntries(
-    Object.entries(tasksByDate).map(([date, tasks]) => [
+    Object.entries(tasksByDate ?? {}).map(([date, tasks]) => [
       date,
       Array.isArray(tasks) ? tasks.map((task, index) => normalizeTask(task, `task-${date}-${index}`)) : [],
     ]),
   );
 
-export const normalizeAppState = (snapshot: AppStateSnapshot, todayStr: string): AppStateSnapshot => {
-  const sourceRoutines = snapshot.routines ?? INITIAL_ROUTINES;
-  const routines = {
+const normalizeRoutines = (routines: RoutineState | null | undefined): RoutineState => {
+  const sourceRoutines = routines ?? INITIAL_ROUTINES;
+
+  return {
     weekday: Array.isArray(sourceRoutines.weekday) ? sourceRoutines.weekday.map((task, index) => normalizeTask(task, `weekday-routine-${index}`)) : [],
     weekend: Array.isArray(sourceRoutines.weekend) ? sourceRoutines.weekend.map((task, index) => normalizeTask(task, `weekend-routine-${index}`)) : [],
   };
-  const skippedRatingTaskIds = snapshot.skippedRatingTaskIds ?? [];
+};
+
+export const toSerializableAppState = (snapshot: AppStateSnapshot): AppStateSnapshot => ({
+  routines: normalizeRoutines(snapshot.routines),
+  tasksByDate: normalizeTasksByDate(snapshot.tasksByDate ?? {}),
+  skippedRatingTaskIds: Array.isArray(snapshot.skippedRatingTaskIds)
+    ? snapshot.skippedRatingTaskIds.filter((id): id is string => typeof id === 'string')
+    : [],
+});
+
+export const normalizeAppState = (snapshot: AppStateSnapshot, todayStr: string): AppStateSnapshot => {
+  const serializableSnapshot = toSerializableAppState(snapshot);
+  const routines = serializableSnapshot.routines;
+  const skippedRatingTaskIds = serializableSnapshot.skippedRatingTaskIds;
   const hasCompletedPastCleanup = skippedRatingTaskIds.includes(ONE_TIME_PAST_CLEANUP_MARKER);
-  const sourceTasksByDate = normalizeTasksByDate(snapshot.tasksByDate ?? {});
+  const sourceTasksByDate = serializableSnapshot.tasksByDate;
   const tasksAfterOneTimeCleanup = hasCompletedPastCleanup
     ? sourceTasksByDate
     : removePastDateTasks(sourceTasksByDate, ONE_TIME_PAST_CLEANUP_CUTOFF);

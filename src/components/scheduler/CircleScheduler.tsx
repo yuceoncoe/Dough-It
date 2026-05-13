@@ -220,6 +220,7 @@ export const CircleScheduler = ({
   const safeOverlapIndex = hasOverlapSlider ? overlapIndex % overlappingActiveTasks.length : 0;
   const displayTask = hasOverlapSlider ? overlappingActiveTasks[safeOverlapIndex] : activeTask;
   const activeTaskProgress = showCurrentTime ? getCenterTaskProgress(displayTask, currentMinutes) : 0;
+  const clampedActiveTaskProgress = Math.max(0, Math.min(1, activeTaskProgress));
   const activeTaskColor = displayTask ? getClockTaskColor(displayTask) : '#ff7a91';
   const laneCount = getRequiredTrackLaneCount(tasks);
   const trackTasks = assignTasksToTrackLanes(tasks, laneCount);
@@ -372,21 +373,19 @@ export const CircleScheduler = ({
           {(hasPendingArcEnd ? ['start', 'end'] as const : ['start'] as const).map((handle) => {
             const angle = handle === 'start' ? pendingArc.startAngle : pendingArc.endAngle;
             const point = polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, angle);
-            const isActive = activeArcHandle === handle;
-            return (
+            return interactive ? (
               <circle
                 key={`${interactive ? 'main' : 'preview'}-pending-arc-${handle}`}
                 cx={point.x}
                 cy={point.y}
-                r={isActive ? 14 : 10}
-                fill="#d90429"
-                stroke="#ffffff"
-                strokeWidth={isActive ? 5 : 4}
-                className={interactive ? 'cursor-grab active:cursor-grabbing' : undefined}
-                onPointerDown={interactive ? (event) => beginArcHandleDrag(event, handle) : undefined}
-                pointerEvents={interactive ? 'auto' : 'none'}
+                r={18}
+                fill="transparent"
+                stroke="none"
+                className="cursor-grab active:cursor-grabbing"
+                onPointerDown={(event) => beginArcHandleDrag(event, handle)}
+                pointerEvents="all"
               />
-            );
+            ) : null;
           })}
         </>
       )}
@@ -615,18 +614,20 @@ export const CircleScheduler = ({
                 </div>
               )}
               <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`} aria-hidden="true">
-                <svg className="center-progress-arc" viewBox="0 0 120 120">
-                  <circle className="center-progress-arc__track" cx="60" cy="60" r="50" />
-                  <circle
-                    className="center-progress-arc__value"
-                    cx="60"
-                    cy="60"
-                    r="50"
-                    pathLength="100"
-                    stroke={hexToRgba(activeTaskColor, 0.86)}
-                    strokeDasharray={`${Math.max(0, Math.min(1, activeTaskProgress)) * 100} 100`}
-                  />
-                </svg>
+                {displayTask && clampedActiveTaskProgress > 0 ? (
+                  <svg className="center-progress-arc" viewBox="0 0 120 120">
+                    <circle className="center-progress-arc__track" cx="60" cy="60" r="50" />
+                    <circle
+                      className="center-progress-arc__value"
+                      cx="60"
+                      cy="60"
+                      r="50"
+                      pathLength="100"
+                      stroke={hexToRgba(activeTaskColor, 0.86)}
+                      strokeDasharray={`${clampedActiveTaskProgress * 100} 100`}
+                    />
+                  </svg>
+                ) : null}
                 <div
                   className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
                   style={{ color: displayTask ? activeTaskColor : 'rgba(214, 211, 209, 0.92)' }}
