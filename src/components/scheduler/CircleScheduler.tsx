@@ -5,14 +5,20 @@ import { isCurrentMinuteInsideTask, getCenterTaskProgress, getClockTaskColor, ge
 import { polarToCartesian, describeArc } from '../../utils/geometry';
 import TaskCreationModal from '../ui/TaskCreationModal';
 import CanvasClockSurface from './CanvasClockSurface';
+import { calculatePetState } from '../../utils/pet';
+import { PixelPet } from '../ui/PixelPet';
 
 export const CircleScheduler = ({
   tasks,
+  tasksByDate,
+  date,
   onAddTask,
   showCurrentTime = true,
   centerAction,
 }: {
   tasks: Task[];
+  tasksByDate: Record<string, Task[]>;
+  date: string;
   onAddTask: (title: string, tags: Tag[], startTime: string, duration: number) => boolean | void;
   showCurrentTime?: boolean;
   centerAction?: {
@@ -222,6 +228,7 @@ export const CircleScheduler = ({
   const activeTaskProgress = showCurrentTime ? getCenterTaskProgress(displayTask, currentMinutes) : 0;
   const clampedActiveTaskProgress = Math.max(0, Math.min(1, activeTaskProgress));
   const activeTaskColor = displayTask ? getClockTaskColor(displayTask) : '#ff7a91';
+  const petState = calculatePetState(tasksByDate, date);
   const laneCount = getRequiredTrackLaneCount(tasks);
   const trackTasks = assignTasksToTrackLanes(tasks, laneCount);
   const interactionRingRadius = (TRACK_INNER_RADIUS + OUTER_BACKGROUND_RADIUS) / 2;
@@ -625,13 +632,46 @@ export const CircleScheduler = ({
                   </div>
                 </div>
               )}
-              <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`} aria-hidden="true">
-                <div
-                  className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
-                  style={{ color: displayTask ? activeTaskColor : 'rgba(214, 211, 209, 0.92)' }}
-                >
-                  {displayTask ? displayTask.title : '비어 있음'}
-                </div>
+              <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''} flex flex-col items-center justify-center`} aria-hidden="true">
+                {displayTask ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <div className="mb-0.5 pointer-events-none">
+                      <PixelPet petState={petState} size={40} interactive={false} />
+                    </div>
+                    <div
+                      className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
+                      style={{
+                        position: 'relative',
+                        left: 'auto',
+                        top: 'auto',
+                        transform: 'none',
+                        color: activeTaskColor,
+                        marginTop: '4px'
+                      }}
+                    >
+                      {displayTask.title}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <div className="pointer-events-auto">
+                      <PixelPet petState={petState} size={72} interactive={true} />
+                    </div>
+                    <div
+                      className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
+                      style={{
+                        position: 'relative',
+                        left: 'auto',
+                        top: 'auto',
+                        transform: 'none',
+                        color: 'rgba(214, 211, 209, 0.92)',
+                        marginTop: '4px'
+                      }}
+                    >
+                      비어 있음
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           )}

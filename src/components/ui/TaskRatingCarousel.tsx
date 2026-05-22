@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Task } from '../../types';
 import { Star } from 'lucide-react';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
+import { playHarpChime } from '../../utils/audio';
 
 export const TaskRatingCarousel = ({
   tasks,
@@ -16,6 +17,12 @@ export const TaskRatingCarousel = ({
   const [ratingsByTaskId, setRatingsByTaskId] = useState<Record<string, number>>({});
   const [notesByTaskId, setNotesByTaskId] = useState<Record<string, string>>({});
   useBodyScrollLock(tasks.length > 0);
+
+  useEffect(() => {
+    if (tasks.length > 0) {
+      playHarpChime();
+    }
+  }, []);
 
   if (tasks.length === 0) return null;
 
@@ -39,7 +46,7 @@ export const TaskRatingCarousel = ({
 
   return (
     <div className="modal-backdrop z-[100] flex-col justify-center">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm animate-jelly">
         <div className="mb-4 text-center">
           <h2 className="font-hand text-3xl text-white drop-shadow-md">일정 평가</h2>
           <p className="mt-1 text-sm text-white/90">종료된 일정들의 달성도를 평가해주세요!</p>

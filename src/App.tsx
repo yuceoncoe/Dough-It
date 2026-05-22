@@ -449,6 +449,7 @@ const AppShell = ({
           <DayScheduleView
             date={todayStr}
             tasks={tasksByDate[todayStr] ?? []}
+            tasksByDate={tasksByDate}
             onOpenSettings={() => setSettingsOpen(true)}
             onPreviousDate={() => moveToDate(todayStr, -1)}
             onNextDate={() => moveToDate(todayStr, 1)}
@@ -462,6 +463,7 @@ const AppShell = ({
           <DayScheduleView
             date={selectedDate}
             tasks={tasksByDate[selectedDate] ?? []}
+            tasksByDate={tasksByDate}
             onOpenSettings={() => setSettingsOpen(true)}
             onPreviousDate={() => moveToDate(selectedDate, -1)}
             onNextDate={() => moveToDate(selectedDate, 1)}

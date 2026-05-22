@@ -18,6 +18,7 @@ import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 export const DayScheduleView = ({
   date,
   tasks,
+  tasksByDate,
   onOpenSettings,
   onPreviousDate,
   onNextDate,
@@ -27,6 +28,7 @@ export const DayScheduleView = ({
 }: {
   date: string;
   tasks: Task[];
+  tasksByDate: Record<string, Task[]>;
   onOpenSettings: () => void;
   onPreviousDate: () => void;
   onNextDate: () => void;
@@ -269,6 +271,7 @@ export const DayScheduleView = ({
         isOpen={reportOpen}
         date={date}
         tasks={tasks}
+        tasksByDate={tasksByDate}
         onClose={() => setReportOpen(false)}
       />
       <RoutineActionModal
@@ -384,6 +387,8 @@ export const DayScheduleView = ({
         <div className="min-h-[45vh] overflow-hidden">
           <CircleScheduler
             tasks={tasks}
+            tasksByDate={tasksByDate}
+            date={date}
             onAddTask={addTask}
             showCurrentTime={isToday}
             centerAction={isPastDate ? {
