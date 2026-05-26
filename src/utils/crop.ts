@@ -166,9 +166,10 @@ export const calculateCropState = (tasksByDate: Record<string, Task[]>, targetDa
   }
 
   // 4. Health (0 to 100)
-  // Health is driven by Q4 completed tasks and penalized by low average ratings instead of uncompleted tasks.
-  const ratingPenalty = averageRating !== null ? (5.0 - averageRating) * 18 : 0;
-  const health = Math.max(0, Math.min(100, Math.round(50 + (healthQ4 * 5) - ratingPenalty)));
+  // Health growth itself is driven by the number of completed tasks (no high baseline), and penalized by low average ratings.
+  const healthBase = Math.min(100, (healthQ4 * 12) + (completedTasksThisMonth * 2));
+  const ratingPenalty = averageRating !== null ? (5.0 - averageRating) * 20 : 0;
+  const health = Math.max(0, Math.round(healthBase - ratingPenalty));
 
   // Evolution stage
   const evolutionStage = getEvolutionStage(growth);
