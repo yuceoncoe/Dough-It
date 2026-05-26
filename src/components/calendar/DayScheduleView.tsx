@@ -91,30 +91,23 @@ export const DayScheduleView = ({
   }, [isToday]);
 
   useEffect(() => {
-    if (!isToday || report.completedCount === 0) {
-      return;
-    }
-
-    const scheduledTasks = tasks.filter((task) => task.startTime && task.duration);
-    if (!scheduledTasks.length) {
+    if (report.completedCount === 0) {
       return;
     }
 
     const [year, month, day] = date.split('-').map(Number);
-    const hasReachedEndOfDayTasks = scheduledTasks.every((task) => {
-      const [hours, minutes] = (task.startTime ?? '00:00').split(':').map(Number);
-      const endAt = new Date(year, month - 1, day, hours, minutes, 0).getTime() + (task.duration ?? 0) * 60 * 1000;
-      return now.getTime() >= endAt;
-    });
+    const midnightOfNextDay = new Date(year, month - 1, day + 1, 0, 0, 0);
+
+    const hasPassedMidnight = now.getTime() >= midnightOfNextDay.getTime();
     const storageKey = `circle-day:report-shown:${date}`;
 
-    if (!hasReachedEndOfDayTasks || window.localStorage.getItem(storageKey) === 'true') {
+    if (!hasPassedMidnight || window.localStorage.getItem(storageKey) === 'true') {
       return;
     }
 
     window.localStorage.setItem(storageKey, 'true');
     setReportOpen(true);
-  }, [date, isToday, now, report.completedCount, tasks]);
+  }, [date, now, report.completedCount]);
 
   const resetForm = () => {
     setTitle('');
@@ -367,6 +360,15 @@ export const DayScheduleView = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {report.completedCount > 0 && (
+            <button
+              onClick={() => setReportOpen(true)}
+              className="flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs font-bold text-amber-800 shadow-sm transition-colors hover:bg-amber-100"
+              aria-label="일일 보고서 보기"
+            >
+              보고서 📊
+            </button>
+          )}
           <button
             onClick={() => {
               resetForm();
