@@ -326,24 +326,24 @@ export const PixelCrop = ({
 
       // --- 4. Sparkles and particles engine (Quality & Health indicators) ---
       // A. Generate particles
-      if (quality === '최상급' && Math.random() < 0.12) {
+      if (quality === '최상급' && Math.random() < 0.20) {
         // Gold Star for Legendary Quality
         cropParticles.push({
           x: baseCenterX + swayOffset + (Math.random() * 26 - 13),
           y: baseCenterY - 12 - (Math.random() * 24),
           alpha: 1.0,
-          size: Math.random() * 2 + 1,
+          size: Math.random() * 2 + 1.8,
           color: '#ffca28', // Golden Yellow
           vx: (Math.random() - 0.5) * 0.4,
           vy: -Math.random() * 0.4 - 0.2,
         });
-      } else if (quality === '상급' && Math.random() < 0.08) {
+      } else if (quality === '상급' && Math.random() < 0.15) {
         // Silver Sparkle for Rare Quality
         cropParticles.push({
           x: baseCenterX + swayOffset + (Math.random() * 22 - 11),
           y: baseCenterY - 12 - (Math.random() * 22),
           alpha: 1.0,
-          size: Math.random() * 1.5 + 0.8,
+          size: Math.random() * 1.5 + 1.5,
           color: '#fff', // White shiny
           vx: (Math.random() - 0.5) * 0.3,
           vy: -Math.random() * 0.3 - 0.1,
@@ -351,12 +351,12 @@ export const PixelCrop = ({
       }
 
       // Vital green sparks for High Health (>= 80)
-      if (health >= 80 && Math.random() < 0.1) {
+      if (health >= 80 && Math.random() < 0.18) {
         cropParticles.push({
           x: baseCenterX + swayOffset + (Math.random() * 32 - 16),
           y: baseCenterY - 5 - (Math.random() * 35),
           alpha: 1.0,
-          size: 1.0,
+          size: Math.random() * 1.0 + 1.2,
           color: '#a5d6a7', // Light green energy dot
           vx: (Math.random() - 0.5) * 0.2,
           vy: -Math.random() * 0.3 - 0.15,
@@ -367,7 +367,7 @@ export const PixelCrop = ({
       cropParticles.forEach((p) => {
         p.x += p.vx;
         p.y += p.vy;
-        p.alpha -= 0.015;
+        p.alpha -= 0.008;
 
         if (p.alpha > 0) {
           ctx.save();
@@ -390,9 +390,17 @@ export const PixelCrop = ({
     };
   }, [cropState]);
 
+  const getCenterOffsetPercent = (stage: number) => {
+    if (stage === 1) return -22;
+    if (stage === 2) return -16;
+    if (stage === 3) return -10;
+    if (stage === 4) return -4;
+    return 2;
+  };
+
   return (
     <div
-      className={`flex items-center justify-center ${interactive ? 'cursor-pointer transition-transform active:scale-95' : ''}`}
+      className={`flex items-center justify-center ${interactive ? 'cursor-pointer' : ''}`}
       style={{ width: size, height: size }}
     >
       <canvas
@@ -400,7 +408,10 @@ export const PixelCrop = ({
         width={60}
         height={60}
         className="h-full w-full"
-        style={{ imageRendering: 'pixelated' }}
+        style={{
+          imageRendering: 'pixelated',
+          transform: `translateY(${getCenterOffsetPercent(cropState.evolutionStage)}%)`,
+        }}
       />
     </div>
   );
