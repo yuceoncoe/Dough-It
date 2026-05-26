@@ -132,18 +132,16 @@ export const CalendarView = ({
             </div>
           </div>
           
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-col items-start gap-1.5">
-              <h2 className="font-hand text-xl text-stone-800 md:text-2xl truncate">
-                {getStageName(cropState.evolutionStage, cropState.cropName)}
-              </h2>
-              <button
-                onClick={() => setArchiveOpen(true)}
-                className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full shrink-0 hover:bg-amber-100 transition-colors shadow-sm"
-              >
-                보관함 🧺
-              </button>
-            </div>
+          <div className="flex-1 min-w-0 flex flex-col items-start justify-center gap-1.5">
+            <h2 className="font-hand text-xl text-stone-800 md:text-2xl truncate w-full">
+              {getStageName(cropState.evolutionStage, cropState.cropName)}
+            </h2>
+            <button
+              onClick={() => setArchiveOpen(true)}
+              className="text-xs font-bold text-amber-700 hover:text-amber-950 transition-colors shrink-0"
+            >
+              보관함 🧺 &gt;
+            </button>
           </div>
         </div>
 
