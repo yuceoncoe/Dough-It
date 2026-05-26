@@ -41,120 +41,80 @@ export const CalendarView = ({
     return `${name} 수확기! 🎉 (5/5)`;
   };
 
-  const getQuadrantFeedback = (state: typeof cropState) => {
-    const { stats } = state;
-    const feedbackList: string[] = [];
-
-    // 1사분면 (Q1 - 줄기 성장)
-    if (stats.growthQ1 >= 7) {
-      feedbackList.push("줄기가 단단하게 자라고 있어요! 💪");
-    } else if (stats.growthQ1 <= 1) {
-      feedbackList.push("줄기가 가늘어요. 중요·긴급한 일에 힘써보세요. 🩹");
-    }
-
-    // 2사분면 (Q2 - 수확량)
-    if (stats.yieldQ2 >= 7) {
-      feedbackList.push("열매 맺을 준비가 아주 든든해요! 🧺");
-    } else if (stats.yieldQ2 <= 1) {
-      feedbackList.push("수확 예정량이 조금 부족한 편이에요. 💧");
-    }
-
-    // 3사분면 (Q3 - 퀄리티)
-    if (stats.qualityQ3 >= 7) {
-      feedbackList.push("햇빛 영양이 풍부해 윤기가 돌아요! ☀️");
-    } else if (stats.qualityQ3 <= 1) {
-      feedbackList.push("영양이 불균형해요. 신속한 일정 해결이 필요합니다. 🕶️");
-    }
-
-    // 4사분면 (Q4 - 건강도)
-    if (stats.healthQ4 >= 7) {
-      feedbackList.push("토양이 비옥해 뿌리가 매우 튼튼해요! 🌸");
-    } else if (stats.healthQ4 <= 1) {
-      feedbackList.push("토양이 조금 척박해요. 일상 루틴을 정돈해봐요. 🩹");
-    }
-
-    if (feedbackList.length > 0) {
-      return " " + feedbackList.slice(0, 2).join(" ");
-    }
-    return "";
-  };
-
-  const getStatusLabel = (val: number) => {
-    if (val >= 7) return `높음 (${val})`;
-    if (val <= 1) return `낮음 (${val})`;
-    return `보통 (${val})`;
-  };
-
-  const getStatusStyle = (val: number) => {
-    if (val >= 7) return 'bg-emerald-50 text-emerald-700 border border-emerald-200/60';
-    if (val <= 1) return 'bg-rose-50 text-rose-700 border border-rose-200/60';
-    return 'bg-stone-100 text-stone-600 border border-stone-200/60';
-  };
-
   const getStageComment = (state: typeof cropState) => {
-    const { evolutionStage, health, yieldCount, quality, cropName } = state;
+    const { evolutionStage, health, stats, cropName, quality, yieldCount } = state;
+
+    // 1. 성장 단계별 & 건강 상태별 기본 문구 (서두)
     let baseComment = "";
-
-    // 1단계: 씨앗
     if (evolutionStage === 1) {
+      if (health >= 80) baseComment = `흙의 상태가 비옥하고 따뜻해 씨앗이 활짝 깨어날 준비를 마쳤어요. 🌱`;
+      else if (health < 40) baseComment = `흙이 많이 건조해 목이 타 들어가는 씨앗이에요. 어서 물을 듬뿍 채워주세요. 💧`;
+      else baseComment = `소중한 씨앗이 흙 속에 얌전히 안착하여 성실한 하루 일정을 기다리고 있어요. 🌱`;
+    } else if (evolutionStage === 2) {
+      if (health >= 80) baseComment = `파릇파릇하고 싱그러운 새싹이 햇살을 받으며 무척 힘차게 자라고 있습니다! 🌿`;
+      else if (health < 40) baseComment = `새싹이 다소 지쳐 힘없이 누워 있어요. 따스한 보살핌과 일정 완료가 필요해요. 🩹`;
+      else baseComment = `${cropName}의 새싹이 조심스럽게 첫 고개를 내밀며 자라날 준비를 시작했어요. 🌿`;
+    } else if (evolutionStage === 3) {
+      if (health >= 80) baseComment = `줄기와 잎사귀에 눈부신 윤기가 흘러넘쳐요. 튼튼한 한 그루의 나무처럼 늠름하네요. 🌳✨`;
+      else if (health < 40) baseComment = `성장이 조급하게 멈춰 선 기분이에요. 핵심 일정을 완료해 줄기에 에너지를 불어넣어 봐요. 💪`;
+      else baseComment = `줄기가 하늘을 향해 차곡차곡 뻗어가고 있어요. 흔들림 없는 성장의 계절입니다. 🌳`;
+    } else if (evolutionStage === 4) {
       if (health >= 80) {
-        baseComment = `흙의 상태가 비옥하고 아주 좋아요. 싹 틔울 준비가 완벽히 되었습니다! 🌱`;
+        if (yieldCount >= 7) baseComment = `꽃망울이 터질 듯 가득 차올랐어요! 풍성하고 기분 좋은 대수확의 예감이 듭니다. 🌸✨`;
+        else baseComment = `화려한 꽃을 피우기 위해 식물이 온 힘을 모으고 있어요. 상태가 무척 튼튼합니다. 😊`;
       } else if (health < 40) {
-        baseComment = `흙이 많이 건조하고 목말라해요. 물(일정 완료)을 듬뿍 주세요! 💧`;
-      } else {
-        baseComment = `아직은 소중한 씨앗 상태예요. 일정을 실천해 새싹을 틔워보세요! 🌱`;
-      }
+        baseComment = `꽃을 피워야 할 시기이지만 영양이 부족해 시들해요. 평점을 챙겨 식물에 힘을 실어주세요. 🩹`;
+      } else baseComment = `순조롭게 꽃망울이 맺히며 곧 다가올 기분 좋은 결실의 순간을 얌전히 기다리고 있어요. 🌸`;
+    } else { // 5단계 (수확)
+      if (health >= 80) {
+        if (quality === '최상급') baseComment = `대성공입니다! 완벽한 하루 관리 덕에 탐스러운 최상급 ${cropName}이 풍성하게 열렸어요! 🏆🎉`;
+        else baseComment = `작물이 아주 건강하고 단단하게 결실을 맺었습니다. 기쁘게 수확할 완벽한 시기예요! 🧺`;
+      } else if (health < 40) {
+        baseComment = `조금 버거운 날씨를 견뎌내며 대견하게 열매를 지켜냈어요. 조심스레 수확을 마무리지어 주세요. 🩹`;
+      } else baseComment = `기다리던 수확기가 다가왔습니다. 무사히 성장한 이 탐스러운 결실들을 기쁘게 보관함에 담아봐요! 🎉`;
     }
-    // 2단계: 새싹
-    else if (evolutionStage === 2) {
-      if (health >= 80) {
-        baseComment = `새싹이 파릇파릇하고 건강해요! 기특하게 잘 자라는 중입니다. 🌿`;
-      } else if (health < 40) {
-        baseComment = `새싹이 지쳐 보여요. 시들지 않게 물주기(일정 완료)로 가꿔주세요. 🩹`;
+
+    // 2. 우수 / 취약 분면 진단 로직
+    const quadrants = [
+      { id: 'Q1', name: '줄기 성장', value: stats.growthQ1, strongDesc: '성장의 기틀이 되는 줄기가 굵고 튼튼하게 뻗어가고 있어요. 💪', weakDesc: '줄기가 가늘고 약해 성장의 중심이 흔들리고 있으니 중요·긴급한 일에 주력해 보세요. 🩹' },
+      { id: 'Q2', name: '수확량 대비', value: stats.yieldQ2, strongDesc: '열매를 맺을 든든한 주머니가 꽉 채워지며 풍성한 결실을 향해 달려가고 있네요. 🧺', weakDesc: '수확할 열매 개수가 부족하여 결실의 크기가 작을 수 있으니 미래를 준비하는 일정을 챙겨봐요. 💧' },
+      { id: 'Q3', name: '품질과 센스', value: stats.qualityQ3, strongDesc: '햇살을 듬뿍 머금은 듯 잎사귀가 반짝반짝 윤기가 흐르고 싱그러워요. ☀️', weakDesc: '빛깔과 퀄리티가 정체되어 시들해질 수 있으니 밀린 일정들을 신속하게 매듭짓는 게 좋아요. 🕶️' },
+      { id: 'Q4', name: '건강과 루틴', value: stats.healthQ4, strongDesc: '토양이 매우 비옥하고 뿌리가 굳건해 흔들림이 전혀 없는 최상의 컨디션이에요. 🌸', weakDesc: '흙이 다소 메말라 잔뿌리가 흔들리니 마음을 차분히 가라앉히고 일상 루틴부터 정돈해 봐요. 🩹' }
+    ];
+
+    // 정렬하여 최댓값과 최솟값 구하기
+    const maxVal = Math.max(stats.growthQ1, stats.yieldQ2, stats.qualityQ3, stats.healthQ4);
+    const minVal = Math.min(stats.growthQ1, stats.yieldQ2, stats.qualityQ3, stats.healthQ4);
+
+    const strongQuads = quadrants.filter(q => q.value === maxVal && maxVal >= 7);
+    const weakQuads = quadrants.filter(q => q.value === minVal && minVal <= 2);
+
+    let feedback = "";
+
+    if (strongQuads.length > 0 && weakQuads.length > 0) {
+      // 1. 우수와 취약이 모두 있을 때
+      const strong = strongQuads[0];
+      const weak = weakQuads[0];
+      feedback = ` ${strong.strongDesc} 다만 ${weak.weakDesc}`;
+    } else if (strongQuads.length > 0) {
+      // 2. 우수 분면만 있을 때
+      const strong = strongQuads[0];
+      feedback = ` 특히 ${strong.strongDesc} 전반적인 성장 밸런스도 무척 안정적이고 좋은 흐름을 보이고 있답니다. ✨`;
+    } else if (weakQuads.length > 0) {
+      // 3. 취약 분면만 있을 때
+      const weak = weakQuads[0];
+      feedback = ` 걱정스럽게도 ${weak.weakDesc} 한 걸음씩 성장의 발걸음을 다시 내딛어 보아요.`;
+    } else {
+      // 4. 우수/취약이 둘 다 없는 평이한 상태 (3 ~ 6 사이)
+      const avg = (stats.growthQ1 + stats.yieldQ2 + stats.qualityQ3 + stats.healthQ4) / 4;
+      if (avg >= 4.5) {
+        feedback = ` 특별히 모자란 부분 없이 모든 능력치가 조화롭게 다듬어져 아주 예쁘고 건강한 성장을 이어가고 있습니다! 🌟`;
       } else {
-        baseComment = `${cropName}의 새싹이 얼굴을 내밀었어요. 성실하게 돌봐주세요! 🌿`;
-      }
-    }
-    // 3단계: 성장
-    else if (evolutionStage === 3) {
-      if (health >= 80) {
-        baseComment = `줄기와 잎에 윤기가 자르르 흘러요. 아주 튼튼하게 자랄 것 같은 기분 좋은 예감! 🌳✨`;
-      } else if (health < 40) {
-        baseComment = `성장이 살짝 지체되어 보여요. 중요 일정(줄기 성장)으로 생기를 더해주세요! 💪`;
-      } else {
-        baseComment = `줄기가 곧게 뻗어 오르고 있어요. 오늘도 성실하게 내실을 다져봐요! 🌳`;
-      }
-    }
-    // 4단계: 개화
-    else if (evolutionStage === 4) {
-      if (health >= 80) {
-        if (yieldCount >= 7) {
-          baseComment = `튼실한 꽃망울이 맺혔어요. 수확이 아주 잘 될 것 같은 예감입니다! 🌸✨`;
-        } else {
-          baseComment = `꽃이 곧 필 것 같아요. 식물의 상태가 매우 싱싱하고 튼튼합니다! 😊`;
-        }
-      } else if (health < 40) {
-        baseComment = `꽃필 준비 중인데 조금 시들해요. 평점(하루 만족도)을 높여 힘을 주세요! 🩹`;
-      } else {
-        baseComment = `개화할 준비를 순조롭게 마쳤어요. 곧 기분 좋은 결실을 맺을 것 같네요! 🌸`;
-      }
-    }
-    // 5단계: 수확 (Mature)
-    else {
-      if (health >= 80) {
-        if (quality === '최상급') {
-          baseComment = `대성공! 아주 탐스러운 최상급 열매가 ${yieldCount}개나 가득 열렸습니다! 🏆🎉`;
-        } else {
-          baseComment = `작물 상태가 매우 건강해요! 풍성한 수확을 거둘 준비를 마쳤습니다. 🧺`;
-        }
-      } else if (health < 40) {
-        baseComment = `조금 힘겨웠지만 대견하게 버텨준 열매들을 기쁘게 수확해 주세요! 🩹`;
-      } else {
-        baseComment = `축하해요! 무사히 다 자랐으니 보관함으로 기쁘게 수확해 주세요! 🎉`;
+        feedback = ` 아직은 큰 특징 없이 잔잔한 시기를 보내고 있네요. 작은 루틴부터 조금씩 물을 채워나가며 식물을 돌봐줍시다. 🌱`;
       }
     }
 
-    return baseComment + getQuadrantFeedback(state);
+    return baseComment + feedback;
   };
 
   return (
@@ -200,35 +160,7 @@ export const CalendarView = ({
           </div>
         </div>
 
-        {/* 4분면 상태값 그리드 */}
-        <div className="mt-4 grid grid-cols-2 gap-2 text-[11px] md:grid-cols-4">
-          <div className="flex items-center justify-between rounded-xl bg-stone-50 border border-stone-100 p-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
-            <span className="text-stone-500 font-medium">Q1 줄기 (중요·긴급)</span>
-            <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] ${getStatusStyle(cropState.stats.growthQ1)}`}>
-              {getStatusLabel(cropState.stats.growthQ1)}
-            </span>
-          </div>
-          <div className="flex items-center justify-between rounded-xl bg-stone-50 border border-stone-100 p-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
-            <span className="text-stone-500 font-medium">Q2 수확 (중요·대비)</span>
-            <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] ${getStatusStyle(cropState.stats.yieldQ2)}`}>
-              {getStatusLabel(cropState.stats.yieldQ2)}
-            </span>
-          </div>
-          <div className="flex items-center justify-between rounded-xl bg-stone-50 border border-stone-100 p-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
-            <span className="text-stone-500 font-medium">Q3 품질 (신속·센스)</span>
-            <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] ${getStatusStyle(cropState.stats.qualityQ3)}`}>
-              {getStatusLabel(cropState.stats.qualityQ3)}
-            </span>
-          </div>
-          <div className="flex items-center justify-between rounded-xl bg-stone-50 border border-stone-100 p-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
-            <span className="text-stone-500 font-medium">Q4 건강 (일상·루틴)</span>
-            <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] ${getStatusStyle(cropState.stats.healthQ4)}`}>
-              {getStatusLabel(cropState.stats.healthQ4)}
-            </span>
-          </div>
-        </div>
-
-        {/* 하단 row: 실시간 상태 코멘트 (전체 가로폭 사용) */}
+        {/* 하단 row: 실시간 상태 코멘트 (전체 가로폭 사용, 뱃지 없이 자연스러운 진단 내용 출력) */}
         <div className="mt-3.5 pt-3 border-t border-stone-100/80 text-left">
           <p className="text-[12px] text-stone-600 leading-relaxed font-medium">
             {getStageComment(cropState)}
