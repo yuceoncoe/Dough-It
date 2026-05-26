@@ -34,11 +34,19 @@ export const CalendarView = ({
   const cropState = calculateCropState(tasksByDate, todayStr);
 
   const getStageName = (stage: number, name: string) => {
-    if (stage === 1) return `씨앗 단계 🌱`;
-    if (stage === 2) return `새싹 단계 🌿`;
-    if (stage === 3) return `성장 단계 🌳`;
-    if (stage === 4) return `개화 단계 🌸`;
-    return `${name} 수확기! 🎉`;
+    if (stage === 1) return `씨앗 단계 🌱 (1/5)`;
+    if (stage === 2) return `새싹 단계 🌿 (2/5)`;
+    if (stage === 3) return `성장 단계 🌳 (3/5)`;
+    if (stage === 4) return `개화 단계 🌸 (4/5)`;
+    return `${name} 수확기! 🎉 (5/5)`;
+  };
+
+  const getStageComment = (stage: number, name: string) => {
+    if (stage === 1) return `아직은 작고 소중한 씨앗이에요. 일정을 완료해서 싹을 틔워보세요! 🌱`;
+    if (stage === 2) return `${name}의 푸릇푸릇한 새싹이 돋아났어요. 무럭무럭 자랄 수 있게 가꾸어주세요! 🌿`;
+    if (stage === 3) return `줄기와 잎이 튼튼하게 뻗어나가고 있어요. 매일매일 성실하게 물을 주듯 가꿔봐요! 🌳`;
+    if (stage === 4) return `꽃봉오리가 맺혀 개화할 준비를 마쳤어요! 곧 아름다운 열매를 맺을 것 같아요. 🌸`;
+    return `축하해요! ${name}가 완전히 다 자라 풍성한 수확기를 맞이했습니다. 다음 달에 수확할 수 있어요! 🎉`;
   };
 
   return (
@@ -69,10 +77,15 @@ export const CalendarView = ({
           </div>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="font-hand text-xl text-stone-800 md:text-2xl truncate">
-                {getStageName(cropState.evolutionStage, cropState.cropName)}
-              </h2>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 min-w-0 text-left">
+                <h2 className="font-hand text-xl text-stone-800 md:text-2xl truncate">
+                  {getStageName(cropState.evolutionStage, cropState.cropName)}
+                </h2>
+                <p className="mt-1.5 text-xs text-stone-500 leading-relaxed">
+                  {getStageComment(cropState.evolutionStage, cropState.cropName)}
+                </p>
+              </div>
               <button
                 onClick={() => setArchiveOpen(true)}
                 className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full shrink-0 hover:bg-amber-100 transition-colors shadow-sm"
@@ -81,36 +94,6 @@ export const CalendarView = ({
               </button>
             </div>
           </div>
-        </div>
-
-        {/* 4대 작물 능력치 게이지 */}
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 pt-3.5 border-t border-stone-100">
-          {[
-            { label: '줄기 성장', value: cropState.stats.growthQ1, max: 10, color: 'bg-rose-500' },
-            { label: '수확량', value: cropState.stats.yieldQ2, max: 10, color: 'bg-sky-500' },
-            { label: '퀄리티', value: cropState.stats.qualityQ3, max: 10, color: 'bg-yellow-400' },
-            { label: '건강도', value: cropState.stats.healthQ4, max: 10, color: 'bg-emerald-400' },
-          ].map((stat, i) => {
-            const displayMax = Math.max(10, cropState.stats.growthQ1, cropState.stats.yieldQ2, cropState.stats.qualityQ3, cropState.stats.healthQ4);
-            const percentage = (stat.value / displayMax) * 100;
-            return (
-              <div key={i} className="flex flex-col">
-                <div className="flex justify-between items-center text-xs mb-0.5">
-                  <span className="text-stone-500 font-medium flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${stat.color}`} />
-                    {stat.label}
-                  </span>
-                  <span className="text-stone-700 font-semibold">{stat.value}</span>
-                </div>
-                <div className="h-1.5 w-full rounded-full bg-stone-100 overflow-hidden">
-                  <div
-                    className={`h-full ${stat.color} transition-all duration-500 ease-out`}
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
         </div>
       </div>
 

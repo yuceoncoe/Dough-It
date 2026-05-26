@@ -391,11 +391,11 @@ export const PixelCrop = ({
   }, [cropState]);
 
   const getCenterOffsetPercent = (stage: number) => {
-    if (stage === 1) return -22;
-    if (stage === 2) return -16;
-    if (stage === 3) return -10;
-    if (stage === 4) return -4;
-    return 2;
+    if (stage === 1) return -38;
+    if (stage === 2) return -30;
+    if (stage === 3) return -22;
+    if (stage === 4) return -14;
+    return -6;
   };
 
   return (
