@@ -41,12 +41,67 @@ export const CalendarView = ({
     return `${name} 수확기! 🎉 (5/5)`;
   };
 
-  const getStageComment = (stage: number, name: string) => {
-    if (stage === 1) return `아직은 작고 소중한 씨앗이에요. 일정을 완료해서 싹을 틔워보세요! 🌱`;
-    if (stage === 2) return `${name}의 푸릇푸릇한 새싹이 돋아났어요. 무럭무럭 자랄 수 있게 가꾸어주세요! 🌿`;
-    if (stage === 3) return `줄기와 잎이 튼튼하게 뻗어나가고 있어요. 매일매일 성실하게 물을 주듯 가꿔봐요! 🌳`;
-    if (stage === 4) return `꽃봉오리가 맺혀 개화할 준비를 마쳤어요! 곧 아름다운 열매를 맺을 것 같아요. 🌸`;
-    return `축하해요! ${name}가 완전히 다 자라 풍성한 수확기를 맞이했습니다. 다음 달에 수확할 수 있어요! 🎉`;
+  const getStageComment = (state: typeof cropState) => {
+    const { evolutionStage, health, yieldCount, quality, cropName } = state;
+
+    // 1단계: 씨앗
+    if (evolutionStage === 1) {
+      if (health >= 80) {
+        return `비옥한 토양에서 싹을 틔울 준비를 마쳤어요. 식물의 상태가 아주 좋아요! 🌱`;
+      }
+      if (health < 40) {
+        return `흙이 많이 메말라 있어요. 일정을 완료해서 시원한 물을 듬뿍 주세요! 💧`;
+      }
+      return `아직은 작고 소중한 씨앗이에요. 일정을 실천해서 새싹을 틔워보세요! 🌱`;
+    }
+
+    // 2단계: 새싹
+    if (evolutionStage === 2) {
+      if (health >= 80) {
+        return `새싹이 아주 파릇파릇하고 건강해요! 기특하게 쑥쑥 크고 있습니다. 🌿`;
+      }
+      if (health < 40) {
+        return `새싹이 시들지 않도록 물주기(일정 완료)와 관심이 필요한 상태예요. 🩹`;
+      }
+      return `${cropName}의 귀여운 새싹이 자라나고 있어요. 애정을 담아 보살펴주세요! 🌿`;
+    }
+
+    // 3단계: 성장
+    if (evolutionStage === 3) {
+      if (health >= 80) {
+        return `줄기와 잎에 윤기가 자르르 흘러요! 지금 기세라면 아주 튼튼하게 자랄 것 같아요. 🌳✨`;
+      }
+      if (health < 40) {
+        return `식물의 성장이 조금 지체되고 있어요. 중요한 줄기 성장을 챙겨 생기를 주세요! 💪`;
+      }
+      return `잎사귀가 튼튼하게 뻗어나가고 있어요. 매일매일 성실하게 물을 주듯 가꿔봐요! 🌳`;
+    }
+
+    // 4단계: 개화
+    if (evolutionStage === 4) {
+      if (health >= 80) {
+        if (yieldCount >= 7) {
+          return `곧 엄청난 양을 거둘 수 있을 만큼 튼실한 꽃봉오리들이 맺혔어요! 수확이 아주 잘 될 것 같아요. 🌸✨`;
+        }
+        return `예쁜 꽃망울이 터지기 직전이에요. 식물의 상태가 매우 싱싱하고 좋습니다! 😊`;
+      }
+      if (health < 40) {
+        return `꽃이 필 준비를 하고 있지만 기력이 조금 약해요. 좋은 일정 평점으로 생기를 채워주세요! 🩹`;
+      }
+      return `꽃봉오리가 맺혀 개화할 준비를 마쳤어요. 조만간 기분 좋은 수확을 할 수 있을 것 같네요! 🌸`;
+    }
+
+    // 5단계: 수확 (Mature)
+    if (health >= 80) {
+      if (quality === '최상급') {
+        return `최고의 관리 덕분에 탐스러운 최상급 작물이 ${yieldCount}개나 가득 열렸습니다! 🏆🎉`;
+      }
+      return `작물 상태가 최상이에요! 풍성한 결실을 맺어 수확 준비를 완벽히 끝마쳤습니다. 🧺`;
+    }
+    if (health < 40) {
+      return `상태는 조금 지쳐 보이지만, 끝까지 자라난 대견한 열매들을 기쁘게 수확해 주세요! 🩹`;
+    }
+    return `축하해요! ${cropName}가 무사히 잘 자라주었습니다. 보관함으로 기쁘게 수확할 시간이에요! 🎉`;
   };
 
   return (
@@ -82,8 +137,8 @@ export const CalendarView = ({
                 <h2 className="font-hand text-xl text-stone-800 md:text-2xl truncate">
                   {getStageName(cropState.evolutionStage, cropState.cropName)}
                 </h2>
-                <p className="mt-1.5 text-xs text-stone-500 leading-relaxed">
-                  {getStageComment(cropState.evolutionStage, cropState.cropName)}
+                <p className="mt-1.5 text-xs text-stone-500 leading-relaxed font-medium">
+                  {getStageComment(cropState)}
                 </p>
               </div>
               <button
