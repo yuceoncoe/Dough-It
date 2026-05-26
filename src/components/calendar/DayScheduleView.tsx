@@ -360,15 +360,6 @@ export const DayScheduleView = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {report.completedCount > 0 && (
-            <button
-              onClick={() => setReportOpen(true)}
-              className="flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs font-bold text-amber-800 shadow-sm transition-colors hover:bg-amber-100"
-              aria-label="일일 보고서 보기"
-            >
-              보고서 📊
-            </button>
-          )}
           <button
             onClick={() => {
               resetForm();
