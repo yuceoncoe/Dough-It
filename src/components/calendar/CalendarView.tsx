@@ -47,61 +47,61 @@ export const CalendarView = ({
     // 1단계: 씨앗
     if (evolutionStage === 1) {
       if (health >= 80) {
-        return `비옥한 토양에서 싹을 틔울 준비를 마쳤어요. 식물의 상태가 아주 좋아요! 🌱`;
+        return `흙의 상태가 비옥하고 아주 좋아요. 싹 틔울 준비가 완벽히 되었습니다! 🌱`;
       }
       if (health < 40) {
-        return `흙이 많이 메말라 있어요. 일정을 완료해서 시원한 물을 듬뿍 주세요! 💧`;
+        return `흙이 많이 건조하고 목말라해요. 물(일정 완료)을 듬뿍 주세요! 💧`;
       }
-      return `아직은 작고 소중한 씨앗이에요. 일정을 실천해서 새싹을 틔워보세요! 🌱`;
+      return `아직은 소중한 씨앗 상태예요. 일정을 실천해 새싹을 틔워보세요! 🌱`;
     }
 
     // 2단계: 새싹
     if (evolutionStage === 2) {
       if (health >= 80) {
-        return `새싹이 아주 파릇파릇하고 건강해요! 기특하게 쑥쑥 크고 있습니다. 🌿`;
+        return `새싹이 파릇파릇하고 건강해요! 기특하게 잘 자라는 중입니다. 🌿`;
       }
       if (health < 40) {
-        return `새싹이 시들지 않도록 물주기(일정 완료)와 관심이 필요한 상태예요. 🩹`;
+        return `새싹이 지쳐 보여요. 시들지 않게 물주기(일정 완료)로 가꿔주세요. 🩹`;
       }
-      return `${cropName}의 귀여운 새싹이 자라나고 있어요. 애정을 담아 보살펴주세요! 🌿`;
+      return `${cropName}의 새싹이 얼굴을 내밀었어요. 성실하게 돌봐주세요! 🌿`;
     }
 
     // 3단계: 성장
     if (evolutionStage === 3) {
       if (health >= 80) {
-        return `줄기와 잎에 윤기가 자르르 흘러요! 지금 기세라면 아주 튼튼하게 자랄 것 같아요. 🌳✨`;
+        return `줄기와 잎에 윤기가 자르르 흘러요. 아주 튼튼하게 자랄 것 같은 기분 좋은 예감! 🌳✨`;
       }
       if (health < 40) {
-        return `식물의 성장이 조금 지체되고 있어요. 중요한 줄기 성장을 챙겨 생기를 주세요! 💪`;
+        return `성장이 살짝 지체되어 보여요. 중요 일정(줄기 성장)으로 생기를 더해주세요! 💪`;
       }
-      return `잎사귀가 튼튼하게 뻗어나가고 있어요. 매일매일 성실하게 물을 주듯 가꿔봐요! 🌳`;
+      return `줄기가 곧게 뻗어 오르고 있어요. 오늘도 성실하게 내실을 다져봐요! 🌳`;
     }
 
     // 4단계: 개화
     if (evolutionStage === 4) {
       if (health >= 80) {
         if (yieldCount >= 7) {
-          return `곧 엄청난 양을 거둘 수 있을 만큼 튼실한 꽃봉오리들이 맺혔어요! 수확이 아주 잘 될 것 같아요. 🌸✨`;
+          return `튼실한 꽃망울이 맺혔어요. 수확이 아주 잘 될 것 같은 예감입니다! 🌸✨`;
         }
-        return `예쁜 꽃망울이 터지기 직전이에요. 식물의 상태가 매우 싱싱하고 좋습니다! 😊`;
+        return `꽃이 곧 필 것 같아요. 식물의 상태가 매우 싱싱하고 튼튼합니다! 😊`;
       }
       if (health < 40) {
-        return `꽃이 필 준비를 하고 있지만 기력이 조금 약해요. 좋은 일정 평점으로 생기를 채워주세요! 🩹`;
+        return `꽃필 준비 중인데 조금 시들해요. 평점(하루 만족도)을 높여 힘을 주세요! 🩹`;
       }
-      return `꽃봉오리가 맺혀 개화할 준비를 마쳤어요. 조만간 기분 좋은 수확을 할 수 있을 것 같네요! 🌸`;
+      return `개화할 준비를 순조롭게 마쳤어요. 곧 기분 좋은 결실을 맺을 것 같네요! 🌸`;
     }
 
     // 5단계: 수확 (Mature)
     if (health >= 80) {
       if (quality === '최상급') {
-        return `최고의 관리 덕분에 탐스러운 최상급 작물이 ${yieldCount}개나 가득 열렸습니다! 🏆🎉`;
+        return `대성공! 아주 탐스러운 최상급 열매가 ${yieldCount}개나 가득 열렸습니다! 🏆🎉`;
       }
-      return `작물 상태가 최상이에요! 풍성한 결실을 맺어 수확 준비를 완벽히 끝마쳤습니다. 🧺`;
+      return `작물 상태가 매우 건강해요! 풍성한 수확을 거둘 준비를 마쳤습니다. 🧺`;
     }
     if (health < 40) {
-      return `상태는 조금 지쳐 보이지만, 끝까지 자라난 대견한 열매들을 기쁘게 수확해 주세요! 🩹`;
+      return `조금 힘겨웠지만 대견하게 버텨준 열매들을 기쁘게 수확해 주세요! 🩹`;
     }
-    return `축하해요! ${cropName}가 무사히 잘 자라주었습니다. 보관함으로 기쁘게 수확할 시간이에요! 🎉`;
+    return `축하해요! 무사히 다 자랐으니 보관함으로 기쁘게 수확해 주세요! 🎉`;
   };
 
   return (
@@ -123,6 +123,7 @@ export const CalendarView = ({
 
       {/* 작물 대시보드 카드 */}
       <div className="mb-4 flex flex-col rounded-3xl border border-stone-200 bg-white p-4 shadow-sm shrink-0">
+        {/* 상단 row: 식물 이미지, 단계명, 보관함 버튼 */}
         <div className="flex items-center gap-4">
           <div className="relative flex-shrink-0 rounded-2xl bg-stone-50 border border-stone-100 p-1">
             <PixelCrop cropState={cropState} size={84} interactive={true} />
@@ -132,15 +133,10 @@ export const CalendarView = ({
           </div>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0 text-left">
-                <h2 className="font-hand text-xl text-stone-800 md:text-2xl truncate">
-                  {getStageName(cropState.evolutionStage, cropState.cropName)}
-                </h2>
-                <p className="mt-1.5 text-xs text-stone-500 leading-relaxed font-medium">
-                  {getStageComment(cropState)}
-                </p>
-              </div>
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="font-hand text-xl text-stone-800 md:text-2xl truncate">
+                {getStageName(cropState.evolutionStage, cropState.cropName)}
+              </h2>
               <button
                 onClick={() => setArchiveOpen(true)}
                 className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full shrink-0 hover:bg-amber-100 transition-colors shadow-sm"
@@ -149,6 +145,13 @@ export const CalendarView = ({
               </button>
             </div>
           </div>
+        </div>
+
+        {/* 하단 row: 실시간 상태 코멘트 (전체 가로폭 사용) */}
+        <div className="mt-3.5 pt-3 border-t border-stone-100/80 text-left">
+          <p className="text-[12px] text-stone-600 leading-relaxed font-medium">
+            {getStageComment(cropState)}
+          </p>
         </div>
       </div>
 
