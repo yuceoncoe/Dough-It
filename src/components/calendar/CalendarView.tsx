@@ -69,7 +69,7 @@ export const CalendarView = ({
           </div>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-baseline justify-between gap-2">
+            <div className="flex items-center justify-between gap-2">
               <h2 className="font-hand text-xl text-stone-800 md:text-2xl truncate">
                 {getStageName(cropState.evolutionStage, cropState.cropName)}
               </h2>
@@ -80,29 +80,16 @@ export const CalendarView = ({
                 보관함 🧺
               </button>
             </div>
-            
-            <div className="mt-2">
-              <div className="flex justify-between text-[11px] font-medium text-stone-500 mb-0.5">
-                <span>성장도 (Q1)</span>
-                <span>{cropState.growth} %</span>
-              </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-stone-100">
-                <div
-                  className="h-full rounded-full bg-amber-400 transition-all duration-500 ease-out"
-                  style={{ width: `${cropState.growth}%` }}
-                />
-              </div>
-            </div>
           </div>
         </div>
 
         {/* 4대 작물 능력치 게이지 */}
         <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 pt-3.5 border-t border-stone-100">
           {[
-            { label: '성장도 (Q1)', value: cropState.stats.growthQ1, max: 10, color: 'bg-rose-500' },
-            { label: '수확량 (Q2)', value: cropState.stats.yieldQ2, max: 10, color: 'bg-sky-500' },
-            { label: '퀄리티 (Q3)', value: cropState.stats.qualityQ3, max: 10, color: 'bg-yellow-400' },
-            { label: '건강도 (Q4)', value: cropState.stats.healthQ4, max: 10, color: 'bg-emerald-400' },
+            { label: '줄기 성장', value: cropState.stats.growthQ1, max: 10, color: 'bg-rose-500' },
+            { label: '수확량', value: cropState.stats.yieldQ2, max: 10, color: 'bg-sky-500' },
+            { label: '퀄리티', value: cropState.stats.qualityQ3, max: 10, color: 'bg-yellow-400' },
+            { label: '건강도', value: cropState.stats.healthQ4, max: 10, color: 'bg-emerald-400' },
           ].map((stat, i) => {
             const displayMax = Math.max(10, cropState.stats.growthQ1, cropState.stats.yieldQ2, cropState.stats.qualityQ3, cropState.stats.healthQ4);
             const percentage = (stat.value / displayMax) * 100;
@@ -140,11 +127,11 @@ export const CalendarView = ({
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1.5 text-center text-[10px] font-semibold uppercase tracking-[0.12em] text-stone-400 md:gap-2 md:text-xs">
+      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase tracking-[0.12em] text-stone-400 md:text-xs">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => <div key={day}>{day}</div>)}
       </div>
 
-      <div className="mt-2 grid min-h-0 flex-1 auto-rows-fr grid-cols-7 gap-1.5 overflow-hidden pb-safe md:gap-2">
+      <div className="mt-2 grid min-h-0 flex-1 auto-rows-fr grid-cols-7 gap-1 overflow-hidden pb-safe">
         {Array.from({ length: firstDay }, (_, index) => <div key={`empty-${index}`} />)}
         {Array.from({ length: totalDays }, (_, index) => {
           const day = index + 1;

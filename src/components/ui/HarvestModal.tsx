@@ -70,7 +70,7 @@ export const HarvestModal = ({
                 <Sparkles size={16} />
               </div>
               <div className="text-left">
-                <p className="text-xs font-medium text-stone-400">성장도 (Q1)</p>
+                <p className="text-xs font-medium text-stone-400">성장도</p>
                 <p className="text-sm font-semibold text-stone-700">최종 성장</p>
               </div>
             </div>
@@ -86,7 +86,7 @@ export const HarvestModal = ({
                 <ShoppingBag size={16} />
               </div>
               <div className="text-left">
-                <p className="text-xs font-medium text-stone-400">수확량 (Q2)</p>
+                <p className="text-xs font-medium text-stone-400">수확량</p>
                 <p className="text-sm font-semibold text-stone-700">작물 수집</p>
               </div>
             </div>
@@ -102,7 +102,7 @@ export const HarvestModal = ({
                 <Award size={16} />
               </div>
               <div className="text-left">
-                <p className="text-xs font-medium text-stone-400">퀄리티 (Q3)</p>
+                <p className="text-xs font-medium text-stone-400">퀄리티</p>
                 <p className="text-sm font-semibold text-stone-700">작물 등급</p>
               </div>
             </div>
@@ -120,7 +120,7 @@ export const HarvestModal = ({
                 <Heart size={16} />
               </div>
               <div className="text-left">
-                <p className="text-xs font-medium text-stone-400">건강도 (Q4)</p>
+                <p className="text-xs font-medium text-stone-400">건강도</p>
                 <p className="text-sm font-semibold text-stone-700">식물 컨디션</p>
               </div>
             </div>
