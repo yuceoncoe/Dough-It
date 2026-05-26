@@ -142,32 +142,32 @@ export const calculateCropState = (tasksByDate: Record<string, Task[]>, targetDa
   const averageRating = ratedTasksCountThisMonth > 0 ? totalRatingsThisMonth / ratedTasksCountThisMonth : null;
   const uncompletedTasksCount = totalTasksThisMonth - completedTasksThisMonth;
 
-  // Calculations
+  // Calculations (Hard Mode - More challenging growth and higher standards)
   // 1. Growth (0 to 100)
-  // Each Q1 completed gives 12% progress. Others give 2% progress.
-  const growth = Math.min(100, (growthQ1 * 12) + (yieldQ2 * 2) + (qualityQ3 * 2) + (healthQ4 * 2));
+  // Each Q1 completed gives 5% progress. Others give 1% progress.
+  const growth = Math.min(100, (growthQ1 * 5) + (yieldQ2 * 1) + (qualityQ3 * 1) + (healthQ4 * 1));
 
   // 2. Yield (1 to 10)
-  // Q2 completed + small Q1 contribution
-  const yieldCount = Math.max(1, Math.min(10, 1 + yieldQ2 * 1 + Math.floor(growthQ1 * 0.2)));
+  // Yield increases slower: Q2 gives 0.5 pieces, Q1 gives 0.1 pieces.
+  const yieldCount = Math.max(1, Math.min(10, 1 + Math.floor(yieldQ2 * 0.5) + Math.floor(growthQ1 * 0.1)));
 
   // 3. Quality (최상급, 상급, 보통, 하급)
-  // Q3 completed + average Rating
-  const qualityRaw = (qualityQ3 * 6) + (averageRating ? (averageRating - 2.5) * 12 : 0);
+  // Quality score increases slower: Q3 gives 3 points, average rating yields fewer bonus points.
+  const qualityRaw = (qualityQ3 * 3) + (averageRating ? (averageRating - 3.0) * 8 : 0);
   let quality: '최상급' | '상급' | '보통' | '하급' = '보통';
-  if (qualityRaw >= 35) {
+  if (qualityRaw >= 28) {
     quality = '최상급';
-  } else if (qualityRaw >= 18) {
+  } else if (qualityRaw >= 14) {
     quality = '상급';
-  } else if (qualityRaw >= 5) {
+  } else if (qualityRaw >= 3) {
     quality = '보통';
   } else {
     quality = '하급';
   }
 
   // 4. Health (0 to 100)
-  // Q4 completed + growthQ1 - uncompleted tasks penalty
-  const health = Math.max(0, Math.min(100, 60 + (healthQ4 * 8) - (uncompletedTasksCount * 3)));
+  // Starts lower (50%), increases slower (+5% per Q4), and uncompleted tasks penalize heavier (-4% per task).
+  const health = Math.max(0, Math.min(100, 50 + (healthQ4 * 5) - (uncompletedTasksCount * 4)));
 
   // Evolution stage
   const evolutionStage = getEvolutionStage(growth);
