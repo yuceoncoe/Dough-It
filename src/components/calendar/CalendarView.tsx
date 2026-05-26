@@ -133,7 +133,7 @@ export const CalendarView = ({
           </div>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col items-start gap-1.5">
               <h2 className="font-hand text-xl text-stone-800 md:text-2xl truncate">
                 {getStageName(cropState.evolutionStage, cropState.cropName)}
               </h2>

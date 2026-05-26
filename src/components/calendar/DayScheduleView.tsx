@@ -91,7 +91,7 @@ export const DayScheduleView = ({
   }, [isToday]);
 
   useEffect(() => {
-    if (report.completedCount === 0) {
+    if (date !== getTodayString() || report.completedCount === 0) {
       return;
     }
 
