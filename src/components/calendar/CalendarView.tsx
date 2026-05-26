@@ -41,67 +41,108 @@ export const CalendarView = ({
     return `${name} 수확기! 🎉 (5/5)`;
   };
 
+  const getQuadrantFeedback = (state: typeof cropState) => {
+    const { stats } = state;
+    const feedbackList: string[] = [];
+
+    // 1사분면 (Q1 - 줄기 성장)
+    if (stats.growthQ1 >= 7) {
+      feedbackList.push("줄기가 단단하게 자라고 있어요! 💪");
+    } else if (stats.growthQ1 <= 1) {
+      feedbackList.push("줄기가 가늘어요. 중요·긴급한 일에 힘써보세요. 🩹");
+    }
+
+    // 2사분면 (Q2 - 수확량)
+    if (stats.yieldQ2 >= 7) {
+      feedbackList.push("열매 맺을 준비가 아주 든든해요! 🧺");
+    } else if (stats.yieldQ2 <= 1) {
+      feedbackList.push("수확 예정량이 조금 부족한 편이에요. 💧");
+    }
+
+    // 3사분면 (Q3 - 퀄리티)
+    if (stats.qualityQ3 >= 7) {
+      feedbackList.push("햇빛 영양이 풍부해 윤기가 돌아요! ☀️");
+    } else if (stats.qualityQ3 <= 1) {
+      feedbackList.push("영양이 불균형해요. 신속한 일정 해결이 필요합니다. 🕶️");
+    }
+
+    // 4사분면 (Q4 - 건강도)
+    if (stats.healthQ4 >= 7) {
+      feedbackList.push("토양이 비옥해 뿌리가 매우 튼튼해요! 🌸");
+    } else if (stats.healthQ4 <= 1) {
+      feedbackList.push("토양이 조금 척박해요. 일상 루틴을 정돈해봐요. 🩹");
+    }
+
+    if (feedbackList.length > 0) {
+      return " " + feedbackList.slice(0, 2).join(" ");
+    }
+    return "";
+  };
+
   const getStageComment = (state: typeof cropState) => {
     const { evolutionStage, health, yieldCount, quality, cropName } = state;
+    let baseComment = "";
 
     // 1단계: 씨앗
     if (evolutionStage === 1) {
       if (health >= 80) {
-        return `흙의 상태가 비옥하고 아주 좋아요. 싹 틔울 준비가 완벽히 되었습니다! 🌱`;
+        baseComment = `흙의 상태가 비옥하고 아주 좋아요. 싹 틔울 준비가 완벽히 되었습니다! 🌱`;
+      } else if (health < 40) {
+        baseComment = `흙이 많이 건조하고 목말라해요. 물(일정 완료)을 듬뿍 주세요! 💧`;
+      } else {
+        baseComment = `아직은 소중한 씨앗 상태예요. 일정을 실천해 새싹을 틔워보세요! 🌱`;
       }
-      if (health < 40) {
-        return `흙이 많이 건조하고 목말라해요. 물(일정 완료)을 듬뿍 주세요! 💧`;
-      }
-      return `아직은 소중한 씨앗 상태예요. 일정을 실천해 새싹을 틔워보세요! 🌱`;
     }
-
     // 2단계: 새싹
-    if (evolutionStage === 2) {
+    else if (evolutionStage === 2) {
       if (health >= 80) {
-        return `새싹이 파릇파릇하고 건강해요! 기특하게 잘 자라는 중입니다. 🌿`;
+        baseComment = `새싹이 파릇파릇하고 건강해요! 기특하게 잘 자라는 중입니다. 🌿`;
+      } else if (health < 40) {
+        baseComment = `새싹이 지쳐 보여요. 시들지 않게 물주기(일정 완료)로 가꿔주세요. 🩹`;
+      } else {
+        baseComment = `${cropName}의 새싹이 얼굴을 내밀었어요. 성실하게 돌봐주세요! 🌿`;
       }
-      if (health < 40) {
-        return `새싹이 지쳐 보여요. 시들지 않게 물주기(일정 완료)로 가꿔주세요. 🩹`;
-      }
-      return `${cropName}의 새싹이 얼굴을 내밀었어요. 성실하게 돌봐주세요! 🌿`;
     }
-
     // 3단계: 성장
-    if (evolutionStage === 3) {
+    else if (evolutionStage === 3) {
       if (health >= 80) {
-        return `줄기와 잎에 윤기가 자르르 흘러요. 아주 튼튼하게 자랄 것 같은 기분 좋은 예감! 🌳✨`;
+        baseComment = `줄기와 잎에 윤기가 자르르 흘러요. 아주 튼튼하게 자랄 것 같은 기분 좋은 예감! 🌳✨`;
+      } else if (health < 40) {
+        baseComment = `성장이 살짝 지체되어 보여요. 중요 일정(줄기 성장)으로 생기를 더해주세요! 💪`;
+      } else {
+        baseComment = `줄기가 곧게 뻗어 오르고 있어요. 오늘도 성실하게 내실을 다져봐요! 🌳`;
       }
-      if (health < 40) {
-        return `성장이 살짝 지체되어 보여요. 중요 일정(줄기 성장)으로 생기를 더해주세요! 💪`;
-      }
-      return `줄기가 곧게 뻗어 오르고 있어요. 오늘도 성실하게 내실을 다져봐요! 🌳`;
     }
-
     // 4단계: 개화
-    if (evolutionStage === 4) {
+    else if (evolutionStage === 4) {
       if (health >= 80) {
         if (yieldCount >= 7) {
-          return `튼실한 꽃망울이 맺혔어요. 수확이 아주 잘 될 것 같은 예감입니다! 🌸✨`;
+          baseComment = `튼실한 꽃망울이 맺혔어요. 수확이 아주 잘 될 것 같은 예감입니다! 🌸✨`;
+        } else {
+          baseComment = `꽃이 곧 필 것 같아요. 식물의 상태가 매우 싱싱하고 튼튼합니다! 😊`;
         }
-        return `꽃이 곧 필 것 같아요. 식물의 상태가 매우 싱싱하고 튼튼합니다! 😊`;
+      } else if (health < 40) {
+        baseComment = `꽃필 준비 중인데 조금 시들해요. 평점(하루 만족도)을 높여 힘을 주세요! 🩹`;
+      } else {
+        baseComment = `개화할 준비를 순조롭게 마쳤어요. 곧 기분 좋은 결실을 맺을 것 같네요! 🌸`;
       }
-      if (health < 40) {
-        return `꽃필 준비 중인데 조금 시들해요. 평점(하루 만족도)을 높여 힘을 주세요! 🩹`;
+    }
+    // 5단계: 수확 (Mature)
+    else {
+      if (health >= 80) {
+        if (quality === '최상급') {
+          baseComment = `대성공! 아주 탐스러운 최상급 열매가 ${yieldCount}개나 가득 열렸습니다! 🏆🎉`;
+        } else {
+          baseComment = `작물 상태가 매우 건강해요! 풍성한 수확을 거둘 준비를 마쳤습니다. 🧺`;
+        }
+      } else if (health < 40) {
+        baseComment = `조금 힘겨웠지만 대견하게 버텨준 열매들을 기쁘게 수확해 주세요! 🩹`;
+      } else {
+        baseComment = `축하해요! 무사히 다 자랐으니 보관함으로 기쁘게 수확해 주세요! 🎉`;
       }
-      return `개화할 준비를 순조롭게 마쳤어요. 곧 기분 좋은 결실을 맺을 것 같네요! 🌸`;
     }
 
-    // 5단계: 수확 (Mature)
-    if (health >= 80) {
-      if (quality === '최상급') {
-        return `대성공! 아주 탐스러운 최상급 열매가 ${yieldCount}개나 가득 열렸습니다! 🏆🎉`;
-      }
-      return `작물 상태가 매우 건강해요! 풍성한 수확을 거둘 준비를 마쳤습니다. 🧺`;
-    }
-    if (health < 40) {
-      return `조금 힘겨웠지만 대견하게 버텨준 열매들을 기쁘게 수확해 주세요! 🩹`;
-    }
-    return `축하해요! 무사히 다 자랐으니 보관함으로 기쁘게 수확해 주세요! 🎉`;
+    return baseComment + getQuadrantFeedback(state);
   };
 
   return (
