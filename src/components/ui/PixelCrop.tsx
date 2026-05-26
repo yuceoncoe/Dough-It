@@ -22,27 +22,36 @@ export const PixelCrop = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Crisp pixel rendering settings
     ctx.imageSmoothingEnabled = false;
 
     let localFrame = 0;
+    // Particles for quality (stars) & health (vital sparkles)
+    let cropParticles: Array<{
+      x: number;
+      y: number;
+      alpha: number;
+      size: number;
+      color: string;
+      vx: number;
+      vy: number;
+    }> = [];
 
     const draw = () => {
       localFrame++;
       ctx.clearRect(0, 0, 60, 60);
 
-      const { evolutionStage, month, health } = cropState;
+      const { evolutionStage, month, health, yieldCount, quality } = cropState;
 
-      // Base coordinates (60x60 grid) - anchored lower to give more room for tall plants
+      // Base Y coordinates
       const baseCenterX = 30;
       const baseCenterY = 53;
 
-      // Wind sway effect: slightly larger sway for taller plants
+      // Wind sway effect
       const swayOffset = Math.sin(localFrame * 0.04) * 2.0 * (health / 100);
 
-      // Dim color if crop is low health
+      // Low health gray/dim filter
       if (health < 40) {
-        ctx.filter = 'saturate(0.55) brightness(0.85)';
+        ctx.filter = 'saturate(0.5) brightness(0.8)';
       } else {
         ctx.filter = 'none';
       }
@@ -64,347 +73,310 @@ export const PixelCrop = ({
       ctx.ellipse(baseCenterX, baseCenterY + 3, 22, 4, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // 2. Draw Soil Mound (Thicker and wider)
+      // 2. Draw Soil Mound
       const soilDark = '#433022';
       const soilLight = '#5c4033';
-      drawPixelRect(baseCenterX - 18, baseCenterY - 2, 36, 5, soilDark);
-      drawPixelRect(baseCenterX - 14, baseCenterY - 4, 28, 2, soilLight);
-      drawPixelRect(baseCenterX - 8, baseCenterY - 5, 16, 1, soilLight);
-      drawPixel(baseCenterX - 11, baseCenterY - 5, soilLight);
-      drawPixel(baseCenterX + 10, baseCenterY - 5, soilLight);
+      const soilWithered = '#6d5c50'; // Dull soil for low health
 
-      // Colors
-      const stemColor = '#4caf50';
-      const stemOutline = '#1b5e20';
-      const leafColor = '#81c784';
+      const currentSoilLight = health < 30 ? soilWithered : soilLight;
+
+      drawPixelRect(baseCenterX - 18, baseCenterY - 2, 36, 5, soilDark);
+      drawPixelRect(baseCenterX - 14, baseCenterY - 4, 28, 2, currentSoilLight);
+      drawPixelRect(baseCenterX - 8, baseCenterY - 5, 16, 1, currentSoilLight);
+      drawPixel(baseCenterX - 11, baseCenterY - 5, currentSoilLight);
+      drawPixel(baseCenterX + 10, baseCenterY - 5, currentSoilLight);
+
+      // Color scheme for plant
+      const stemColor = health < 45 ? '#689f38' : '#4caf50'; // Dull green vs vibrant green
+      const stemOutline = health < 45 ? '#33691e' : '#1b5e20';
+      const leafColor = health < 45 ? '#9ccc65' : '#81c784';
 
       // 3. Draw Crop by Stage
       if (evolutionStage === 1) {
-        // --- SEED STAGE (Much larger) ---
-        const seedColor = '#a87c53';
+        // --- SEED STAGE ---
+        const seedColor = health < 40 ? '#8d6e63' : '#a87c53';
         const seedOutline = '#2b1c11';
-        // Draw 6x6 seed in the middle of soil
         drawPixelRect(baseCenterX - 3, baseCenterY - 9, 6, 6, seedOutline);
         drawPixelRect(baseCenterX - 2, baseCenterY - 8, 4, 4, seedColor);
-        drawPixelRect(baseCenterX - 1, baseCenterY - 9, 2, 1, '#d7ccc8'); // Highlight on seed
+        drawPixelRect(baseCenterX - 1, baseCenterY - 9, 2, 1, '#d7ccc8'); // shine
       } else if (evolutionStage === 2) {
-        // --- SPROUT STAGE (Thicker shoot, bigger leaves) ---
+        // --- SPROUT STAGE ---
         const swayX = Math.round(swayOffset * 0.4);
-
-        // Thicker stem (3px wide)
+        
+        // Stem
         drawPixelRect(baseCenterX - 2 + swayX, baseCenterY - 11, 4, 8, stemOutline);
         drawPixelRect(baseCenterX - 1 + swayX, baseCenterY - 11, 2, 8, stemColor);
 
-        // Big Left Leaf
-        drawPixelRect(baseCenterX - 7 + swayX, baseCenterY - 14, 5, 3, stemOutline);
-        drawPixelRect(baseCenterX - 6 + swayX, baseCenterY - 13, 4, 2, leafColor);
+        // Leaves - Drooping if health is low
+        const leafYOffset = health < 40 ? 2 : 0;
 
-        // Big Right Leaf
-        drawPixelRect(baseCenterX + 2 + swayX, baseCenterY - 15, 6, 3, stemOutline);
-        drawPixelRect(baseCenterX + 2 + swayX, baseCenterY - 14, 5, 2, leafColor);
+        // Left Leaf
+        drawPixelRect(baseCenterX - 7 + swayX, baseCenterY - 14 + leafYOffset, 5, 3, stemOutline);
+        drawPixelRect(baseCenterX - 6 + swayX, baseCenterY - 13 + leafYOffset, 4, 2, leafColor);
+
+        // Right Leaf
+        drawPixelRect(baseCenterX + 2 + swayX, baseCenterY - 15 + leafYOffset, 6, 3, stemOutline);
+        drawPixelRect(baseCenterX + 2 + swayX, baseCenterY - 14 + leafYOffset, 5, 2, leafColor);
       } else if (evolutionStage === 3) {
-        // --- GROWING STAGE (Taller, branching leaves) ---
+        // --- GROWING STAGE ---
         const swayX = Math.round(swayOffset * 0.7);
+        const leafYOffset = health < 40 ? 3 : 0;
 
-        // Main Stem (Y from 30 to 50, height 20px)
+        // Main Stem
         drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.5), baseCenterY - 21, 4, 18, stemOutline);
-        drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.5), baseCenterY - 21, 2, 18, stemColor);
+        drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.5), baseCenterY - 20, 2, 17, stemColor);
 
         // Lower Left leaf
-        drawPixelRect(baseCenterX - 8 + Math.round(swayX * 0.2), baseCenterY - 12, 6, 3, stemOutline);
-        drawPixelRect(baseCenterX - 7 + Math.round(swayX * 0.2), baseCenterY - 11, 5, 2, leafColor);
+        drawPixelRect(baseCenterX - 8 + Math.round(swayX * 0.2), baseCenterY - 12 + leafYOffset, 6, 3, stemOutline);
+        drawPixelRect(baseCenterX - 7 + Math.round(swayX * 0.2), baseCenterY - 11 + leafYOffset, 5, 2, leafColor);
 
         // Mid Right leaf
-        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.6), baseCenterY - 17, 7, 3, stemOutline);
-        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.6), baseCenterY - 16, 6, 2, leafColor);
+        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.6), baseCenterY - 17 + leafYOffset, 7, 3, stemOutline);
+        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.6), baseCenterY - 16 + leafYOffset, 6, 2, leafColor);
 
         // Upper Left leaf
-        drawPixelRect(baseCenterX - 7 + swayX, baseCenterY - 22, 5, 3, stemOutline);
-        drawPixelRect(baseCenterX - 6 + swayX, baseCenterY - 21, 4, 2, leafColor);
+        drawPixelRect(baseCenterX - 7 + swayX, baseCenterY - 22 + leafYOffset, 5, 3, stemOutline);
+        drawPixelRect(baseCenterX - 6 + swayX, baseCenterY - 21 + leafYOffset, 4, 2, leafColor);
       } else if (evolutionStage === 4) {
-        // --- BLOOMING STAGE (Tall stem with a large budding flower) ---
+        // --- BLOOMING STAGE ---
         const swayX = Math.round(swayOffset);
+        const leafYOffset = health < 40 ? 3 : 0;
 
-        // Main Stem (Y from 20 to 50, height 30px)
+        // Stem
         drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.5), baseCenterY - 31, 4, 28, stemOutline);
         drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.5), baseCenterY - 30, 2, 27, stemColor);
 
-        // Big Leaves
-        drawPixelRect(baseCenterX - 9 + Math.round(swayX * 0.3), baseCenterY - 15, 7, 3, stemOutline);
-        drawPixelRect(baseCenterX - 8 + Math.round(swayX * 0.3), baseCenterY - 14, 6, 2, leafColor);
+        // Leaves
+        drawPixelRect(baseCenterX - 9 + Math.round(swayX * 0.3), baseCenterY - 15 + leafYOffset, 7, 3, stemOutline);
+        drawPixelRect(baseCenterX - 8 + Math.round(swayX * 0.3), baseCenterY - 14 + leafYOffset, 6, 2, leafColor);
 
-        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 22, 8, 3, stemOutline);
-        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 21, 7, 2, leafColor);
+        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 22 + leafYOffset, 8, 3, stemOutline);
+        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 21 + leafYOffset, 7, 2, leafColor);
 
-        // Bud / Flower on top
+        // Bud Color
         let budColor = '#f48fb1';
         let budCore = '#fff59d';
         if (month === 5 || month === 12) {
-          budColor = '#ef5350'; // Red
+          budColor = '#ef5350';
         } else if (month === 8 || month === 9) {
-          budColor = '#fdd835'; // Yellow
+          budColor = '#fdd835';
         } else if (month === 2 || month === 10) {
-          budColor = '#ffb74d'; // Orange
+          budColor = '#ffb74d';
         }
 
-        // Flower Bud head (Y: 14 to 22, 8x8 pixels)
+        // Low health bud color (withering)
+        if (health < 40) {
+          budColor = '#bcaaa4'; // brownish bud
+          budCore = '#d7ccc8';
+        }
+
         const headY = baseCenterY - 39;
         drawPixelRect(baseCenterX - 5 + swayX, headY, 10, 9, stemOutline);
         drawPixelRect(baseCenterX - 4 + swayX, headY + 1, 8, 7, budColor);
         drawPixelRect(baseCenterX - 2 + swayX, headY + 3, 4, 3, budCore);
       } else {
         // --- MATURE / HARVEST STAGE (Stage 5) ---
-        // Double-sized, detailed monthly crops
+        // Dynamically renders count & layout of fruits based on YIELDCOUNT (Q2)
+        // yieldCount: 1~3 (Low - 1 fruit), 4~7 (Med - 2 fruits), 8~10 (High - 3 fruits)
         const swayX = Math.round(swayOffset * 1.2);
-        const stemTopY = baseCenterY - 34; // Y: 19
+        const stemTopY = baseCenterY - 34;
 
-        // Tall Sturdy Stem
+        // Stem
         drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.5), baseCenterY - 34, 4, 31, stemOutline);
         drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.5), baseCenterY - 33, 2, 30, stemColor);
 
-        // Leaves
-        drawPixelRect(baseCenterX - 9 + Math.round(swayX * 0.4), baseCenterY - 16, 7, 3, stemOutline);
-        drawPixelRect(baseCenterX - 8 + Math.round(swayX * 0.4), baseCenterY - 15, 6, 2, leafColor);
+        // Leaves (droop if low health)
+        const leafYOffset = health < 40 ? 3 : 0;
+        drawPixelRect(baseCenterX - 9 + Math.round(swayX * 0.4), baseCenterY - 16 + leafYOffset, 7, 3, stemOutline);
+        drawPixelRect(baseCenterX - 8 + Math.round(swayX * 0.4), baseCenterY - 15 + leafYOffset, 6, 2, leafColor);
 
-        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 24, 8, 3, stemOutline);
-        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 23, 7, 2, leafColor);
+        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 24 + leafYOffset, 8, 3, stemOutline);
+        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 23 + leafYOffset, 7, 2, leafColor);
 
-        switch (month) {
-          case 1: {
-            // 🍓 STRAWBERRY (Large hanging strawberry fruit)
-            const red = '#d32f2f';
-            const redLight = '#f44336';
-            const seed = '#ffeb3b';
-            const greenCalyx = '#388e3c';
+        const isLowYield = yieldCount <= 3;
+        const isMedYield = yieldCount > 3 && yieldCount <= 7;
+        const isHighYield = yieldCount > 7;
 
-            const fruitX = baseCenterX - 6 + swayX;
-            const fruitY = stemTopY - 2;
+        // Colors
+        let fruitColor = '#d32f2f'; // default red
+        let fruitLight = '#f44336';
+        let fruitAccent = '#ffeb3b';
 
-            // Green Calyx cap
-            drawPixelRect(fruitX, fruitY, 12, 3, greenCalyx);
-            // Strawberry body (14x13)
-            drawPixelRect(fruitX - 1, fruitY + 3, 14, 7, '#2b0c0c'); // Outline
-            drawPixelRect(fruitX, fruitY + 3, 12, 7, red);
-            drawPixelRect(fruitX + 2, fruitY + 10, 8, 3, red);
-            drawPixelRect(fruitX + 4, fruitY + 13, 4, 2, red);
-            // Light red highlight
-            drawPixelRect(fruitX + 1, fruitY + 4, 3, 2, redLight);
-            // Yellow seeds
-            drawPixel(fruitX + 2, fruitY + 7, seed);
-            drawPixel(fruitX + 6, fruitY + 5, seed);
-            drawPixel(fruitX + 9, fruitY + 7, seed);
-            drawPixel(fruitX + 4, fruitY + 9, seed);
-            drawPixel(fruitX + 7, fruitY + 11, seed);
-            break;
-          }
-          case 2: {
-            // 🍊 TANGERINE (Large orange fruit with leaf)
-            const orange = '#ef6c00';
-            const orangeLight = '#ffb74d';
-            const leaf = '#2e7d32';
+        // Quality (Q3) modifier: '최상급' has golden highlight, '하급' is unripe/unhealthy
+        if (quality === '최상급') {
+          fruitAccent = '#ffd700'; // Golden highlight
+        } else if (quality === '하급') {
+          fruitColor = '#8d6e63'; // Brownish/unripe/rotten
+          fruitLight = '#bcaaa4';
+          fruitAccent = '#795548';
+        }
 
-            const fruitX = baseCenterX + swayX;
-            const fruitY = stemTopY + 2;
-
-            // Little stem leaf
-            drawPixelRect(fruitX - 1, fruitY - 4, 3, 2, leaf);
-            drawPixelRect(fruitX - 3, fruitY - 3, 3, 1, leaf);
-            // Round Fruit (14x13)
-            drawPixelRect(fruitX - 7, fruitY - 1, 14, 13, '#3e2723'); // Outline
-            drawPixelRect(fruitX - 6, fruitY, 12, 11, orange);
-            // Highlights & shadows
-            drawPixelRect(fruitX - 4, fruitY + 2, 4, 3, orangeLight);
-            drawPixelRect(fruitX + 2, fruitY + 8, 3, 2, '#d84315');
-            break;
-          }
-          case 3: {
-            // 🌱 SPROUT VEGETABLES (Large bushy cluster of baby greens)
-            const greenDeep = '#2e7d32';
-            const greenMid = '#4caf50';
-            const greenLight = '#a5d6a7';
-
-            const fx = baseCenterX + swayX;
-            const fy = stemTopY + 2;
-
-            drawPixelRect(fx - 10, fy - 6, 20, 14, greenDeep);
-            drawPixelRect(fx - 8, fy - 5, 16, 12, greenMid);
-            drawPixelRect(fx - 5, fy - 3, 10, 8, greenLight);
-            break;
-          }
-          case 4: {
-            // 🌸 CHERRY BLOSSOM TREE (Pink cherry blossoms canopy)
-            const pinkDark = '#c2185b';
-            const pinkMid = '#e91e63';
-            const pinkLight = '#f8bbd0';
-
-            const fx = baseCenterX + swayX;
-            const fy = stemTopY - 4;
-
-            // Blossom cloud
-            drawPixelRect(fx - 13, fy - 8, 26, 17, pinkDark);
-            drawPixelRect(fx - 11, fy - 7, 22, 15, pinkMid);
-            drawPixelRect(fx - 8, fy - 5, 16, 11, pinkLight);
-            // White highlight dots
-            drawPixel(fx - 4, fy - 2, '#fff');
-            drawPixel(fx + 3, fy - 4, '#fff');
-            break;
-          }
-          case 5: {
-            // 🌹 ROSE (Huge red rose flower head)
-            const darkRed = '#880e4f';
-            const midRed = '#d32f2f';
-            const brightRed = '#ff5252';
-
-            const fx = baseCenterX + swayX;
-            const fy = stemTopY - 3;
-
-            // Outer rose shape
-            drawPixelRect(fx - 9, fy - 6, 18, 14, darkRed);
-            drawPixelRect(fx - 8, fy - 5, 16, 12, midRed);
-            // Petal patterns inside
-            drawPixelRect(fx - 4, fy - 2, 8, 6, brightRed);
-            drawPixelRect(fx - 2, fy - 1, 4, 3, '#ff8a80');
-            drawPixel(fx, fy, darkRed);
-            break;
-          }
-          case 6: {
-            // 🟢 PLUM (Dual green plums hanging)
-            const greenDark = '#1b5e20';
-            const greenMid = '#4caf50';
-            const yellowGreen = '#c0ca33';
-
-            const fx = baseCenterX + swayX;
-            const fy = stemTopY;
-
-            // Left Plum
-            drawPixelRect(fx - 9, fy - 1, 8, 8, greenDark);
-            drawPixelRect(fx - 8, fy, 6, 6, greenMid);
-            drawPixelRect(fx - 7, fy + 1, 3, 3, yellowGreen);
-
-            // Right Plum
-            drawPixelRect(fx + 1, fy + 3, 8, 8, greenDark);
-            drawPixelRect(fx + 2, fy + 4, 6, 6, greenMid);
-            drawPixelRect(fx + 3, fy + 5, 3, 3, yellowGreen);
-            break;
-          }
-          case 7: {
-            // 🍉 WATERMELON (Huge striped watermelon lying on the soil)
-            const greenDark = '#1b5e20';
-            const greenMid = '#388e3c';
-            const greenLight = '#a5d6a7';
-
-            const melonX = baseCenterX + swayX;
-            const melonY = baseCenterY - 8;
-
-            // Giant watermelon lying on the ground (22x13 pixels)
-            drawPixelRect(melonX - 11, melonY, 22, 13, greenDark);
-            drawPixelRect(melonX - 10, melonY + 1, 20, 11, greenMid);
-
-            // Light green vertical stripes
-            for (let offset = -8; offset <= 8; offset += 4) {
-              drawPixelRect(melonX + offset, melonY + 1, 2, 11, greenLight);
+        const drawFruitItem = (fx: number, fy: number, scale = 1.0) => {
+          // Inner drawing per crop type (scaled slightly if needed)
+          switch (month) {
+            case 1: {
+              // Strawberry 🍓
+              const w = Math.round(12 * scale);
+              const h = Math.round(11 * scale);
+              drawPixelRect(fx - w / 2, fy, w, 2, '#388e3c'); // Calyx
+              drawPixelRect(fx - w / 2 - 1, fy + 2, w + 2, h, '#2b0c0c'); // Outline
+              drawPixelRect(fx - w / 2, fy + 2, w, h, fruitColor);
+              drawPixelRect(fx - w / 2 + 2, fy + 3, Math.round(3 * scale), 2, fruitLight); // shine
+              drawPixel(fx - 2, fy + 5, fruitAccent); // seeds
+              drawPixel(fx + 2, fy + 5, fruitAccent);
+              drawPixel(fx, fy + 8, fruitAccent);
+              break;
             }
-            break;
+            case 2: {
+              // Tangerine 🍊
+              const r = Math.round(6 * scale);
+              drawPixelRect(fx - r, fy - r, r * 2, r * 2, '#3e2723'); // outline
+              drawPixelRect(fx - r + 1, fy - r + 1, r * 2 - 2, r * 2 - 2, '#ef6c00');
+              drawPixelRect(fx - 2, fy - 3, 2, 2, '#fff176'); // shine
+              break;
+            }
+            case 3: {
+              // Sprout Cluster 🌱
+              drawPixelRect(fx - 7, fy - 4, 14, 9, '#2e7d32');
+              drawPixelRect(fx - 6, fy - 3, 12, 7, '#4caf50');
+              drawPixelRect(fx - 3, fy - 2, 6, 5, '#a5d6a7');
+              break;
+            }
+            case 4: {
+              // Cherry Blossom 🌸
+              drawPixelRect(fx - 8, fy - 5, 16, 10, '#c2185b');
+              drawPixelRect(fx - 7, fy - 4, 14, 8, '#e91e63');
+              drawPixelRect(fx - 4, fy - 3, 8, 6, '#f8bbd0');
+              break;
+            }
+            case 5: {
+              // Rose 🌹
+              drawPixelRect(fx - 7, fy - 5, 14, 10, '#880e4f');
+              drawPixelRect(fx - 6, fy - 4, 12, 8, '#d32f2f');
+              drawPixelRect(fx - 3, fy - 2, 6, 4, '#ff8a80');
+              break;
+            }
+            case 6: {
+              // Plum 🟢
+              const r = Math.round(4 * scale);
+              drawPixelRect(fx - r, fy - r, r * 2, r * 2, '#1b5e20');
+              drawPixelRect(fx - r + 1, fy - r + 1, r * 2 - 2, r * 2 - 2, '#4caf50');
+              break;
+            }
+            case 7: {
+              // Watermelon 🍉
+              drawPixelRect(fx - 9, fy, 18, 10, '#1b5e20');
+              drawPixelRect(fx - 8, fy + 1, 16, 8, '#388e3c');
+              drawPixelRect(fx - 6, fy + 1, 2, 8, '#a5d6a7'); // stripes
+              drawPixelRect(fx + 2, fy + 1, 2, 8, '#a5d6a7');
+              break;
+            }
+            case 8: {
+              // Corn 🌽
+              drawPixelRect(fx - 3, fy, 6, 12, '#f57f17');
+              drawPixelRect(fx - 2, fy, 4, 12, '#fbc02d');
+              drawPixelRect(fx - 1, fy + 2, 2, 8, '#fff176');
+              break;
+            }
+            case 9: {
+              // Sunflower 🌻
+              drawPixelRect(fx - 8, fy - 8, 16, 16, '#f57f17');
+              drawPixelRect(fx - 7, fy - 7, 14, 14, '#ffeb3b');
+              drawPixelRect(fx - 3, fy - 3, 6, 6, '#3e2723'); // core
+              break;
+            }
+            case 10: {
+              // Persimmon 🍅
+              drawPixelRect(fx - 5, fy - 4, 10, 8, '#3e2723');
+              drawPixelRect(fx - 4, fy - 3, 8, 6, '#e65100');
+              drawPixel(fx - 1, fy - 4, '#263238'); // stem
+              break;
+            }
+            case 11: {
+              // Sweet Potato 🍠
+              drawPixelRect(fx - 7, fy, 14, 6, '#4a148c');
+              drawPixelRect(fx - 6, fy + 1, 12, 4, '#7b1fa2');
+              break;
+            }
+            case 12: {
+              // Camellia 🌺
+              drawPixelRect(fx - 6, fy - 4, 12, 8, '#880e4f');
+              drawPixelRect(fx - 5, fy - 3, 10, 6, '#c2185b');
+              drawPixel(fx, fy - 1, '#ffca28'); // gold core
+              break;
+            }
           }
-          case 8: {
-            // 🌽 CORN (Huge yellow ear with husks)
-            const husk = '#2e7d32';
-            const huskLight = '#558b2f';
-            const yellow = '#fbc02d';
-            const yellowLight = '#fff176';
+        };
 
-            const fx = baseCenterX + swayX;
-            const fy = stemTopY - 4;
-
-            // Green husks on sides
-            drawPixelRect(fx - 6, fy, 12, 16, husk);
-            drawPixelRect(fx - 5, fy + 2, 10, 14, huskLight);
-            // Yellow ear
-            drawPixelRect(fx - 3, fy - 2, 6, 15, '#f57f17'); // outline
-            drawPixelRect(fx - 2, fy - 2, 4, 15, yellow);
-            // Kernel highlights
-            drawPixelRect(fx - 1, fy - 1, 2, 12, yellowLight);
-            // Silk
-            drawPixelRect(fx - 1, fy - 5, 2, 3, '#d1c4e9');
-            break;
-          }
-          case 9: {
-            // 🌻 SUNFLOWER (Huge yellow petals with brown face)
-            const gold = '#f57f17';
-            const yellow = '#ffeb3b';
-            const brown = '#3e2723';
-            const orange = '#ffb300';
-
-            const fx = baseCenterX + swayX;
-            const fy = stemTopY - 7;
-
-            // Petals (22x21)
-            drawPixelRect(fx - 11, fy, 22, 21, gold);
-            drawPixelRect(fx - 10, fy + 1, 20, 19, yellow);
-            // Center brown disk
-            drawPixelRect(fx - 5, fy + 5, 10, 10, '#5d4037');
-            drawPixelRect(fx - 4, fy + 6, 8, 8, brown);
-            drawPixelRect(fx - 2, fy + 8, 4, 4, orange);
-            break;
-          }
-          case 10: {
-            // 🍅 PERSIMMON (Large bright orange persimmon)
-            const orange = '#e65100';
-            const orangeLight = '#ff9100';
-            const blackCalyx = '#263238';
-
-            const fx = baseCenterX + swayX;
-            const fy = stemTopY + 2;
-
-            // Fruit
-            drawPixelRect(fx - 7, fy - 1, 14, 12, '#3e2723'); // outline
-            drawPixelRect(fx - 6, fy, 12, 10, orange);
-            drawPixelRect(fx - 4, fy + 1, 8, 5, orangeLight);
-            // Calyx
-            drawPixelRect(fx - 3, fy - 3, 6, 2, blackCalyx);
-            break;
-          }
-          case 11: {
-            // 🍠 SWEET POTATO (Huge purple tubers embedded in soil)
-            const purple = '#4a148c';
-            const purpleLight = '#7b1fa2';
-            const purpleSoft = '#ba68c8';
-
-            const fx = baseCenterX + swayX;
-            const fy = baseCenterY - 4;
-
-            // Purple tubers showing partly above/in soil
-            drawPixelRect(fx - 11, fy, 22, 9, purple);
-            drawPixelRect(fx - 10, fy + 1, 20, 7, purpleLight);
-            drawPixelRect(fx - 6, fy + 3, 12, 3, purpleSoft);
-            break;
-          }
-          case 12: {
-            // 🌺 WINTER CAMELLIA (Snowy soil and huge blooming red winter flowers)
-            const snow = '#eceff1';
-            const red = '#880e4f';
-            const pink = '#c2185b';
-            const gold = '#ffca28';
-
-            const fx = baseCenterX + swayX;
-            const fy = stemTopY - 2;
-
-            // Thick snow on soil
-            drawPixelRect(baseCenterX - 16, baseCenterY - 5, 32, 2, '#ffffff');
-            drawPixelRect(baseCenterX - 12, baseCenterY - 6, 24, 1, snow);
-
-            // Large Camellia flower
-            drawPixelRect(fx - 7, fy - 4, 14, 11, red);
-            drawPixelRect(fx - 6, fy - 3, 12, 9, pink);
-            drawPixelRect(fx - 2, fy - 1, 4, 3, gold); // golden core
-            break;
-          }
-          default:
-            // Generic giant star leaf
-            drawPixelRect(baseCenterX - 8 + swayX, stemTopY - 4, 16, 16, '#2e7d32');
-            drawPixelRect(baseCenterX - 6 + swayX, stemTopY - 2, 12, 12, '#4caf50');
+        // Render quantity based on Yield Bucket
+        if (isLowYield) {
+          // 1 central large fruit
+          drawFruitItem(baseCenterX + swayX, stemTopY, 1.15);
+        } else if (isMedYield) {
+          // 2 medium fruits (left & right)
+          drawFruitItem(baseCenterX - 7 + Math.round(swayX * 0.7), stemTopY - 2, 0.9);
+          drawFruitItem(baseCenterX + 7 + Math.round(swayX * 1.1), stemTopY + 2, 0.9);
+        } else {
+          // 3 fruits (left, right, and top center)
+          drawFruitItem(baseCenterX - 8 + Math.round(swayX * 0.6), stemTopY - 3, 0.85);
+          drawFruitItem(baseCenterX + 8 + Math.round(swayX * 1.2), stemTopY + 3, 0.85);
+          drawFruitItem(baseCenterX + swayX, stemTopY - 7, 1.0);
         }
       }
+
+      // --- 4. Sparkles and particles engine (Quality & Health indicators) ---
+      // A. Generate particles
+      if (quality === '최상급' && Math.random() < 0.12) {
+        // Gold Star for Legendary Quality
+        cropParticles.push({
+          x: baseCenterX + swayOffset + (Math.random() * 26 - 13),
+          y: baseCenterY - 12 - (Math.random() * 24),
+          alpha: 1.0,
+          size: Math.random() * 2 + 1,
+          color: '#ffca28', // Golden Yellow
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: -Math.random() * 0.4 - 0.2,
+        });
+      } else if (quality === '상급' && Math.random() < 0.08) {
+        // Silver Sparkle for Rare Quality
+        cropParticles.push({
+          x: baseCenterX + swayOffset + (Math.random() * 22 - 11),
+          y: baseCenterY - 12 - (Math.random() * 22),
+          alpha: 1.0,
+          size: Math.random() * 1.5 + 0.8,
+          color: '#fff', // White shiny
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: -Math.random() * 0.3 - 0.1,
+        });
+      }
+
+      // Vital green sparks for High Health (>= 80)
+      if (health >= 80 && Math.random() < 0.1) {
+        cropParticles.push({
+          x: baseCenterX + swayOffset + (Math.random() * 32 - 16),
+          y: baseCenterY - 5 - (Math.random() * 35),
+          alpha: 1.0,
+          size: 1.0,
+          color: '#a5d6a7', // Light green energy dot
+          vx: (Math.random() - 0.5) * 0.2,
+          vy: -Math.random() * 0.3 - 0.15,
+        });
+      }
+
+      // B. Update and draw particles
+      cropParticles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.015;
+
+        if (p.alpha > 0) {
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          drawPixelRect(p.x, p.y, p.size, p.size, p.color);
+          ctx.restore();
+        }
+      });
+      cropParticles = cropParticles.filter((p) => p.alpha > 0);
 
       animationIdRef.current = requestAnimationFrame(draw);
     };
