@@ -655,20 +655,7 @@ export const CircleScheduler = ({
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <div className="pointer-events-auto">
-                      <PixelCrop cropState={cropState} size={96} interactive={true} />
-                    </div>
-                    <div
-                      className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
-                      style={{
-                        position: 'relative',
-                        left: 'auto',
-                        top: 'auto',
-                        transform: 'none',
-                        color: 'rgba(214, 211, 209, 0.92)',
-                        marginTop: '4px'
-                      }}
-                    >
-                      비어 있음
+                      <PixelCrop cropState={cropState} size={132} interactive={true} />
                     </div>
                   </div>
                 )}
