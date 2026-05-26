@@ -636,7 +636,7 @@ export const CircleScheduler = ({
                 {displayTask ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <div className="mb-0.5 pointer-events-none">
-                      <PixelCrop cropState={cropState} size={40} interactive={false} />
+                      <PixelCrop cropState={cropState} size={52} interactive={false} />
                     </div>
                     <div
                       className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
@@ -655,7 +655,7 @@ export const CircleScheduler = ({
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <div className="pointer-events-auto">
-                      <PixelCrop cropState={cropState} size={72} interactive={true} />
+                      <PixelCrop cropState={cropState} size={96} interactive={true} />
                     </div>
                     <div
                       className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
