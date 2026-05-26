@@ -287,7 +287,7 @@ export const CircleScheduler = ({
             <path
               className="center-progress-surface__value"
               d={describeArc(CENTER, CENTER, TRACK_INNER_RADIUS, 0, clampedActiveTaskProgress * 360)}
-              fill={hexToRgba(activeTaskColor, 0.28)}
+              fill={hexToRgba(activeTaskColor, 0.92)}
             />
           ) : null}
         </g>
