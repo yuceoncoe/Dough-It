@@ -166,8 +166,9 @@ export const calculateCropState = (tasksByDate: Record<string, Task[]>, targetDa
   }
 
   // 4. Health (0 to 100)
-  // Starts lower (50%), increases slower (+5% per Q4), and uncompleted tasks penalize heavier (-4% per task).
-  const health = Math.max(0, Math.min(100, 50 + (healthQ4 * 5) - (uncompletedTasksCount * 4)));
+  // Health is driven by Q4 completed tasks and penalized by low average ratings instead of uncompleted tasks.
+  const ratingPenalty = averageRating !== null ? (5.0 - averageRating) * 18 : 0;
+  const health = Math.max(0, Math.min(100, Math.round(50 + (healthQ4 * 5) - ratingPenalty)));
 
   // Evolution stage
   const evolutionStage = getEvolutionStage(growth);
