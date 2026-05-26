@@ -142,18 +142,24 @@ export const calculateCropState = (tasksByDate: Record<string, Task[]>, targetDa
   const averageRating = ratedTasksCountThisMonth > 0 ? totalRatingsThisMonth / ratedTasksCountThisMonth : null;
   const uncompletedTasksCount = totalTasksThisMonth - completedTasksThisMonth;
 
-  // Calculations (Hard Mode - More challenging growth and higher standards)
+  // Calculations (Hard Mode - All stats have rating-based penalties)
   // 1. Growth (0 to 100)
-  // Each Q1 completed gives 5% progress. Others give 1% progress.
-  const growth = Math.min(100, (growthQ1 * 5) + (yieldQ2 * 1) + (qualityQ3 * 1) + (healthQ4 * 1));
+  // Base: Q1 gives 5%, others 1%. Penalty: up to -40% based on average rating.
+  const growthBase = (growthQ1 * 5) + (yieldQ2 * 1) + (qualityQ3 * 1) + (healthQ4 * 1);
+  const growthPenalty = averageRating !== null ? (5.0 - averageRating) * 10 : 0;
+  const growth = Math.max(0, Math.min(100, Math.round(growthBase - growthPenalty)));
 
   // 2. Yield (1 to 10)
-  // Yield increases slower: Q2 gives 0.5 pieces, Q1 gives 0.1 pieces.
-  const yieldCount = Math.max(1, Math.min(10, 1 + Math.floor(yieldQ2 * 0.5) + Math.floor(growthQ1 * 0.1)));
+  // Base: Q2 gives 0.5 pieces, Q1 gives 0.1 pieces. Penalty: up to -6 pieces based on average rating.
+  const yieldBase = 1 + (yieldQ2 * 0.5) + (growthQ1 * 0.1);
+  const yieldPenalty = averageRating !== null ? (5.0 - averageRating) * 1.5 : 0;
+  const yieldCount = Math.max(1, Math.min(10, Math.floor(yieldBase - yieldPenalty)));
 
   // 3. Quality (최상급, 상급, 보통, 하급)
-  // Quality score increases slower: Q3 gives 3 points, average rating yields fewer bonus points.
-  const qualityRaw = (qualityQ3 * 3) + (averageRating ? (averageRating - 3.0) * 8 : 0);
+  // Base: Q3 gives 4 points. Penalty: up to -32 points based on average rating.
+  const qualityBase = qualityQ3 * 4;
+  const qualityPenalty = averageRating !== null ? (5.0 - averageRating) * 8 : 0;
+  const qualityRaw = qualityBase - qualityPenalty;
   let quality: '최상급' | '상급' | '보통' | '하급' = '보통';
   if (qualityRaw >= 28) {
     quality = '최상급';
@@ -166,10 +172,10 @@ export const calculateCropState = (tasksByDate: Record<string, Task[]>, targetDa
   }
 
   // 4. Health (0 to 100)
-  // Health growth itself is driven by the number of completed tasks (no high baseline), and penalized by low average ratings.
+  // Base: Q4 gives 12%, completed tasks give 2%. Penalty: up to -80% based on average rating.
   const healthBase = Math.min(100, (healthQ4 * 12) + (completedTasksThisMonth * 2));
-  const ratingPenalty = averageRating !== null ? (5.0 - averageRating) * 20 : 0;
-  const health = Math.max(0, Math.round(healthBase - ratingPenalty));
+  const healthPenalty = averageRating !== null ? (5.0 - averageRating) * 20 : 0;
+  const health = Math.max(0, Math.round(healthBase - healthPenalty));
 
   // Evolution stage
   const evolutionStage = getEvolutionStage(growth);
