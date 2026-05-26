@@ -79,6 +79,18 @@ export const CalendarView = ({
     return "";
   };
 
+  const getStatusLabel = (val: number) => {
+    if (val >= 7) return `높음 (${val})`;
+    if (val <= 1) return `낮음 (${val})`;
+    return `보통 (${val})`;
+  };
+
+  const getStatusStyle = (val: number) => {
+    if (val >= 7) return 'bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+    if (val <= 1) return 'bg-rose-50 text-rose-700 border border-rose-200/60';
+    return 'bg-stone-100 text-stone-600 border border-stone-200/60';
+  };
+
   const getStageComment = (state: typeof cropState) => {
     const { evolutionStage, health, yieldCount, quality, cropName } = state;
     let baseComment = "";
@@ -185,6 +197,34 @@ export const CalendarView = ({
                 보관함 🧺
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* 4분면 상태값 그리드 */}
+        <div className="mt-4 grid grid-cols-2 gap-2 text-[11px] md:grid-cols-4">
+          <div className="flex items-center justify-between rounded-xl bg-stone-50 border border-stone-100 p-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+            <span className="text-stone-500 font-medium">Q1 줄기 (중요·긴급)</span>
+            <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] ${getStatusStyle(cropState.stats.growthQ1)}`}>
+              {getStatusLabel(cropState.stats.growthQ1)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between rounded-xl bg-stone-50 border border-stone-100 p-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+            <span className="text-stone-500 font-medium">Q2 수확 (중요·대비)</span>
+            <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] ${getStatusStyle(cropState.stats.yieldQ2)}`}>
+              {getStatusLabel(cropState.stats.yieldQ2)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between rounded-xl bg-stone-50 border border-stone-100 p-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+            <span className="text-stone-500 font-medium">Q3 품질 (신속·센스)</span>
+            <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] ${getStatusStyle(cropState.stats.qualityQ3)}`}>
+              {getStatusLabel(cropState.stats.qualityQ3)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between rounded-xl bg-stone-50 border border-stone-100 p-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+            <span className="text-stone-500 font-medium">Q4 건강 (일상·루틴)</span>
+            <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] ${getStatusStyle(cropState.stats.healthQ4)}`}>
+              {getStatusLabel(cropState.stats.healthQ4)}
+            </span>
           </div>
         </div>
 
