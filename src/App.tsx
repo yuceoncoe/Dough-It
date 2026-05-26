@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { Home, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
-import { RoutineState, Task, RoutineScope } from './types';
+import { RoutineState, Task, RoutineScope, HarvestedCrop } from './types';
 import { addOrReplaceDateTasks, getRoutineBaseId, getRoutineBucketForDate, getTodayString } from './utils/task';
 import RoutineSettingsModal from './components/ui/RoutineSettingsModal';
 import DayScheduleView from './components/calendar/DayScheduleView';
 import CalendarView from './components/calendar/CalendarView';
 import TaskRatingCarousel from './components/ui/TaskRatingCarousel';
+import HarvestModal from './components/ui/HarvestModal';
+import { calculateCropState, getCropComment } from './utils/crop';
 import { syncTaskAlarms, requestNotificationPermissions } from './utils/notifications';
 import { timeToMinutes } from './utils/time';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
@@ -74,6 +76,7 @@ const AppShell = ({
   const initialState = useMemo(() => createDefaultAppState(todayStr), [todayStr]);
   const [routines, setRoutines] = useState<RoutineState>(initialState.routines);
   const [tasksByDate, setTasksByDate] = useState<Record<string, Task[]>>(initialState.tasksByDate);
+  const [harvestedCrops, setHarvestedCrops] = useState<HarvestedCrop[]>(initialState.harvestedCrops);
   const [activeTab, setActiveTab] = useState<'home' | 'calendar'>('home');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -131,12 +134,14 @@ const AppShell = ({
       setRoutines(cachedState.snapshot.routines);
       setTasksByDate(cachedState.snapshot.tasksByDate);
       setSkippedRatingTaskIds(new Set(cachedState.snapshot.skippedRatingTaskIds));
+      setHarvestedCrops(cachedState.snapshot.harvestedCrops ?? []);
     } else if (isActive) {
       remoteUpdatedAtRef.current = null;
       const defaultState = createDefaultAppState(todayStr);
       setRoutines(defaultState.routines);
       setTasksByDate(defaultState.tasksByDate);
       setSkippedRatingTaskIds(new Set(defaultState.skippedRatingTaskIds));
+      setHarvestedCrops([]);
     }
 
     const hydrate = async () => {
@@ -161,6 +166,7 @@ const AppShell = ({
         setRoutines(normalizedState.routines);
         setTasksByDate(normalizedState.tasksByDate);
         setSkippedRatingTaskIds(new Set(normalizedState.skippedRatingTaskIds));
+        setHarvestedCrops(normalizedState.harvestedCrops ?? []);
         persistCachedAppState(user.id, normalizedState, remoteState.remoteUpdatedAt);
       } catch (error) {
         if (!isActive || hydrationTokenRef.current !== hydrationToken) {
@@ -197,6 +203,7 @@ const AppShell = ({
       routines,
       tasksByDate,
       skippedRatingTaskIds: Array.from(skippedRatingTaskIds),
+      harvestedCrops,
     };
 
     persistCachedAppState(user.id, snapshot, remoteUpdatedAtRef.current);
@@ -228,7 +235,7 @@ const AppShell = ({
     }, 500);
 
     return () => window.clearTimeout(timeoutId);
-  }, [routines, tasksByDate, skippedRatingTaskIds, user.id]);
+  }, [routines, tasksByDate, skippedRatingTaskIds, harvestedCrops, user.id]);
 
   useEffect(() => {
     if (!isHydratedRef.current) {
@@ -268,6 +275,40 @@ const AppShell = ({
       window.removeEventListener('focus', checkEndedTasks);
     };
   }, [tasksByDate, todayStr, skippedRatingTaskIds]);
+
+  const [harvestPendingMonthId, setHarvestPendingMonthId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isBootstrapping) return;
+
+    // Find all months in tasksByDate
+    const currentMonthKey = todayStr.slice(0, 7); // "YYYY-MM"
+    const monthsInHistory = new Set<string>();
+
+    Object.keys(tasksByDate).forEach((dateStr) => {
+      if (dateStr.length >= 7) {
+        const monthKey = dateStr.slice(0, 7);
+        if (monthKey < currentMonthKey) {
+          const dayTasks = tasksByDate[dateStr] ?? [];
+          if (dayTasks.length > 0) {
+            monthsInHistory.add(monthKey);
+          }
+        }
+      }
+    });
+
+    // Find the first month that hasn't been harvested yet
+    const unharvestedMonths = Array.from(monthsInHistory).filter(
+      (mKey) => !harvestedCrops.some((crop) => crop.id === mKey)
+    );
+
+    if (unharvestedMonths.length > 0) {
+      unharvestedMonths.sort();
+      setHarvestPendingMonthId(unharvestedMonths[0]);
+    } else {
+      setHarvestPendingMonthId(null);
+    }
+  }, [tasksByDate, harvestedCrops, isBootstrapping, todayStr]);
 
   const handleRateTask = (taskId: string, rating: number, note?: string) => {
     setTasksByDate((current) => {
@@ -443,6 +484,36 @@ const AppShell = ({
           onClose={handleCloseRating}
         />
       )}
+      {harvestPendingMonthId && (
+        (() => {
+          const [yr, mn] = harvestPendingMonthId.split('-').map(Number);
+          const cropStateForHarvest = calculateCropState(tasksByDate, `${harvestPendingMonthId}-01`);
+          return (
+            <HarvestModal
+              cropState={cropStateForHarvest}
+              year={yr}
+              month={mn}
+              onHarvest={() => {
+                const newCrop: HarvestedCrop = {
+                  id: harvestPendingMonthId,
+                  year: yr,
+                  month: mn,
+                  cropName: cropStateForHarvest.cropName,
+                  emoji: cropStateForHarvest.emoji,
+                  growth: cropStateForHarvest.growth,
+                  yieldCount: cropStateForHarvest.yieldCount,
+                  quality: cropStateForHarvest.quality,
+                  health: cropStateForHarvest.health,
+                  harvestedAt: new Date().toISOString(),
+                  comment: getCropComment(cropStateForHarvest.cropName, cropStateForHarvest.growth, cropStateForHarvest.yieldCount, cropStateForHarvest.quality, cropStateForHarvest.health),
+                };
+                setHarvestedCrops((prev) => [...prev, newCrop]);
+                setHarvestPendingMonthId(null);
+              }}
+            />
+          );
+        })()
+      )}
 
       <main className="app-main flex-1 overflow-hidden">
         {activeTab === 'home' && (
@@ -478,6 +549,7 @@ const AppShell = ({
             tasksByDate={tasksByDate}
             onOpenSettings={() => setSettingsOpen(true)}
             onSelectDate={openDate}
+            harvestedCrops={harvestedCrops}
           />
         ) : null}
       </main>

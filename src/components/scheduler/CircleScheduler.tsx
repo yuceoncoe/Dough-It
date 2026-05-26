@@ -5,8 +5,8 @@ import { isCurrentMinuteInsideTask, getCenterTaskProgress, getClockTaskColor, ge
 import { polarToCartesian, describeArc } from '../../utils/geometry';
 import TaskCreationModal from '../ui/TaskCreationModal';
 import CanvasClockSurface from './CanvasClockSurface';
-import { calculatePetState } from '../../utils/pet';
-import { PixelPet } from '../ui/PixelPet';
+import { calculateCropState } from '../../utils/crop';
+import { PixelCrop } from '../ui/PixelCrop';
 
 export const CircleScheduler = ({
   tasks,
@@ -228,7 +228,7 @@ export const CircleScheduler = ({
   const activeTaskProgress = showCurrentTime ? getCenterTaskProgress(displayTask, currentMinutes) : 0;
   const clampedActiveTaskProgress = Math.max(0, Math.min(1, activeTaskProgress));
   const activeTaskColor = displayTask ? getClockTaskColor(displayTask) : '#ff7a91';
-  const petState = calculatePetState(tasksByDate, date);
+  const cropState = calculateCropState(tasksByDate, date);
   const laneCount = getRequiredTrackLaneCount(tasks);
   const trackTasks = assignTasksToTrackLanes(tasks, laneCount);
   const interactionRingRadius = (TRACK_INNER_RADIUS + OUTER_BACKGROUND_RADIUS) / 2;
@@ -636,7 +636,7 @@ export const CircleScheduler = ({
                 {displayTask ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <div className="mb-0.5 pointer-events-none">
-                      <PixelPet petState={petState} size={40} interactive={false} />
+                      <PixelCrop cropState={cropState} size={40} interactive={false} />
                     </div>
                     <div
                       className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
@@ -655,7 +655,7 @@ export const CircleScheduler = ({
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <div className="pointer-events-auto">
-                      <PixelPet petState={petState} size={72} interactive={true} />
+                      <PixelCrop cropState={cropState} size={72} interactive={true} />
                     </div>
                     <div
                       className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
