@@ -128,14 +128,30 @@ export const PixelCrop = ({
 
       // 3. Draw Crop by Stage
       if (evolutionStage === 1) {
-        // --- SEED STAGE ---
+        // --- 1. SEED STAGE ---
         const seedColor = health < 40 ? '#8d6e63' : '#a87c53';
         const seedOutline = '#2b1c11';
         drawPixelRect(baseCenterX - 3, baseCenterY - 9, 6, 6, seedOutline);
         drawPixelRect(baseCenterX - 2, baseCenterY - 8, 4, 4, seedColor);
         drawPixelRect(baseCenterX - 1, baseCenterY - 9, 2, 1, '#d7ccc8'); // shine
       } else if (evolutionStage === 2) {
-        // --- SPROUT STAGE ---
+        // --- 2. GERMINATION STAGE (Seed + Tiny Sprout) ---
+        const swayX = Math.round(swayOffset * 0.25);
+        const seedColor = health < 40 ? '#8d6e63' : '#a87c53';
+        const seedOutline = '#2b1c11';
+
+        // Draw Seed
+        drawPixelRect(baseCenterX - 3, baseCenterY - 9, 6, 6, seedOutline);
+        drawPixelRect(baseCenterX - 2, baseCenterY - 8, 4, 4, seedColor);
+        drawPixelRect(baseCenterX - 1, baseCenterY - 9, 2, 1, '#d7ccc8'); // shine
+
+        // Draw tiny emerging green sprout
+        drawPixel(baseCenterX - 1 + swayX, baseCenterY - 10, stemOutline);
+        drawPixel(baseCenterX + swayX, baseCenterY - 11, stemOutline);
+        drawPixel(baseCenterX + swayX, baseCenterY - 10, stemColor);
+        drawPixel(baseCenterX - 1 + swayX, baseCenterY - 11, leafColor);
+      } else if (evolutionStage === 3) {
+        // --- 3. SPROUT STAGE ---
         const swayX = Math.round(swayOffset * 0.4);
         
         // Stem
@@ -164,8 +180,41 @@ export const PixelCrop = ({
           drawPixel(baseCenterX - 4 + swayX, baseCenterY - 13 + leafYOffset, '#3e2723');
           drawPixel(baseCenterX + 4 + swayX, baseCenterY - 14 + leafYOffset, '#3e2723');
         }
-      } else if (evolutionStage === 3) {
-        // --- GROWING STAGE ---
+      } else if (evolutionStage === 4) {
+        // --- 4. SEEDLING STAGE (묘목) ---
+        const swayX = Math.round(swayOffset * 0.55);
+        
+        // Stem (13px tall)
+        for (let i = 0; i < 13; i++) {
+          const currY = baseCenterY - 16 + i;
+          const tX = isCrooked ? Math.round(Math.sin(i * 0.35) * 1.8) : 0;
+          drawPixelRect(baseCenterX - 2 + swayX + tX, currY, 4, 1, stemOutline);
+          drawPixelRect(baseCenterX - 1 + swayX + tX, currY, 2, 1, stemColor);
+        }
+
+        const leafYOffset = health < 40 ? 2 : 0;
+
+        // Left Leaf
+        const leftLeafW = Math.max(1, 5 + leafSizeModifier);
+        drawPixelRect(baseCenterX - 2 - leftLeafW + Math.round(swayX * 0.3), baseCenterY - 12 + leafYOffset, leftLeafW, 3, stemOutline);
+        drawPixelRect(baseCenterX - 1 - leftLeafW + Math.round(swayX * 0.3), baseCenterY - 11 + leafYOffset, leftLeafW - 1, 2, leafColor);
+
+        // Right Leaf
+        const rightLeafW = Math.max(1, 6 + leafSizeModifier);
+        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 15 + leafYOffset, rightLeafW, 3, stemOutline);
+        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 14 + leafYOffset, rightLeafW - 1, 2, leafColor);
+
+        // Third Top Leaf
+        drawPixelRect(baseCenterX - 1 + swayX, baseCenterY - 19 + leafYOffset, 3, 3, stemOutline);
+        drawPixelRect(baseCenterX + swayX, baseCenterY - 18 + leafYOffset, 2, 2, leafColor);
+
+        // Q3 Dark Spots
+        if (isLowQualityQ3) {
+          drawPixel(baseCenterX - 4 + Math.round(swayX * 0.3), baseCenterY - 11 + leafYOffset, '#3e2723');
+          drawPixel(baseCenterX + 4 + Math.round(swayX * 0.7), baseCenterY - 14 + leafYOffset, '#3e2723');
+        }
+      } else if (evolutionStage === 5) {
+        // --- 5. GROWING STAGE ---
         const swayX = Math.round(swayOffset * 0.7);
         const leafYOffset = health < 40 ? 3 : 0;
 
@@ -203,8 +252,63 @@ export const PixelCrop = ({
           drawPixel(baseCenterX - 5 + Math.round(swayX * 0.2), baseCenterY - 11 + leafYOffset, '#3e2723');
           drawPixel(baseCenterX + 4 + Math.round(swayX * 0.6), baseCenterY - 16 + leafYOffset, '#3e2723');
         }
-      } else if (evolutionStage === 4) {
-        // --- BLOOMING STAGE ---
+      } else if (evolutionStage === 6) {
+        // --- 6. BUDDING / FRUIT SET STAGE (꽃봉오리 / 아기 열매) ---
+        const swayX = Math.round(swayOffset * 0.85);
+        const leafYOffset = health < 40 ? 3 : 0;
+
+        // Stem (23px tall)
+        for (let i = 0; i < 23; i++) {
+          const currY = baseCenterY - 26 + i;
+          const tX = isCrooked ? Math.round(Math.sin(i * 0.22) * 2.5) : 0;
+          drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.5) + tX, currY, 4, 1, stemOutline);
+          drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.5) + tX, currY, 2, 1, stemColor);
+        }
+
+        // Leaves
+        const l1W = Math.max(1, 7 + leafSizeModifier);
+        drawPixelRect(baseCenterX - 2 - l1W + Math.round(swayX * 0.3), baseCenterY - 14 + leafYOffset, l1W, 3, stemOutline);
+        drawPixelRect(baseCenterX - 1 - l1W + Math.round(swayX * 0.3), baseCenterY - 13 + leafYOffset, l1W - 1, 2, leafColor);
+
+        const l2W = Math.max(1, 7 + leafSizeModifier);
+        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 19 + leafYOffset, l2W, 3, stemOutline);
+        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 18 + leafYOffset, l2W - 1, 2, leafColor);
+
+        // Q3 Dark Spots
+        if (isLowQualityQ3) {
+          drawPixel(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 13 + leafYOffset, '#3e2723');
+          drawPixel(baseCenterX + 5 + Math.round(swayX * 0.7), baseCenterY - 18 + leafYOffset, '#3e2723');
+        }
+
+        const stemHeadX = isCrooked ? Math.round(Math.sin(0 * 0.22) * 2.5) : 0;
+        const budY = baseCenterY - 30;
+
+        const isFlowerType = month === 4 || month === 5 || month === 9 || month === 12;
+
+        if (isFlowerType) {
+          // Draw small closed flower bud
+          let budColor = '#f48fb1'; // pink
+          if (month === 5 || month === 12) budColor = '#ef5350'; // red
+          else if (month === 9) budColor = '#fdd835'; // yellow/orange
+          if (health < 40) budColor = '#bcaaa4'; // withered
+
+          // Draw Sepals (green cup)
+          drawPixelRect(baseCenterX - 2 + swayX + stemHeadX, budY + 3, 4, 1, stemOutline);
+          drawPixel(baseCenterX - 1 + swayX + stemHeadX, budY + 4, stemOutline);
+          // Draw Bud
+          drawPixelRect(baseCenterX - 2 + swayX + stemHeadX, budY, 4, 3, stemOutline);
+          drawPixelRect(baseCenterX - 1 + swayX + stemHeadX, budY + 1, 2, 2, budColor);
+        } else {
+          // Draw tiny unripe green fruit (아기 열매)
+          const unripeColor = '#a5d6a7'; // light green
+          const unripeOutline = '#2e7d32'; // dark green
+
+          drawPixelRect(baseCenterX - 2 + swayX + stemHeadX, budY + 1, 4, 3, unripeOutline);
+          drawPixelRect(baseCenterX - 1 + swayX + stemHeadX, budY + 2, 2, 2, unripeColor);
+          drawPixel(baseCenterX + swayX + stemHeadX, budY, unripeOutline); // connector
+        }
+      } else if (evolutionStage === 7) {
+        // --- 7. BLOOMING / RIPENING STAGE (개화 / 설익은 열매) ---
         const swayX = Math.round(swayOffset);
         const leafYOffset = health < 40 ? 3 : 0;
 
@@ -237,28 +341,68 @@ export const PixelCrop = ({
           drawPixel(baseCenterX + 5 + Math.round(swayX * 0.7), baseCenterY - 21 + leafYOffset, '#3e2723');
         }
 
-        // Bud Color
-        let budColor = '#f48fb1';
-        let budCore = '#fff59d';
-        if (month === 5 || month === 12) {
-          budColor = '#ef5350';
-        } else if (month === 8 || month === 9) {
-          budColor = '#fdd835';
-        } else if (month === 2 || month === 10) {
-          budColor = '#ffb74d';
-        }
-
-        // Low health bud color (withering)
-        if (health < 40) {
-          budColor = '#bcaaa4'; // brownish bud
-          budCore = '#d7ccc8';
-        }
-
-        const headY = baseCenterY - 39;
         const stemHeadX = isCrooked ? Math.round(Math.sin(0 * 0.18) * 2.8) : 0;
-        drawPixelRect(baseCenterX - 5 + swayX + stemHeadX, headY, 10, 9, stemOutline);
-        drawPixelRect(baseCenterX - 4 + swayX + stemHeadX, headY + 1, 8, 7, budColor);
-        drawPixelRect(baseCenterX - 2 + swayX + stemHeadX, headY + 3, 4, 3, budCore);
+        const isFlowerType = month === 4 || month === 5 || month === 9 || month === 12;
+
+        if (isFlowerType) {
+          // Draw fully open flower
+          let budColor = '#f48fb1';
+          let budCore = '#fff59d';
+          if (month === 5 || month === 12) {
+            budColor = '#ef5350';
+          } else if (month === 8 || month === 9) {
+            budColor = '#fdd835';
+          } else if (month === 2 || month === 10) {
+            budColor = '#ffb74d';
+          }
+
+          if (health < 40) {
+            budColor = '#bcaaa4';
+            budCore = '#d7ccc8';
+          }
+
+          const headY = baseCenterY - 39;
+          drawPixelRect(baseCenterX - 5 + swayX + stemHeadX, headY, 10, 9, stemOutline);
+          drawPixelRect(baseCenterX - 4 + swayX + stemHeadX, headY + 1, 8, 7, budColor);
+          drawPixelRect(baseCenterX - 2 + swayX + stemHeadX, headY + 3, 4, 3, budCore);
+        } else {
+          // Draw ripening semi-ripe fruit
+          const headY = baseCenterY - 37;
+          const fx = baseCenterX + swayX + stemHeadX;
+          const fy = headY;
+          
+          if (month === 1) { // Strawberry
+            drawPixelRect(fx - 4, fy, 8, 2, '#2e7d32');
+            drawPixelRect(fx - 4, fy + 2, 8, 7, '#7b2e1a');
+            drawPixelRect(fx - 3, fy + 2, 6, 7, '#ff8a80'); // light pink
+            drawPixelRect(fx - 1, fy + 2, 2, 2, '#c8e6c9'); // unripe spot
+          } else if (month === 2) { // Tangerine
+            drawPixelRect(fx - 4, fy + 1, 8, 8, '#5d4037');
+            drawPixelRect(fx - 3, fy + 2, 6, 6, '#ffd54f'); // light orange-yellow
+            drawPixelRect(fx - 2, fy + 2, 3, 3, '#a5d6a7'); // green hint
+          } else if (month === 3) { // Sprout cluster
+            drawPixelRect(fx - 5, fy + 2, 10, 6, '#2e7d32');
+            drawPixelRect(fx - 4, fy + 3, 8, 4, '#81c784');
+          } else if (month === 6) { // Plum
+            drawPixelRect(fx - 3, fy + 2, 6, 6, '#1b5e20');
+            drawPixelRect(fx - 2, fy + 3, 4, 4, '#9ccc65');
+          } else if (month === 7) { // Watermelon
+            drawPixelRect(fx - 6, fy + 1, 12, 7, '#1b5e20');
+            drawPixelRect(fx - 5, fy + 2, 10, 5, '#a5d6a7');
+            drawPixel(fx - 2, fy + 3, '#388e3c');
+            drawPixel(fx + 2, fy + 3, '#388e3c');
+          } else if (month === 8) { // Corn
+            drawPixelRect(fx - 2, fy + 1, 4, 9, '#5d4037');
+            drawPixelRect(fx - 1, fy + 1, 2, 9, '#c0ca33');
+          } else if (month === 10) { // Persimmon
+            drawPixelRect(fx - 4, fy + 2, 8, 6, '#5d4037');
+            drawPixelRect(fx - 3, fy + 3, 6, 4, '#ffb74d');
+            drawPixel(fx - 1, fy + 1, '#2e7d32');
+          } else { // Sweet potato or fallback
+            drawPixelRect(fx - 5, fy + 2, 10, 5, '#5d4037');
+            drawPixelRect(fx - 4, fy + 3, 8, 3, '#8d6e63');
+          }
+        }
       } else {
         // --- MATURE / HARVEST STAGE (Stage 5) ---
         const swayX = Math.round(swayOffset * 1.2);
@@ -420,7 +564,7 @@ export const PixelCrop = ({
       // A. Generate particles
       
       // Global Health: Falling leaves if health is low
-      if (health < 30 && Math.random() < 0.035 && evolutionStage >= 2) {
+      if (health < 30 && Math.random() < 0.035 && evolutionStage >= 3) {
         cropParticles.push({
           x: baseCenterX + swayOffset + (Math.random() * 20 - 10),
           y: baseCenterY - 15 - Math.random() * 15,
@@ -588,9 +732,12 @@ export const PixelCrop = ({
 
   const getCenterOffsetPercent = (stage: number) => {
     if (stage === 1) return -38;
-    if (stage === 2) return -30;
-    if (stage === 3) return -22;
-    if (stage === 4) return -14;
+    if (stage === 2) return -34;
+    if (stage === 3) return -30;
+    if (stage === 4) return -26;
+    if (stage === 5) return -22;
+    if (stage === 6) return -18;
+    if (stage === 7) return -14;
     return -6;
   };
 

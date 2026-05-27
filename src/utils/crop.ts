@@ -30,7 +30,7 @@ export interface CropState {
   yieldCount: number;  // 1 to 10
   quality: '최상급' | '상급' | '보통' | '하급';
   health: number;      // 0 to 100
-  evolutionStage: 1 | 2 | 3 | 4 | 5; // 1: 씨앗, 2: 새싹, 3: 성장, 4: 개화, 5: 수확
+  evolutionStage: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8; // 1: 씨앗, 2: 발아, 3: 새싹, 4: 묘목, 5: 성장, 6: 꽃봉오리/아기열매, 7: 개화/설익은열매, 8: 수확
   stats: {
     growthQ1: number;
     yieldQ2: number;
@@ -40,12 +40,15 @@ export interface CropState {
   todayDiary: string;
 }
 
-export const getEvolutionStage = (growth: number): 1 | 2 | 3 | 4 | 5 => {
-  if (growth < 15) return 1; // Seed
-  if (growth < 40) return 2; // Sprout
-  if (growth < 70) return 3; // Growing
-  if (growth < 100) return 4; // Blooming
-  return 5; // Mature / Harvestable
+export const getEvolutionStage = (growth: number): 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 => {
+  if (growth < 10) return 1; // 씨앗 (Seed)
+  if (growth < 25) return 2; // 발아 (Germination)
+  if (growth < 45) return 3; // 새싹 (Sprout)
+  if (growth < 60) return 4; // 묘목 (Seedling)
+  if (growth < 75) return 5; // 성장 (Growing)
+  if (growth < 90) return 6; // 꽃봉오리/아기열매 (Budding)
+  if (growth < 100) return 7; // 개화/설익은열매 (Blooming)
+  return 8; // 성숙/수확기 (Mature / Harvestable)
 };
 
 export const generateCropDiaryComment = (todayTasks: Task[]): string => {
