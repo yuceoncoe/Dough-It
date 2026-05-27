@@ -199,16 +199,17 @@ export const PixelAction = ({
           const loopFrame = frame % 110;
           let shearsX = 42;
           let shearsY = 25;
-          let shearsAngle = 0.6;
+          let shearsAngle = 0.7;
+          let shearsY = 24;
 
           if (loopFrame < 35) {
             const t = loopFrame / 35;
             shearsX = 42 - t * 22; // 42 -> 20
-            shearsAngle = 0.6;
+            shearsAngle = 0.7;
           } else if (loopFrame >= 35 && loopFrame < 45) {
             shearsX = 20;
             const t = (loopFrame - 35) / 10;
-            shearsAngle = 0.6 * (1 - t);
+            shearsAngle = 0.7 * (1 - t);
             if (loopFrame === 40) {
               cutLeaf.active = true;
               cutLeaf.vx = -0.5;
@@ -231,7 +232,7 @@ export const PixelAction = ({
           } else {
             const t = (loopFrame - 55) / 55;
             shearsX = 20 + t * 22;
-            shearsAngle = 0.6 * t;
+            shearsAngle = 0.7 * t;
           }
 
           // Cut leaf falling
@@ -265,31 +266,34 @@ export const PixelAction = ({
           });
           particles = particles.filter((p) => p.life < p.maxLife);
 
-          // === Dark Iron Scissors (enlarged, clear ring handles) ===
+          // === Dark Iron Scissors (rings spread outward when open) ===
+          // Key: upper ring at local y=+5 (below blade), lower ring at y=-5 (above).
+          // When upper rotates CW (+angle), y=+5 swings DOWN → handle opens down.
+          // When lower rotates CCW (-angle), y=-5 swings UP → handle opens up.
 
           // ── Upper half (rotates +shearsAngle) ──
           ctx.save();
           ctx.translate(shearsX, shearsY);
           ctx.rotate(shearsAngle);
 
-          // Blade: 22px long, 3px tall, tapered
-          drawPixelRect(-22,  -3, 22,  3, '#606060');  // body
-          drawPixelRect(-22,  -4, 12,  1, '#909090');  // top edge
-          drawPixelRect(-22,  -3,  2,  1, '#d8d8d8');  // tip bright
-          drawPixelRect(-12,  -1, 12,  1, '#3a3a3a');  // lower shadow
+          // Blade: 20px long, 4px thick
+          drawPixelRect(-20, -4, 20, 4, '#646464');
+          drawPixelRect(-20, -5, 12,  1, '#939393');  // top edge
+          drawPixelRect(-20, -4,  2,  1, '#e0e0e0');  // tip
+          drawPixelRect(-10, -1, 10,  1, '#363636');  // lower shadow
 
-          // Neck connector
-          drawPixelRect(  0,  -2,  3,  4, '#505050');
+          // Neck
+          drawPixelRect(  0, -3,  5,  6, '#505050');
 
-          // Ring handle: 13px wide × 12px tall, 2px walls
-          // Upper ring sits higher (y: -7 to +5)
-          drawPixelRect(  3,  -7, 13,  2, '#3c3c3c');  // top wall
-          drawPixelRect(  2,  -6,  2, 11, '#3c3c3c');  // left wall
-          drawPixelRect( 14,  -6,  2, 11, '#3c3c3c');  // right wall
-          drawPixelRect(  3,   4, 13,  2, '#3c3c3c');  // bottom wall
-          drawPixelRect(  4,  -5,  9,  9, '#141414');  // interior
-          drawPixelRect(  3,  -7, 13,  1, '#6a6a6a');  // top highlight
-          drawPixelRect(  2,  -6,  1,  4, '#585858');  // left highlight
+          // Upper ring: CENTER at local (10, +5) → opens downward
+          // outer 14×12 at (4, 1)-(17, 12)
+          drawPixelRect(  4,   1, 14,  2, '#3c3c3c');  // top wall
+          drawPixelRect(  3,   3,  2,  8, '#3c3c3c');  // left wall
+          drawPixelRect( 16,   3,  2,  8, '#3c3c3c');  // right wall
+          drawPixelRect(  4,  11, 14,  2, '#3c3c3c');  // bottom wall
+          drawPixelRect(  5,   3, 10,  8, '#141414');  // interior
+          drawPixelRect(  4,   1, 14,  1, '#6a6a6a');  // top highlight
+          drawPixelRect(  3,   3,  1,  4, '#585858');  // left highlight
 
           ctx.restore();
 
@@ -298,30 +302,31 @@ export const PixelAction = ({
           ctx.translate(shearsX, shearsY);
           ctx.rotate(-shearsAngle);
 
-          // Blade
-          drawPixelRect(-22,   0, 22,  3, '#484848');  // body
-          drawPixelRect(-22,   2, 12,  1, '#282828');  // bottom shadow
-          drawPixelRect(-22,   0,  2,  1, '#b8b8b8');  // tip bright
-          drawPixelRect(-12,   0, 12,  1, '#565656');  // upper mid
+          // Blade: 20px, 4px thick
+          drawPixelRect(-20,  0, 20,  4, '#484848');
+          drawPixelRect(-20,  3, 12,  1, '#262626');  // bottom shadow
+          drawPixelRect(-20,  0,  2,  1, '#c0c0c0');  // tip
+          drawPixelRect(-10,  0, 10,  1, '#585858');  // upper mid
 
-          // Neck connector
-          drawPixelRect(  0,  -2,  3,  4, '#404040');
+          // Neck
+          drawPixelRect(  0, -3,  5,  6, '#404040');
 
-          // Ring handle: sits lower (y: -5 to +7)
-          drawPixelRect(  3,  -5, 13,  2, '#3c3c3c');  // top wall
-          drawPixelRect(  2,  -4,  2, 11, '#3c3c3c');  // left wall
-          drawPixelRect( 14,  -4,  2, 11, '#3c3c3c');  // right wall
-          drawPixelRect(  3,   6, 13,  2, '#3c3c3c');  // bottom wall
-          drawPixelRect(  4,  -3,  9,  9, '#141414');  // interior
-          drawPixelRect(  3,   7, 13,  1, '#282828');  // bottom shadow
-          drawPixelRect( 14,  -4,  1,  4, '#525252');  // right highlight
+          // Lower ring: CENTER at local (10, -5) → opens upward
+          // outer 14×12 at (4, -12)-(17, -1)
+          drawPixelRect(  4, -12, 14,  2, '#3c3c3c');  // top wall
+          drawPixelRect(  3, -10,  2,  8, '#3c3c3c');  // left wall
+          drawPixelRect( 16, -10,  2,  8, '#3c3c3c');  // right wall
+          drawPixelRect(  4,  -2, 14,  2, '#3c3c3c');  // bottom wall
+          drawPixelRect(  5, -10, 10,  8, '#141414');  // interior
+          drawPixelRect(  4, -12, 14,  1, '#525252');  // top wall highlight
+          drawPixelRect( 16, -10,  1,  4, '#525252');  // right highlight
 
           ctx.restore();
 
-          // ── Center pivot screw ──
-          drawPixelRect(shearsX - 2, shearsY - 2, 5, 5, '#505050');
-          drawPixelRect(shearsX - 1, shearsY - 1, 3, 3, '#909090');
-          drawPixel(shearsX, shearsY, '#d0d0d0');
+          // ── Center pivot screw (6×6) ──
+          drawPixelRect(shearsX - 3, shearsY - 3, 6, 6, '#505050');
+          drawPixelRect(shearsX - 2, shearsY - 2, 4, 4, '#909090');
+          drawPixelRect(shearsX - 1, shearsY - 1, 2, 2, '#d0d0d0');
 
         } else if (actionType === 'fertilizing') {
           // --- 3. POTION BOTTLE SCENE (Magical Elixir/Fertilizer Bottle) ---
@@ -348,7 +353,7 @@ export const PixelAction = ({
           // Potion bottle movement
           const loopFrame = frame % 90;
           let bottleX = 38;
-          let bottleY = 16;
+          let bottleY = 24;
           let bottleAngle = -0.45;
 
           const isPouring = loopFrame >= 25 && loopFrame <= 65;
@@ -392,51 +397,51 @@ export const PixelAction = ({
           });
           particles = particles.filter((p) => p.life < p.maxLife);
 
-          // === Round Cyan Potion Bottle (matching reference image) ===
+          // === Round Cyan Potion Bottle (enlarged 18×16px body) ===
           ctx.save();
           ctx.translate(bottleX, bottleY);
           ctx.rotate(bottleAngle);
 
-          // -- Neck --
-          drawPixelRect(-2, -14,  4,  3, '#4a7c6f');  // neck shadow
-          drawPixelRect(-1, -14,  3,  3, '#5fa08a');  // neck main
-          drawPixelRect( 0, -14,  1,  3, '#7ec8b0');  // neck highlight
+          // -- Neck (5×4px) --
+          drawPixelRect(-3, -18,  6,  4, '#3d6b5e');  // neck shadow
+          drawPixelRect(-2, -18,  4,  4, '#5fa08a');  // neck main
+          drawPixelRect(-1, -18,  2,  4, '#7ec8b0');  // neck highlight
 
-          // -- Cork stopper --
-          drawPixelRect(-3, -17,  6,  4, '#6b4226');  // cork dark
-          drawPixelRect(-2, -17,  4,  3, '#8b5a2b');  // cork main
-          drawPixelRect(-2, -17,  2,  2, '#a87040');  // cork highlight
-          drawPixelRect(-3, -14,  6,  1, '#4a2f1a');  // cork bottom rim
+          // -- Cork stopper (8×6px) --
+          drawPixelRect(-4, -23,  8,  6, '#5a3520');  // cork dark
+          drawPixelRect(-3, -23,  6,  5, '#8b5a2b');  // cork main
+          drawPixelRect(-3, -23,  3,  3, '#b07840');  // cork highlight
+          drawPixelRect(-4, -18,  8,  1, '#3a2010');  // cork base rim
 
-          // -- Round Body: outer dark border (approximated circle 14x14) --
-          drawPixelRect(-5, -12,  10,  1, '#2a6b5a');  // top border
-          drawPixelRect(-6, -11,  12,  1, '#2a6b5a');
-          drawPixelRect(-7, -10,  14, 10, '#2a6b5a');  // sides
-          drawPixelRect(-6,   0,  12,  1, '#2a6b5a');
-          drawPixelRect(-5,   1,  10,  1, '#2a6b5a');  // bottom border
+          // -- Round Body outer border (18×16px, rounded corners) --
+          drawPixelRect(-6, -16, 12,  1, '#2a6b5a');  // top narrow
+          drawPixelRect(-8, -15, 16,  1, '#2a6b5a');
+          drawPixelRect(-9, -14, 18, 16, '#2a6b5a');  // sides
+          drawPixelRect(-8,   2, 16,  1, '#2a6b5a');
+          drawPixelRect(-6,   3, 12,  1, '#2a6b5a');  // bottom narrow
 
-          // -- Body fill (mid cyan-teal) --
-          drawPixelRect(-6, -11,  12,  1, '#3d9e84');
-          drawPixelRect(-7, -10,  14, 10, '#3d9e84');
-          drawPixelRect(-6,   0,  12,  1, '#3d9e84');
+          // -- Body fill (mid teal) --
+          drawPixelRect(-8, -15, 16,  1, '#3d9e84');
+          drawPixelRect(-9, -14, 18, 16, '#3d9e84');
+          drawPixelRect(-8,   2, 16,  1, '#3d9e84');
 
           // -- Inner lighter fill --
-          drawPixelRect(-5,  -9,  10,  8, '#52c4a0');
+          drawPixelRect(-7, -13, 14, 14, '#52c4a0');
 
-          // -- Bright highlight (upper-left quadrant) --
-          drawPixelRect(-4,  -9,   5,  1, '#a8e8d8');
-          drawPixelRect(-5,  -8,   6,  3, '#7ed8c0');
-          drawPixelRect(-4,  -8,   4,  2, '#b8f0e0');  // brightest spot
-          drawPixelRect(-3,  -7,   2,  1, '#d4f8f0');  // specular
+          // -- Bright highlight (upper-left) --
+          drawPixelRect(-5, -13,  7,  1, '#a8e8d8');
+          drawPixelRect(-7, -12,  9,  5, '#7ed8c0');
+          drawPixelRect(-5, -12,  6,  4, '#b8f0e0');  // bright spot
+          drawPixelRect(-3, -10,  3,  1, '#d4f8f0');  // specular
 
-          // -- Decorative ring (middle band) --
-          drawPixelRect(-7,  -3,  14,  2, '#2a6b5a');  // ring dark
-          drawPixelRect(-6,  -3,  12,  1, '#60b898');  // ring lighter top
-          drawPixelRect(-6,  -2,  12,  1, '#2e8065');  // ring darker bottom
+          // -- Decorative ring band (middle) --
+          drawPixelRect(-9,  -2, 18,  3, '#2a6b5a');  // ring outer
+          drawPixelRect(-8,  -2, 16,  1, '#60b898');  // ring top lighter
+          drawPixelRect(-8,  -1, 16,  1, '#2e8065');  // ring bottom darker
 
-          // -- Lower shadow on body --
-          drawPixelRect(-6,   -1,  12,  1, '#2a6b5a');
-          drawPixelRect(-4,   -1,   8,  2, '#236055');
+          // -- Lower shadow --
+          drawPixelRect(-8,   0, 16,  3, '#2a6b5a');
+          drawPixelRect(-5,   1, 10,  2, '#236055');
 
           ctx.restore();
 
