@@ -1384,54 +1384,156 @@ export const PixelCrop = ({
               break;
             }
             case 9: {
-              // 해바라기 🌻 - 8단계 완숙 (Stardew Valley 스타일로 개선)
-              const oCol = '#b35c00'; // Deep golden-brown outline
+              // 해바라기 🌻 - 8단계 완숙 (체커보드 씨앗판 및 풍성한 레이어드 꽃잎 개선)
+              const oCol = '#1a0c02'; // Very dark brown/black outline
               const pCol = '#fbc02d'; // Golden yellow petals
-              const hCol = '#ffeb3b'; // Bright yellow highlight/tips
+              const hCol = '#ffeb3b'; // Bright yellow highlights
+              const shadowCol = '#b35c00'; // Orange/brown backing petals
 
-              // 1. Petal outer outline
-              drawPixel(fx, fy - 7 - offset, oCol); // 상
-              drawPixelRect(fx - 1, fy - 6 - offset, 3, 1, oCol);
-              drawPixel(fx, fy + 7 + offset, oCol); // 하
-              drawPixelRect(fx - 1, fy + 6 + offset, 3, 1, oCol);
-              drawPixel(fx - 7 - offset, fy, oCol); // 좌
-              drawPixelRect(fx - 6 - offset, fy - 1, 1, 3, oCol);
-              drawPixel(fx + 7 + offset, fy, oCol); // 우
-              drawPixelRect(fx + 6 + offset, fy - 1, 1, 3, oCol);
+              if (isSmall) {
+                // --- SMALL SUNFLOWER (11x11) ---
+                // 1. Seed Core (5x5 rounded checkerboard)
+                for (let y = -2; y <= 2; y++) {
+                  for (let x = -2; x <= 2; x++) {
+                    if (Math.abs(x) + Math.abs(y) <= 3) {
+                      const isDark = (x + y) % 2 === 0;
+                      drawPixel(fx + x, fy + y, isDark ? '#271c19' : '#3e2723');
+                    }
+                  }
+                }
+                drawPixel(fx - 1, fy - 1, '#5d4037'); // Core highlight
 
-              // Diagonal tips
-              drawPixel(fx - 5 - offset, fy - 5 - offset, oCol);
-              drawPixel(fx + 5 + offset, fy - 5 - offset, oCol);
-              drawPixel(fx - 5 - offset, fy + 5 + offset, oCol);
-              drawPixel(fx + 5 + offset, fy + 5 + offset, oCol);
+                // 2. Backing Petals (Orange shadow layer)
+                drawPixel(fx - 2, fy - 3, shadowCol); drawPixel(fx + 2, fy - 3, shadowCol);
+                drawPixel(fx - 2, fy + 3, shadowCol); drawPixel(fx + 2, fy + 3, shadowCol);
+                drawPixel(fx - 3, fy - 2, shadowCol); drawPixel(fx - 3, fy + 2, shadowCol);
+                drawPixel(fx + 3, fy - 2, shadowCol); drawPixel(fx + 3, fy + 2, shadowCol);
 
-              // Orange boundary box to ensure outline completeness
-              drawPixelRect(fx - 5 - offset, fy - 4 - offset, 11 + 2 * offset, 9 + 2 * offset, oCol);
+                // 3. Golden Yellow Petals (Front layer)
+                drawPixel(fx, fy - 3, pCol); drawPixel(fx, fy + 3, pCol);
+                drawPixel(fx - 3, fy, pCol); drawPixel(fx + 3, fy, pCol);
 
-              // 2. Petal body (Yellow & Highlight)
-              drawPixelRect(fx - 4 - offset, fy - 3 - offset, 9 + 2 * offset, 7 + 2 * offset, pCol); // base fill
-              
-              // Tips highlight (overwriting inside layer of tips)
-              drawPixel(fx, fy - 6 - offset, hCol);
-              drawPixelRect(fx - 1, fy - 5 - offset, 3, 1, hCol);
-              drawPixel(fx, fy + 6 + offset, hCol);
-              drawPixelRect(fx - 1, fy + 5 - offset, 3, 1, hCol);
-              drawPixel(fx - 6 - offset, fy, hCol);
-              drawPixelRect(fx - 5 - offset, fy - 1, 1, 3, hCol);
-              drawPixel(fx + 6 + offset, fy, hCol);
-              drawPixelRect(fx + 5 - offset, fy - 1, 1, 3, hCol);
+                // 4. Highlight Tips (Bright yellow)
+                drawPixel(fx, fy - 4, hCol); drawPixel(fx, fy + 4, hCol);
+                drawPixel(fx - 4, fy, hCol); drawPixel(fx + 4, fy, hCol);
+                drawPixel(fx - 2, fy - 2, hCol); drawPixel(fx + 2, fy - 2, hCol);
+                drawPixel(fx - 2, fy + 2, hCol); drawPixel(fx + 2, fy + 2, hCol);
 
-              // Diagonal fills
-              drawPixel(fx - 4 - offset, fy - 4 - offset, hCol);
-              drawPixel(fx + 4 + offset, fy - 4 - offset, hCol);
-              drawPixel(fx - 4 - offset, fy + 4 + offset, hCol);
-              drawPixel(fx + 4 + offset, fy + 4 + offset, hCol);
+                // 5. Dark Outline
+                drawPixel(fx, fy - 5, oCol); drawPixel(fx - 1, fy - 4, oCol); drawPixel(fx + 1, fy - 4, oCol);
+                drawPixel(fx, fy + 5, oCol); drawPixel(fx - 1, fy + 4, oCol); drawPixel(fx + 1, fy + 4, oCol);
+                drawPixel(fx - 5, fy, oCol); drawPixel(fx - 4, fy - 1, oCol); drawPixel(fx - 4, fy + 1, oCol);
+                drawPixel(fx + 5, fy, oCol); drawPixel(fx + 4, fy - 1, oCol); drawPixel(fx + 4, fy + 1, oCol);
 
-              // 3. Brown seed core (rounded 5x5 center)
-              drawPixelRect(fx - 3, fy - 2, 7, 5, coreOutline);
-              drawPixelRect(fx - 2, fy - 1, 5, 3, '#3e2723');
-              drawPixelRect(fx - 1, fy - 1, 3, 3, '#271c19');
-              drawPixel(fx - 1, fy - 1, '#5d4037'); // Single soft highlight dot
+                drawPixel(fx - 3, fy - 3, oCol); drawPixel(fx - 3, fy - 2, oCol); drawPixel(fx - 2, fy - 3, oCol);
+                drawPixel(fx + 3, fy - 3, oCol); drawPixel(fx + 3, fy - 2, oCol); drawPixel(fx + 2, fy - 3, oCol);
+                drawPixel(fx - 3, fy + 3, oCol); drawPixel(fx - 3, fy + 2, oCol); drawPixel(fx - 2, fy + 3, oCol);
+                drawPixel(fx + 3, fy + 3, oCol); drawPixel(fx + 3, fy + 2, oCol); drawPixel(fx + 2, fy + 3, oCol);
+              } else if (isLarge) {
+                // --- LARGE SUNFLOWER (15x15) ---
+                // 1. Seed Core (9x9 rounded checkerboard)
+                for (let y = -4; y <= 4; y++) {
+                  for (let x = -4; x <= 4; x++) {
+                    if (Math.abs(x) + Math.abs(y) <= 5) {
+                      const isDark = (x + y) % 2 === 0;
+                      drawPixel(fx + x, fy + y, isDark ? '#271c19' : '#3e2723');
+                    }
+                  }
+                }
+                drawPixel(fx - 1, fy - 1, '#5d4037'); drawPixel(fx, fy - 1, '#5d4037');
+
+                // 2. Backing Petals
+                drawPixel(fx - 4, fy - 4, shadowCol); drawPixel(fx + 4, fy - 4, shadowCol);
+                drawPixel(fx - 4, fy + 4, shadowCol); drawPixel(fx + 4, fy + 4, shadowCol);
+                drawPixel(fx - 5, fy - 3, shadowCol); drawPixel(fx - 5, fy + 3, shadowCol);
+                drawPixel(fx + 5, fy - 3, shadowCol); drawPixel(fx + 5, fy + 3, shadowCol);
+                drawPixel(fx - 3, fy - 5, shadowCol); drawPixel(fx + 3, fy - 5, shadowCol);
+                drawPixel(fx - 3, fy + 5, shadowCol); drawPixel(fx + 3, fy + 5, shadowCol);
+
+                // 3. Golden Yellow Petals
+                drawPixelRect(fx - 2, fy - 5, 5, 1, pCol);
+                drawPixelRect(fx - 2, fy + 5, 5, 1, pCol);
+                drawPixelRect(fx - 5, fy - 2, 1, 5, pCol);
+                drawPixelRect(fx + 5, fy - 2, 1, 5, pCol);
+                drawPixel(fx - 3, fy - 4, pCol); drawPixel(fx - 4, fy - 3, pCol);
+                drawPixel(fx + 3, fy - 4, pCol); drawPixel(fx + 4, fy - 3, pCol);
+                drawPixel(fx - 3, fy + 4, pCol); drawPixel(fx - 4, fy + 3, pCol);
+                drawPixel(fx + 3, fy + 4, pCol); drawPixel(fx + 4, fy + 3, pCol);
+
+                // 4. Highlight Tips
+                drawPixel(fx, fy - 6, hCol); drawPixel(fx, fy + 6, hCol);
+                drawPixel(fx - 6, fy, hCol); drawPixel(fx + 6, fy, hCol);
+                drawPixel(fx - 4, fy - 4, hCol); drawPixel(fx + 4, fy - 4, hCol);
+                drawPixel(fx - 4, fy + 4, hCol); drawPixel(fx + 4, fy + 4, hCol);
+
+                // 5. Dark Outline
+                drawPixel(fx, fy - 7, oCol); drawPixel(fx - 1, fy - 6, oCol); drawPixel(fx + 1, fy - 6, oCol);
+                drawPixel(fx, fy + 7, oCol); drawPixel(fx - 1, fy + 6, oCol); drawPixel(fx + 1, fy + 6, oCol);
+                drawPixel(fx - 7, fy, oCol); drawPixel(fx - 6, fy - 1, oCol); drawPixel(fx - 6, fy + 1, oCol);
+                drawPixel(fx + 7, fy, oCol); drawPixel(fx + 6, fy - 1, oCol); drawPixel(fx + 6, fy + 1, oCol);
+
+                drawPixel(fx - 5, fy - 5, oCol); drawPixel(fx - 5, fy - 4, oCol); drawPixel(fx - 4, fy - 5, oCol);
+                drawPixel(fx + 5, fy - 5, oCol); drawPixel(fx + 5, fy - 4, oCol); drawPixel(fx + 4, fy - 5, oCol);
+                drawPixel(fx - 5, fy + 5, oCol); drawPixel(fx - 5, fy + 4, oCol); drawPixel(fx - 4, fy + 5, oCol);
+                drawPixel(fx + 5, fy + 5, oCol); drawPixel(fx + 5, fy + 4, oCol); drawPixel(fx + 4, fy + 5, oCol);
+
+                drawPixelRect(fx - 3, fy - 6, 2, 1, oCol); drawPixelRect(fx + 2, fy - 6, 2, 1, oCol);
+                drawPixelRect(fx - 3, fy + 6, 2, 1, oCol); drawPixelRect(fx + 2, fy + 6, 2, 1, oCol);
+                drawPixelRect(fx - 6, fy - 3, 1, 2, oCol); drawPixelRect(fx - 6, fy + 2, 1, 2, oCol);
+                drawPixelRect(fx + 6, fy - 3, 1, 2, oCol); drawPixelRect(fx + 6, fy + 2, 1, 2, oCol);
+              } else {
+                // --- NORMAL SUNFLOWER (13x13) ---
+                // 1. Seed Core (7x7 rounded checkerboard)
+                for (let y = -3; y <= 3; y++) {
+                  for (let x = -3; x <= 3; x++) {
+                    if (Math.abs(x) + Math.abs(y) <= 4) {
+                      const isDark = (x + y) % 2 === 0;
+                      drawPixel(fx + x, fy + y, isDark ? '#271c19' : '#3e2723');
+                    }
+                  }
+                }
+                drawPixel(fx - 1, fy - 1, '#5d4037'); // Core highlight
+
+                // 2. Backing Petals (Orange shadow layer)
+                drawPixel(fx - 3, fy - 3, shadowCol); drawPixel(fx + 3, fy - 3, shadowCol);
+                drawPixel(fx - 3, fy + 3, shadowCol); drawPixel(fx + 3, fy + 3, shadowCol);
+                drawPixel(fx - 4, fy - 2, shadowCol); drawPixel(fx - 4, fy + 2, shadowCol);
+                drawPixel(fx + 4, fy - 2, shadowCol); drawPixel(fx + 4, fy + 2, shadowCol);
+                drawPixel(fx - 2, fy - 4, shadowCol); drawPixel(fx + 2, fy - 4, shadowCol);
+                drawPixel(fx - 2, fy + 4, shadowCol); drawPixel(fx + 2, fy + 4, shadowCol);
+
+                // 3. Golden Yellow Petals (Front layer)
+                drawPixelRect(fx - 1, fy - 4, 3, 1, pCol);
+                drawPixelRect(fx - 1, fy + 4, 3, 1, pCol);
+                drawPixelRect(fx - 4, fy - 1, 1, 3, pCol);
+                drawPixelRect(fx + 4, fy - 1, 1, 3, pCol);
+                drawPixel(fx - 2, fy - 3, pCol); drawPixel(fx - 3, fy - 2, pCol);
+                drawPixel(fx + 2, fy - 3, pCol); drawPixel(fx + 3, fy - 2, pCol);
+                drawPixel(fx - 2, fy + 3, pCol); drawPixel(fx - 3, fy + 2, pCol);
+                drawPixel(fx + 2, fy + 3, pCol); drawPixel(fx + 3, fy + 2, pCol);
+
+                // 4. Highlight Tips (Bright yellow)
+                drawPixel(fx, fy - 5, hCol); drawPixel(fx, fy + 5, hCol);
+                drawPixel(fx - 5, fy, hCol); drawPixel(fx + 5, fy, hCol);
+                drawPixel(fx - 3, fy - 3, hCol); drawPixel(fx + 3, fy - 3, hCol);
+                drawPixel(fx - 3, fy + 3, hCol); drawPixel(fx + 3, fy + 3, hCol);
+
+                // 5. Dark Outline
+                drawPixel(fx, fy - 6, oCol); drawPixel(fx - 1, fy - 5, oCol); drawPixel(fx + 1, fy - 5, oCol);
+                drawPixel(fx, fy + 6, oCol); drawPixel(fx - 1, fy + 5, oCol); drawPixel(fx + 1, fy + 5, oCol);
+                drawPixel(fx - 6, fy, oCol); drawPixel(fx - 5, fy - 1, oCol); drawPixel(fx - 5, fy + 1, oCol);
+                drawPixel(fx + 6, fy, oCol); drawPixel(fx + 5, fy - 1, oCol); drawPixel(fx + 5, fy + 1, oCol);
+
+                drawPixel(fx - 4, fy - 4, oCol); drawPixel(fx - 4, fy - 3, oCol); drawPixel(fx - 3, fy - 4, oCol);
+                drawPixel(fx + 4, fy - 4, oCol); drawPixel(fx + 4, fy - 3, oCol); drawPixel(fx + 3, fy - 4, oCol);
+                drawPixel(fx - 4, fy + 4, oCol); drawPixel(fx - 4, fy + 3, oCol); drawPixel(fx - 3, fy + 4, oCol);
+                drawPixel(fx + 4, fy + 4, oCol); drawPixel(fx + 4, fy + 3, oCol); drawPixel(fx + 3, fy + 4, oCol);
+
+                drawPixel(fx - 2, fy - 5, oCol); drawPixel(fx + 2, fy - 5, oCol);
+                drawPixel(fx - 2, fy + 5, oCol); drawPixel(fx + 2, fy + 5, oCol);
+                drawPixel(fx - 5, fy - 2, oCol); drawPixel(fx - 5, fy + 2, oCol);
+                drawPixel(fx + 5, fy - 2, oCol); drawPixel(fx + 5, fy + 2, oCol);
+              }
               break;
             }
             case 10: {
