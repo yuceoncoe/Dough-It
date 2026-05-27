@@ -20,7 +20,7 @@ export const CropArchiveModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative flex h-full max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-[2rem] border border-stone-200 bg-[#f6f6f8] p-6 text-stone-900 shadow-2xl animate-in zoom-in-95 duration-200">
+      <div className="relative flex h-full max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-[2rem] border border-stone-200 bg-[#e8e8ed] p-6 text-stone-900 shadow-2xl animate-in zoom-in-95 duration-200">
         
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stone-200/60 pb-4 shrink-0">

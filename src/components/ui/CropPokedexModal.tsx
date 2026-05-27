@@ -49,7 +49,7 @@ export const CropPokedexModal = ({ isOpen, onClose, currentMonth }: CropPokedexM
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200 sm:items-center">
-      <div className="relative flex h-[92vh] w-full max-w-md flex-col overflow-hidden rounded-t-[2rem] border border-stone-200 bg-[#f6f6f8] shadow-2xl animate-in slide-in-from-bottom-4 duration-300 sm:h-[85vh] sm:rounded-[2rem]">
+      <div className="relative flex h-[92vh] w-full max-w-md flex-col overflow-hidden rounded-t-[2rem] border border-stone-200 bg-[#e8e8ed] shadow-2xl animate-in slide-in-from-bottom-4 duration-300 sm:h-[85vh] sm:rounded-[2rem]">
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stone-200/60 px-5 py-4 shrink-0">

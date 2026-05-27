@@ -481,7 +481,7 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
 
   ctx.clearRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
 
-  ctx.fillStyle = '#f6f6f8';
+  ctx.fillStyle = '#e8e8ed';
   ctx.fillRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
 
   ctx.save();

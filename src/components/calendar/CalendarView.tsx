@@ -138,8 +138,8 @@ export const CalendarView = ({
   };
 
   return (
-    <section className="flex h-full flex-col overflow-y-auto bg-[#f6f6f8] p-4 md:p-8">
-      <div className="sticky top-0 z-30 mb-4 flex items-center justify-between gap-3 bg-[#f6f6f8]/95 pb-3 backdrop-blur">
+    <section className="flex h-full flex-col overflow-y-auto bg-[#e8e8ed] p-4 md:p-8">
+      <div className="sticky top-0 z-30 mb-4 flex items-center justify-between gap-3 bg-[#e8e8ed]/95 pb-3 backdrop-blur">
         <div>
           <h1 className="font-hand text-3xl text-stone-800 md:text-5xl">달력 보기</h1>
         </div>

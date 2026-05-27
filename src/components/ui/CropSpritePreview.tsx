@@ -27,7 +27,7 @@ export const CropSpritePreview = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f6f6f8] p-6 md:p-12 text-stone-900 overflow-y-auto">
+    <div className="min-h-screen bg-[#e8e8ed] p-6 md:p-12 text-stone-900 overflow-y-auto">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8 flex items-center justify-between">
           <div>
