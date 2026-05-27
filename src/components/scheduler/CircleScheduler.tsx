@@ -32,13 +32,13 @@ export const CircleScheduler = ({
     const hasUrgent = tags.includes('urgent');
     const hasImportant = tags.includes('important');
     if (hasUrgent && hasImportant) {
-      return 'pruning';
+      return 'fertilizing';
     }
     if (hasUrgent) {
-      return 'watering';
+      return 'pruning';
     }
     if (hasImportant) {
-      return 'fertilizing';
+      return 'watering';
     }
     return 'tilling';
   };
