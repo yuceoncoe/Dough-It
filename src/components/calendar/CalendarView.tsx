@@ -36,14 +36,14 @@ export const CalendarView = ({
   const getStageName = (stage: number, name: string, month: number) => {
     const isFlowerType = month === 4 || month === 5 || month === 9 || month === 12;
 
-    if (stage === 1) return `씨앗 단계 🌱 (1/8)`;
-    if (stage === 2) return `발아 단계 🌱✨ (2/8)`;
-    if (stage === 3) return `새싹 단계 🌿 (3/8)`;
-    if (stage === 4) return `묘목 단계 🪴 (4/8)`;
-    if (stage === 5) return `성장 단계 🌳 (5/8)`;
-    if (stage === 6) return isFlowerType ? `꽃봉오리 단계 🪻 (6/8)` : `아기 열매 단계 🍏 (6/8)`;
-    if (stage === 7) return isFlowerType ? `개화 단계 🌸 (7/8)` : `설익은 열매 단계 🍊 (7/8)`;
-    return `${name} 수확기! 🎉 (8/8)`;
+    if (stage === 1) return `씨앗 단계 (1/8)`;
+    if (stage === 2) return `발아 단계 (2/8)`;
+    if (stage === 3) return `새싹 단계 (3/8)`;
+    if (stage === 4) return `묘목 단계 (4/8)`;
+    if (stage === 5) return `성장 단계 (5/8)`;
+    if (stage === 6) return isFlowerType ? `꽃봉오리 단계 (6/8)` : `아기 열매 단계 (6/8)`;
+    if (stage === 7) return isFlowerType ? `개화 단계 (7/8)` : `설익은 열매 단계 (7/8)`;
+    return `${name} 수확기! (8/8)`;
   };
 
   const getStageComment = (state: typeof cropState) => {
@@ -53,54 +53,54 @@ export const CalendarView = ({
     // 1. 기본 서두 문구 극소화
     let baseComment = "";
     if (evolutionStage === 1) {
-      if (health >= 80) baseComment = `씨앗이 싹 틔울 준비를 마쳤어요. 🌱`;
-      else if (health < 40) baseComment = `흙이 메말라 씨앗이 목말라해요. 물을 주세요! 💧`;
-      else baseComment = `씨앗이 하루 일정을 기다리고 있어요. 🌱`;
+      if (health >= 80) baseComment = `씨앗이 싹 틔울 준비를 마쳤어요.`;
+      else if (health < 40) baseComment = `흙이 메말라 씨앗이 목말라해요. 물을 주세요!`;
+      else baseComment = `씨앗이 하루 일정을 기다리고 있어요.`;
     } else if (evolutionStage === 2) {
-      if (health >= 80) baseComment = `작은 싹이 껍질을 깨고 나오려 해요! 힘찬 시작입니다. 🌱✨`;
-      else if (health < 40) baseComment = `싹이 나오려 하지만 수분이 매우 부족해요. 🩹`;
-      else baseComment = `흙 틈 사이로 아주 작은 연둣빛 싹이 삐죽 고개를 내밀었어요. 🌱`;
+      if (health >= 80) baseComment = `작은 싹이 껍질을 깨고 나오려 해요! 힘찬 시작입니다.`;
+      else if (health < 40) baseComment = `싹이 나오려 하지만 수분이 매우 부족해요.`;
+      else baseComment = `흙 틈 사이로 아주 작은 연둣빛 싹이 삐죽 고개를 내밀었어요.`;
     } else if (evolutionStage === 3) {
-      if (health >= 80) baseComment = `새싹이 파릇파릇하고 건강하게 자라는 중입니다! 🌿`;
-      else if (health < 40) baseComment = `새싹이 시들해 보여 물주기가 시급해요. 🩹`;
-      else baseComment = `${cropName}의 새싹이 자라나기 시작했어요. 🌿`;
+      if (health >= 80) baseComment = `새싹이 파릇파릇하고 건강하게 자라는 중입니다!`;
+      else if (health < 40) baseComment = `새싹이 시들해 보여 물주기가 시급해요.`;
+      else baseComment = `${cropName}의 새싹이 자라나기 시작했어요.`;
     } else if (evolutionStage === 4) {
-      if (health >= 80) baseComment = `잎사귀가 점점 늘어나며 묘목이 되어가고 있어요! 🪴`;
-      else if (health < 40) baseComment = `어린 이파리들이 메마르지 않게 보살펴 주세요. 🩹`;
-      else baseComment = `어엿한 아기 작물의 형태를 갖추어가고 있습니다. 🪴`;
+      if (health >= 80) baseComment = `잎사귀가 점점 늘어나며 묘목이 되어가고 있어요!`;
+      else if (health < 40) baseComment = `어린 이파리들이 메마르지 않게 보살펴 주세요.`;
+      else baseComment = `어엿한 아기 작물의 형태를 갖추어가고 있습니다.`;
     } else if (evolutionStage === 5) {
-      if (health >= 80) baseComment = `줄기와 잎사귀에 윤기가 흘러넘쳐요! 🌳✨`;
-      else if (health < 40) baseComment = `성장이 정체되었으니 핵심 일정을 챙겨주세요. 💪`;
-      else baseComment = `줄기가 위를 향해 곧게 뻗어가고 있어요. 🌳`;
+      if (health >= 80) baseComment = `줄기와 잎사귀에 윤기가 흘러넘쳐요!`;
+      else if (health < 40) baseComment = `성장이 정체되었으니 핵심 일정을 챙겨주세요.`;
+      else baseComment = `줄기가 위를 향해 곧게 뻗어가고 있어요.`;
     } else if (evolutionStage === 6) {
       if (isFlowerType) {
-        if (health >= 80) baseComment = `영양분을 듬뿍 머금은 꽃봉오리가 맺혔어요. 곧 꽃이 피겠어요! 🪻`;
-        else if (health < 40) baseComment = `꽃을 피우기 위해 더 많은 보살핌이 필요해요. 🩹`;
-        else baseComment = `줄기 끝에 조그맣고 소중한 꽃봉오리가 생겼습니다. 🪻`;
+        if (health >= 80) baseComment = `영양분을 듬뿍 머금은 꽃봉오리가 맺혔어요. 곧 꽃이 피겠어요!`;
+        else if (health < 40) baseComment = `꽃을 피우기 위해 더 많은 보살핌이 필요해요.`;
+        else baseComment = `줄기 끝에 조그맣고 소중한 꽃봉오리가 생겼습니다.`;
       } else {
-        if (health >= 80) baseComment = `꽃이 지고 푸른 아기 열매가 빼꼼 고개를 내밀었습니다! 🍏`;
-        else if (health < 40) baseComment = `아기 열매가 맺혔으나 물이 모자라 시들해요. 🩹`;
-        else baseComment = `줄기 사이에 아주 작은 아기 열매가 생겼어요. 🍏`;
+        if (health >= 80) baseComment = `꽃이 지고 푸른 아기 열매가 빼꼼 고개를 내밀었습니다!`;
+        else if (health < 40) baseComment = `아기 열매가 맺혔으나 물이 모자라 시들해요.`;
+        else baseComment = `줄기 사이에 아주 작은 아기 열매가 생겼어요.`;
       }
     } else if (evolutionStage === 7) {
       if (isFlowerType) {
         if (health >= 80) {
-          if (yieldCount >= 7) baseComment = `꽃망울이 터질 듯해 대수확이 예상됩니다! 🌸✨`;
-          else baseComment = `꽃 피울 준비가 된 싱싱한 상태예요. 😊`;
-        } else if (health < 40) baseComment = `꽃이 필 시기이지만 시들해 관리가 필요해요. 🩹`;
-        else baseComment = `순조롭게 꽃망울이 맺히며 결실을 준비하고 있어요. 🌸`;
+          if (yieldCount >= 7) baseComment = `꽃망울이 터질 듯해 대수확이 예상됩니다!`;
+          else baseComment = `꽃 피울 준비가 된 싱싱한 상태예요.`;
+        } else if (health < 40) baseComment = `꽃이 필 시기이지만 시들해 관리가 필요해요.`;
+        else baseComment = `순조롭게 꽃망울이 맺히며 결실을 준비하고 있어요.`;
       } else {
         if (health >= 80) {
-          baseComment = `열매가 굵어지고 알맞게 설익어 색이 도는 중입니다! 🍊`;
-        } else if (health < 40) baseComment = `열매가 자라나는 중요한 시기인데 시들시들해요. 🩹`;
-        else baseComment = `열매가 제법 탐스러운 형태를 갖춰가며 물들어갑니다. 🍊`;
+          baseComment = `열매가 굵어지고 알맞게 설익어 색이 도는 중입니다!`;
+        } else if (health < 40) baseComment = `열매가 자라나는 중요한 시기인데 시들시들해요.`;
+        else baseComment = `열매가 제법 탐스러운 형태를 갖춰가며 물들어갑니다.`;
       }
     } else { // 8단계 (수확)
       if (health >= 80) {
-        if (quality === '최상급') baseComment = `대성공! 탐스러운 최상급 작물이 열렸어요! 🏆🎉`;
-        else baseComment = `작물이 건강하게 자라 수확할 완벽한 시기예요! 🧺`;
-      } else if (health < 40) baseComment = `버거운 날씨를 버텨내 준 작물을 수확해 주세요. 🩹`;
-      else baseComment = `무사히 다 자란 결실들을 보관함에 수확해 보세요! 🎉`;
+        if (quality === '최상급') baseComment = `대성공! 탐스러운 최상급 작물이 열렸어요!`;
+        else baseComment = `작물이 건강하게 자라 수확할 완벽한 시기예요!`;
+      } else if (health < 40) baseComment = `버거운 날씨를 버텨내 준 작물을 수확해 주세요.`;
+      else baseComment = `무사히 다 자란 결실들을 보관함에 수확해 보세요!`;
     }
 
     // 2. 우수 / 취약 분면 압축 진단 로직
@@ -120,16 +120,16 @@ export const CalendarView = ({
     let feedback = "";
 
     if (strongQuads.length > 0 && weakQuads.length > 0) {
-      feedback = ` ${strongQuads[0].strongDesc}이나, ${weakQuads[0].weakDesc} 상태예요. 🩹`;
+      feedback = ` ${strongQuads[0].strongDesc}이나, ${weakQuads[0].weakDesc} 상태예요.`;
     } else if (strongQuads.length > 0) {
-      feedback = ` ${strongQuads[0].strongDesc}이며 균형도 안정적입니다. ✨`;
+      feedback = ` ${strongQuads[0].strongDesc}이며 균형도 안정적입니다.`;
     } else if (weakQuads.length > 0) {
-      feedback = ` ${weakQuads[0].weakDesc} 상태이니 관리가 필요해요. 💪`;
+      feedback = ` ${weakQuads[0].weakDesc} 상태이니 관리가 필요해요.`;
     } else {
       const avg = (stats.growthQ1 + stats.yieldQ2 + stats.qualityQ3 + stats.healthQ4) / 4;
       feedback = avg >= 4.5
-        ? ` 모든 요소가 고르게 발달한 건강한 상태입니다. 🌟`
-        : ` 잔잔한 성장기이니 가벼운 루틴부터 챙겨주세요. 🌱`;
+        ? ` 모든 요소가 고르게 발달한 건강한 상태입니다.`
+        : ` 잔잔한 성장기이니 가벼운 루틴부터 챙겨주세요.`;
     }
 
     return `${baseComment}${feedback}`;
@@ -159,7 +159,7 @@ export const CalendarView = ({
           <div className="relative flex-shrink-0 rounded-2xl bg-stone-50 border border-stone-100 p-1">
             <PixelCrop cropState={cropState} size={84} interactive={true} />
             <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full bg-stone-900 px-2 py-0.5 text-[9px] font-bold text-white whitespace-nowrap shadow-sm">
-              {cropState.cropName} {cropState.emoji}
+              {cropState.cropName}
             </div>
           </div>
           
@@ -171,7 +171,7 @@ export const CalendarView = ({
               onClick={() => setArchiveOpen(true)}
               className="text-xs font-bold text-amber-700 hover:text-amber-950 transition-colors shrink-0"
             >
-              보관함 🧺 &gt;
+              보관함 보기 &gt;
             </button>
           </div>
         </div>

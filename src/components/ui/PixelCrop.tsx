@@ -132,7 +132,7 @@ export const PixelCrop = ({
         } else if (month === 4) { // Cherry Blossom
           stemColor = '#5d4037'; // Bark brown
           stemOutline = '#3e2723';
-          leafColor = health < 45 ? '#9ccc65' : '#a5d6a7'; // Soft light green leaves
+          leafColor = health < 45 ? '#f48fb1' : '#f8bbd0'; // Soft pink blossoms
         } else if (month === 6) { // Plum
           stemColor = '#4e342e'; // Antique woody brown
           stemOutline = '#271c19';
@@ -259,13 +259,13 @@ export const PixelCrop = ({
           }
         } else if (isStrawberry) {
           // --- 1월 딸기: 포복형 짧은 수풀 스타일 ---
-          let bushHeight = 4;
-          let bushWidth = 10;
-          if (evolutionStage === 3) { bushHeight = 4; bushWidth = 12; }
-          else if (evolutionStage === 4) { bushHeight = 6; bushWidth = 16; }
-          else if (evolutionStage === 5) { bushHeight = 8; bushWidth = 20; }
-          else if (evolutionStage === 6) { bushHeight = 10; bushWidth = 24; }
-          else if (evolutionStage === 7) { bushHeight = 12; bushWidth = 26; }
+          let bushHeight = 6;
+          let bushWidth = 12;
+          if (evolutionStage === 3) { bushHeight = 6; bushWidth = 12; }
+          else if (evolutionStage === 4) { bushHeight = 10; bushWidth = 16; }
+          else if (evolutionStage === 5) { bushHeight = 13; bushWidth = 20; }
+          else if (evolutionStage === 6) { bushHeight = 16; bushWidth = 24; }
+          else if (evolutionStage === 7) { bushHeight = 18; bushWidth = 26; }
 
           const swayX = Math.round(swayOffset * 0.45);
           const leafYOffset = health < 40 ? 2 : 0;
@@ -287,8 +287,9 @@ export const PixelCrop = ({
             ctx.lineTo(endX, endY);
             ctx.stroke();
 
-            drawPixelRect(endX - 2, endY - 2, 5, 4, stemOutline);
-            drawPixelRect(endX - 1, endY - 1, 3, 2, leafColor);
+            const size = evolutionStage >= 5 ? 3 : 2;
+            drawPixelRect(endX - size, endY - size + 1, size * 2 + 1, size * 2, stemOutline);
+            drawPixelRect(endX - size + 1, endY - size + 2, size * 2 - 1, size * 2 - 2, leafColor);
           });
 
           if (evolutionStage === 6) {
@@ -347,17 +348,28 @@ export const PixelCrop = ({
             drawPixelRect(baseCenterX + Math.round(swayOffset * 0.5) - 1, topY - 3, 3, 1, '#fff');
           }
         } else if (isWoody) {
-          // --- WOODY TREE PROGRESSION (귤, 벚꽃, 매실, 감, 동백) ---
+          // --- --- WOODY TREE PROGRESSION (귤, 벚꽃, 매실, 감, 동백) ---
           const swayX = Math.round(swayOffset * (evolutionStage === 3 ? 0.4 : (evolutionStage === 4 ? 0.55 : (evolutionStage === 5 ? 0.7 : (evolutionStage === 6 ? 0.85 : 1.0)))));
           const leafYOffset = health < 40 ? (evolutionStage >= 5 ? 3 : 2) : 0;
-          const leafOutline = health < 45 ? '#33691e' : '#1b5e20';
+          const leafOutline = month === 4 ? (health < 45 ? '#ad1457' : '#c2185b') : (health < 45 ? '#33691e' : '#1b5e20');
 
           const drawFoliage = (cx: number, cy: number, r: number) => {
+            // Draw outer circle with outline
             for (let y = -r; y <= r; y++) {
               const rowW = Math.round(Math.sqrt(r * r - y * y) * 2.0);
-              const lx = cx - Math.floor(rowW / 2);
-              drawPixelRect(lx, cy + y + leafYOffset, rowW, 1, leafOutline);
-              drawPixelRect(lx + 1, cy + y + leafYOffset, rowW - 2, 1, leafColor);
+              if (rowW > 0) {
+                const lx = cx - Math.floor(rowW / 2);
+                drawPixelRect(lx, cy + y + leafYOffset, rowW, 1, leafOutline);
+              }
+            }
+            // Draw inner circle with fill
+            const rInner = r - 1;
+            for (let y = -rInner; y <= rInner; y++) {
+              const rowW = Math.round(Math.sqrt(rInner * rInner - y * y) * 2.0);
+              if (rowW > 0) {
+                const lx = cx - Math.floor(rowW / 2);
+                drawPixelRect(lx, cy + y + leafYOffset, rowW, 1, leafColor);
+              }
             }
           };
 
@@ -397,26 +409,55 @@ export const PixelCrop = ({
               drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.2), currY, 4, 1, stemOutline);
               drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.2), currY, 2, 1, stemColor);
             }
-            // Left branch (short)
-            for (let i = 1; i <= 5; i++) {
-              const currX = baseCenterX - 2 - i + Math.round(swayX * 0.3);
-              const currY = baseCenterY - 13 - i;
-              drawPixelRect(currX, currY, 2, 2, stemOutline);
-              drawPixel(currX + 1, currY + 1, stemColor);
-            }
-            // Right branch (short)
-            for (let i = 1; i <= 5; i++) {
-              const currX = baseCenterX + 1 + i + Math.round(swayX * 0.3);
-              const currY = baseCenterY - 13 - Math.round(i * 1.2);
-              drawPixelRect(currX, currY, 2, 2, stemOutline);
-              drawPixel(currX, currY + 1, stemColor);
-            }
+            
+            // Draw branches using clean continuous lines
+            ctx.save();
+            // Left branch
+            ctx.strokeStyle = stemOutline;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 13);
+            ctx.lineTo(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 18);
+            ctx.stroke();
+
+            ctx.strokeStyle = stemColor;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 13);
+            ctx.lineTo(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 18);
+            ctx.stroke();
+
+            // Right branch
+            ctx.strokeStyle = stemOutline;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 13);
+            ctx.lineTo(baseCenterX + 5 + Math.round(swayX * 0.3), baseCenterY - 19);
+            ctx.stroke();
+
+            ctx.strokeStyle = stemColor;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 13);
+            ctx.lineTo(baseCenterX + 5 + Math.round(swayX * 0.3), baseCenterY - 19);
+            ctx.stroke();
+
             // Center branch
-            for (let i = 0; i < 8; i++) {
-              const currY = baseCenterY - 13 - i;
-              drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.4), currY, 3, 1, stemOutline);
-              drawPixel(baseCenterX + Math.round(swayX * 0.4), currY, stemColor);
-            }
+            ctx.strokeStyle = stemOutline;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 13);
+            ctx.lineTo(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 21);
+            ctx.stroke();
+
+            ctx.strokeStyle = stemColor;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 13);
+            ctx.lineTo(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 21);
+            ctx.stroke();
+            ctx.restore();
+
             // Foliages
             drawFoliage(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 18, 5 + leafSizeModifier);
             drawFoliage(baseCenterX + 5 + Math.round(swayX * 0.3), baseCenterY - 19, 5 + leafSizeModifier);
@@ -424,31 +465,59 @@ export const PixelCrop = ({
           } else {
             // Stage 6 and 7: Trees are nearly full size with branching and flowers/fruit budding
             // Trunk
-            for (let i = 0; i < 13; i++) {
+            for (let i = 0; i < 11; i++) {
               const currY = baseCenterY - 4 - i;
               drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.2), currY, 4, 1, stemOutline);
               drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.2), currY, 2, 1, stemColor);
             }
+            
+            // Draw branches using clean continuous lines
+            ctx.save();
             // Left branch
-            for (let i = 1; i <= 9; i++) {
-              const currX = baseCenterX - 2 - i + Math.round(swayX * 0.3);
-              const currY = baseCenterY - 16 - Math.round(i * 1.0);
-              drawPixelRect(currX, currY, 2, 2, stemOutline);
-              drawPixel(currX + 1, currY + 1, stemColor);
-            }
+            ctx.strokeStyle = stemOutline;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 14);
+            ctx.lineTo(baseCenterX - 9 + Math.round(swayX * 0.4), baseCenterY - 26);
+            ctx.stroke();
+
+            ctx.strokeStyle = stemColor;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 14);
+            ctx.lineTo(baseCenterX - 9 + Math.round(swayX * 0.4), baseCenterY - 26);
+            ctx.stroke();
+
             // Right branch
-            for (let i = 1; i <= 9; i++) {
-              const currX = baseCenterX + 1 + i + Math.round(swayX * 0.3);
-              const currY = baseCenterY - 16 - Math.round(i * 1.2);
-              drawPixelRect(currX, currY, 2, 2, stemOutline);
-              drawPixel(currX, currY + 1, stemColor);
-            }
+            ctx.strokeStyle = stemOutline;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 14);
+            ctx.lineTo(baseCenterX + 9 + Math.round(swayX * 0.5), baseCenterY - 28);
+            ctx.stroke();
+
+            ctx.strokeStyle = stemColor;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 14);
+            ctx.lineTo(baseCenterX + 9 + Math.round(swayX * 0.5), baseCenterY - 28);
+            ctx.stroke();
+
             // Center branch
-            for (let i = 0; i < 16; i++) {
-              const currY = baseCenterY - 16 - i;
-              drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.4), currY, 3, 1, stemOutline);
-              drawPixel(baseCenterX + Math.round(swayX * 0.4), currY, stemColor);
-            }
+            ctx.strokeStyle = stemOutline;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 14);
+            ctx.lineTo(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35);
+            ctx.stroke();
+
+            ctx.strokeStyle = stemColor;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 14);
+            ctx.lineTo(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35);
+            ctx.stroke();
+            ctx.restore();
 
             // Foliages
             const fRadL = evolutionStage === 6 ? 7 : 9;
@@ -743,7 +812,7 @@ export const PixelCrop = ({
         const isTall = month === 8 || month === 9;
         
         let stemH = 31;
-        let bushHeight = 12;
+        let bushHeight = 20;
         let bushWidth = 28;
 
         if (isVine) {
@@ -800,8 +869,10 @@ export const PixelCrop = ({
             ctx.lineTo(endX, endY);
             ctx.stroke();
 
-            drawPixelRect(endX - 2, endY - 2, 5, 4, stemOutline);
-            drawPixelRect(endX - 1, endY - 1, 3, 2, leafColor);
+            // Rich strawberry leaf cluster (7x5)
+            drawPixelRect(endX - 3, endY - 2, 7, 5, stemOutline);
+            drawPixelRect(endX - 2, endY - 1, 5, 3, leafColor);
+            drawPixel(endX, endY - 2, leafColor); // top leaf point
 
             // Q3 dark spot on strawberry leaves
             if (isLowQualityQ3 && Math.random() < 0.3) {
@@ -845,44 +916,79 @@ export const PixelCrop = ({
         } else if (isWoody) {
           // --- WOODY TREE DRAWING (귤, 벚꽃, 매실, 감, 동백) ---
           // Draw trunk
-          for (let i = 0; i < 13; i++) {
+          for (let i = 0; i < 11; i++) {
             const currY = baseCenterY - 4 - i;
             drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.2), currY, 4, 1, stemOutline);
             drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.2), currY, 2, 1, stemColor);
           }
 
+          // Draw branches using clean continuous lines
+          ctx.save();
           // Left branch
-          for (let i = 1; i <= 9; i++) {
-            const currX = baseCenterX - 2 - i + Math.round(swayX * 0.3);
-            const currY = baseCenterY - 16 - Math.round(i * 1.0);
-            drawPixelRect(currX, currY, 2, 2, stemOutline);
-            drawPixel(currX + 1, currY + 1, stemColor);
-          }
+          ctx.strokeStyle = stemOutline;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 14);
+          ctx.lineTo(baseCenterX - 9 + Math.round(swayX * 0.3), baseCenterY - 26);
+          ctx.stroke();
+
+          ctx.strokeStyle = stemColor;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 14);
+          ctx.lineTo(baseCenterX - 9 + Math.round(swayX * 0.3), baseCenterY - 26);
+          ctx.stroke();
 
           // Right branch
-          for (let i = 1; i <= 9; i++) {
-            const currX = baseCenterX + 1 + i + Math.round(swayX * 0.3);
-            const currY = baseCenterY - 16 - Math.round(i * 1.2);
-            drawPixelRect(currX, currY, 2, 2, stemOutline);
-            drawPixel(currX, currY + 1, stemColor);
-          }
+          ctx.strokeStyle = stemOutline;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 14);
+          ctx.lineTo(baseCenterX + 9 + Math.round(swayX * 0.5), baseCenterY - 28);
+          ctx.stroke();
 
-          // Center branch extension
-          for (let i = 0; i < 16; i++) {
-            const currY = baseCenterY - 16 - i;
-            const currX = baseCenterX + Math.round(swayX * 0.4);
-            drawPixelRect(currX - 1, currY, 3, 1, stemOutline);
-            drawPixel(currX, currY, stemColor);
-          }
+          ctx.strokeStyle = stemColor;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 14);
+          ctx.lineTo(baseCenterX + 9 + Math.round(swayX * 0.5), baseCenterY - 28);
+          ctx.stroke();
 
-          // Foliage blocks (green clouds) at the tips
-          const leafOutline = health < 45 ? '#33691e' : '#1b5e20';
+          // Center branch
+          ctx.strokeStyle = stemOutline;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 14);
+          ctx.lineTo(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35);
+          ctx.stroke();
+
+          ctx.strokeStyle = stemColor;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(baseCenterX + Math.round(swayX * 0.2), baseCenterY - 14);
+          ctx.lineTo(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35);
+          ctx.stroke();
+          ctx.restore();
+
+          // Foliage blocks (green/pink clouds) at the tips
+          const leafOutline = month === 4 ? (health < 45 ? '#ad1457' : '#c2185b') : (health < 45 ? '#33691e' : '#1b5e20');
           const drawFoliage = (cx: number, cy: number, r: number) => {
+            // Draw outer circle with outline
             for (let y = -r; y <= r; y++) {
               const rowW = Math.round(Math.sqrt(r * r - y * y) * 2.0);
-              const lx = cx - Math.floor(rowW / 2);
-              drawPixelRect(lx, cy + y + leafYOffset, rowW, 1, leafOutline);
-              drawPixelRect(lx + 1, cy + y + leafYOffset, rowW - 2, 1, leafColor);
+              if (rowW > 0) {
+                const lx = cx - Math.floor(rowW / 2);
+                drawPixelRect(lx, cy + y + leafYOffset, rowW, 1, leafOutline);
+              }
+            }
+            // Draw inner circle with fill
+            const rInner = r - 1;
+            for (let y = -rInner; y <= rInner; y++) {
+              const rowW = Math.round(Math.sqrt(rInner * rInner - y * y) * 2.0);
+              if (rowW > 0) {
+                const lx = cx - Math.floor(rowW / 2);
+                drawPixelRect(lx, cy + y + leafYOffset, rowW, 1, leafColor);
+              }
             }
           };
 
@@ -1389,14 +1495,14 @@ export const PixelCrop = ({
           }
         } else if (isStrawberry) {
           const list = [
-            { dx: -Math.round(bushWidth * 0.35), dy: -Math.round(bushHeight * 0.6) + leafYOffset + 5, scale: 0.95 },
-            { dx: Math.round(bushWidth * 0.35), dy: -Math.round(bushHeight * 0.6) + leafYOffset + 5, scale: 0.95 },
-            { dx: 4, dy: -Math.round(bushHeight * 0.5) + leafYOffset + 6, scale: 0.90 },
-            { dx: -4, dy: -Math.round(bushHeight * 0.5) + leafYOffset + 6, scale: 0.90 },
-            { dx: -Math.round(bushWidth * 0.45), dy: -Math.round(bushHeight * 0.4) + leafYOffset + 4, scale: 0.85 },
-            { dx: Math.round(bushWidth * 0.45), dy: -Math.round(bushHeight * 0.4) + leafYOffset + 4, scale: 0.85 },
-            { dx: 0, dy: -Math.round(bushHeight * 0.8) + leafYOffset + 5, scale: 0.80 },
-            { dx: 0, dy: -bushHeight + leafYOffset + 7, scale: 1.0 }
+            { dx: -Math.round(bushWidth * 0.35), dy: -Math.round(bushHeight * 0.7) + leafYOffset, scale: 0.95 },
+            { dx: Math.round(bushWidth * 0.35), dy: -Math.round(bushHeight * 0.7) + leafYOffset, scale: 0.95 },
+            { dx: 4, dy: -Math.round(bushHeight * 0.75) + leafYOffset, scale: 0.90 },
+            { dx: -4, dy: -Math.round(bushHeight * 0.75) + leafYOffset, scale: 0.90 },
+            { dx: -Math.round(bushWidth * 0.45), dy: -Math.round(bushHeight * 0.8) + leafYOffset, scale: 0.85 },
+            { dx: Math.round(bushWidth * 0.45), dy: -Math.round(bushHeight * 0.8) + leafYOffset, scale: 0.85 },
+            { dx: 0, dy: -Math.round(bushHeight * 0.95) + leafYOffset, scale: 0.80 },
+            { dx: 0, dy: -bushHeight + leafYOffset, scale: 1.0 }
           ];
           coords = list.slice(0, Math.min(yieldCount, list.length));
         } else if (isGroup) {

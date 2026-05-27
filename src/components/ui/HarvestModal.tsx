@@ -44,7 +44,7 @@ export const HarvestModal = ({
             {year}년 {month}월 결산
           </span>
           <h2 className="mt-3 font-hand text-3xl font-bold tracking-wide text-stone-800">
-            작물 수확 완료! {cropState.emoji}
+            작물 수확 완료!
           </h2>
           <p className="mt-1 text-xs text-stone-500">
             한 달 동안의 실천과 노력의 결실을 맺었습니다.
@@ -143,7 +143,7 @@ export const HarvestModal = ({
           onClick={onHarvest}
           className="mt-6 w-full rounded-2xl bg-stone-900 py-3.5 text-sm font-bold text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]"
         >
-          수확물 보관함에 보관하기 🧺
+          수확물 보관함에 보관하기
         </button>
 
       </div>

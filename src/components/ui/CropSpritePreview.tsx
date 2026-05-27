@@ -6,7 +6,7 @@ export const CropSpritePreview = () => {
   const stages = [1, 2, 3, 4, 5, 6, 7, 8];
 
   const getMockCropState = (month: number, stage: number): CropState => {
-    const cropInfo = CROP_BY_MONTH[month] || { month, name: '작물', emoji: '🌱' };
+    const cropInfo = CROP_BY_MONTH[month] || { month, name: '작물', emoji: '' };
     return {
       month,
       cropName: cropInfo.name,
@@ -31,7 +31,7 @@ export const CropSpritePreview = () => {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="font-hand text-4xl font-bold text-stone-800">식물 도감 & 스프라이트 미리보기 🎨</h1>
+            <h1 className="font-hand text-4xl font-bold text-stone-800">식물 도감 & 스프라이트 미리보기</h1>
             <p className="text-sm text-stone-500 mt-1">1월부터 12월까지 모든 작물의 1~8단계 성장 모습입니다.</p>
           </div>
           <a
@@ -49,7 +49,6 @@ export const CropSpritePreview = () => {
             return (
               <div key={m} className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
                 <div className="mb-4 flex items-center gap-2 border-b border-stone-100 pb-2">
-                  <span className="text-lg">{crop.emoji}</span>
                   <span className="font-bold text-lg text-stone-800">{m}월: {crop.name}</span>
                 </div>
 

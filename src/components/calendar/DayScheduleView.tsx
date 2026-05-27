@@ -512,7 +512,7 @@ export const DayScheduleView = ({
                               {getTaskToneLabel(task)}
                             </span>
                           ) : null}
-                          {task.rating !== undefined && <span className="whitespace-nowrap text-xs font-bold text-amber-500">⭐️ {task.rating}</span>}
+                          {task.rating !== undefined && <span className="whitespace-nowrap text-xs font-bold text-amber-500">★ {task.rating}</span>}
                         </div>
                       </div>
                     </button>

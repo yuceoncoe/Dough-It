@@ -25,7 +25,6 @@ export const CropArchiveModal = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stone-200/60 pb-4 shrink-0">
           <div className="flex items-center gap-2.5">
-            <span className="text-2xl">🧺</span>
             <h2 className="font-hand text-2xl font-bold text-stone-800 md:text-3xl">
               나의 수확 보관함
             </h2>
@@ -42,7 +41,7 @@ export const CropArchiveModal = ({
         <div className="flex-1 overflow-y-auto py-4">
           {sortedCrops.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center py-12 text-center">
-              <span className="text-6xl animate-bounce duration-1000">🌱</span>
+              <ShoppingBag size={48} className="text-stone-300 animate-bounce duration-1000" />
               <h3 className="mt-4 font-semibold text-stone-700">보관함이 비어있어요</h3>
               <p className="mt-1.5 max-w-xs text-xs leading-relaxed text-stone-400">
                 매월 계획했던 일들을 완료하여 식물을 가꾸어보세요! 한 달이 끝날 때 첫 수확물이 보관됩니다.
@@ -58,7 +57,6 @@ export const CropArchiveModal = ({
                   {/* Top: Crop & Date */}
                   <div className="flex items-start justify-between gap-2 border-b border-stone-100 pb-2.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-3xl shrink-0">{crop.emoji}</span>
                       <div className="text-left">
                         <h4 className="font-semibold text-stone-800 text-sm leading-tight">
                           {crop.cropName}

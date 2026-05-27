@@ -8,18 +8,18 @@ export interface CropInfo {
 }
 
 export const CROP_BY_MONTH: Record<number, CropInfo> = {
-  1: { month: 1, name: '달콤 딸기', emoji: '🍓' },
-  2: { month: 2, name: '상큼 귤', emoji: '🍊' },
-  3: { month: 3, name: '아삭 새싹채소', emoji: '🌱' },
-  4: { month: 4, name: '분홍 벚꽃나무', emoji: '🌸' },
-  5: { month: 5, name: '붉은 장미', emoji: '🌹' },
-  6: { month: 6, name: '초록 매실', emoji: '🟢' },
-  7: { month: 7, name: '시원 수박', emoji: '🍉' },
-  8: { month: 8, name: '노란 옥수수', emoji: '🌽' },
-  9: { month: 9, name: '황금 해바라기', emoji: '🌻' },
-  10: { month: 10, name: '달콤 감', emoji: '🍅' },
-  11: { month: 11, name: '달달 고구마', emoji: '🍠' },
-  12: { month: 12, name: '빨간 동백꽃', emoji: '🌺' },
+  1: { month: 1, name: '달콤 딸기', emoji: '' },
+  2: { month: 2, name: '상큼 귤', emoji: '' },
+  3: { month: 3, name: '아삭 새싹채소', emoji: '' },
+  4: { month: 4, name: '분홍 벚꽃나무', emoji: '' },
+  5: { month: 5, name: '붉은 장미', emoji: '' },
+  6: { month: 6, name: '초록 매실', emoji: '' },
+  7: { month: 7, name: '시원 수박', emoji: '' },
+  8: { month: 8, name: '노란 옥수수', emoji: '' },
+  9: { month: 9, name: '황금 해바라기', emoji: '' },
+  10: { month: 10, name: '달콤 감', emoji: '' },
+  11: { month: 11, name: '달달 고구마', emoji: '' },
+  12: { month: 12, name: '빨간 동백꽃', emoji: '' },
 };
 
 export interface CropState {
@@ -54,7 +54,7 @@ export const getEvolutionStage = (growth: number): 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 export const generateCropDiaryComment = (todayTasks: Task[]): string => {
   const completedTasks = todayTasks.filter((t) => t.completed);
   if (completedTasks.length === 0) {
-    return '오늘 하루는 작물도 나도 푹 쉬어가는 날이야 💤 내일 물을 주며 다시 튼튼하게 키워보자!';
+    return '오늘 하루는 작물도 나도 푹 쉬어가는 날이야. 내일 물을 주며 다시 튼튼하게 키워보자!';
   }
 
   const completedRatedTasks = completedTasks.filter((t) => t.rating !== undefined);
@@ -85,20 +85,20 @@ export const generateCropDiaryComment = (todayTasks: Task[]): string => {
   }
 
   if (avgRating !== null && avgRating < 3.0) {
-    return '오늘 일정 중에 조금 벅찼던 순간이 있었나봐. 시든 잎을 다듬어주듯이, 내일은 조금 더 부드럽게 보살펴줄게 🩹';
+    return '오늘 일정 중에 조금 벅찼던 순간이 있었나봐. 시든 잎을 다듬어주듯이, 내일은 조금 더 부드럽게 보살펴줄게.';
   }
 
   switch (dominantType) {
     case 'urgentImportant':
-      return `오늘은 중요하고 긴급한 일(줄기 성장)을 ${q1}개나 클리어했어! 쑥쑥 자라나는 작물처럼 내 하루도 힘차게 성장했네 🌱✨`;
+      return `오늘은 중요하고 긴급한 일(줄기 성장)을 ${q1}개나 클리어했어! 쑥쑥 자라나는 작물처럼 내 하루도 힘차게 성장했네.`;
     case 'important':
-      return `미래를 위해 정말 중요한 일(풍성한 수확 대비)을 ${q2}개 완료! 열매가 맺힐 준비를 단단히 채워가고 있어 🍇💪`;
+      return `미래를 위해 정말 중요한 일(풍성한 수확 대비)을 ${q2}개 완료! 열매가 맺힐 준비를 단단히 채워가고 있어.`;
     case 'urgent':
-      return `빠른 피드백과 센스가 필요한 일(고품질 햇빛 영양)을 ${q3}개 신속 처리! 반짝반짝 작물의 윤기가 도는 느낌이야 ☀️🕶️`;
+      return `빠른 피드백과 센스가 필요한 일(고품질 햇빛 영양)을 ${q3}개 신속 처리! 반짝반짝 작물의 윤기가 도는 느낌이야.`;
     case 'normal':
-      return `소소하지만 평화로운 일상(비옥한 토양 가꾸기)을 ${q4}개 해냈어. 촉촉하게 물을 주듯 차분히 내실을 다진 하루 🌸💧`;
+      return `소소하지만 평화로운 일상(비옥한 토양 가꾸기)을 ${q4}개 해냈어. 촉촉하게 물을 주듯 차분히 내실을 다진 하루.`;
     default:
-      return `오늘 한 일들이 차곡차곡 쌓여 작물에 튼튼한 거름이 되었어! 내일도 즐겁게 가꾸어보자 🚀🌟`;
+      return `오늘 한 일들이 차곡차곡 쌓여 작물에 튼튼한 거름이 되었어! 내일도 즐겁게 가꾸어보자.`;
   }
 };
 
@@ -107,7 +107,7 @@ export const calculateCropState = (tasksByDate: Record<string, Task[]>, targetDa
   const targetYearNum = parseInt(targetYear, 10);
   const targetMonthNum = parseInt(targetMonthStr, 10);
 
-  const cropInfo = CROP_BY_MONTH[targetMonthNum] || { month: targetMonthNum, name: '신비의 작물', emoji: '🌱' };
+  const cropInfo = CROP_BY_MONTH[targetMonthNum] || { month: targetMonthNum, name: '신비의 작물', emoji: '' };
 
   let growthQ1 = 0;
   let yieldQ2 = 0;
@@ -214,16 +214,16 @@ export const getCropComment = (
   health: number
 ): string => {
   if (growth < 70) {
-    return `바쁜 일상 중에도 ${cropName}의 새싹을 틔웠어요. 다음 달에는 조금 더 많은 보살핌을 주면 활짝 필 거예요! 🌱`;
+    return `바쁜 일상 중에도 ${cropName}의 새싹을 틔웠어요. 다음 달에는 조금 더 많은 보살핌을 주면 활짝 필 거예요!`;
   }
   if (quality === '최상급' && health >= 85) {
-    return `축하해요! 완벽한 하루 관리 덕분에 건강 수치 ${health}%의 눈부신 ${quality} ${cropName} ${yieldCount}개를 수확했습니다! 🏆✨`;
+    return `축하해요! 완벽한 하루 관리 덕분에 건강 수치 ${health}%의 눈부신 ${quality} ${cropName} ${yieldCount}개를 수확했습니다!`;
   }
   if (quality === '최상급' || quality === '상급') {
-    return `중요한 일들을 성실히 달성하여 고품질의 ${cropName} ${yieldCount}개를 멋지게 수확해 냈어요! 훌륭한 한 달이었습니다 🌟`;
+    return `중요한 일들을 성실히 달성하여 고품질의 ${cropName} ${yieldCount}개를 멋지게 수확해 냈어요! 훌륭한 한 달이었습니다.`;
   }
   if (health < 40) {
-    return `물주기와 비옥한 토양 관리가 조금 부족했지만, 끈질기게 자란 ${cropName} ${yieldCount}개를 무사히 수확했습니다 🩹`;
+    return `물주기와 비옥한 토양 관리가 조금 부족했지만, 끈질기게 자란 ${cropName} ${yieldCount}개를 무사히 수확했습니다.`;
   }
-  return `계절의 변화와 계획을 실천하며 평화로운 가을 햇살 아래 ${cropName} ${yieldCount}개를 안정적으로 수확했습니다 🧺`;
+  return `계절의 변화와 계획을 실천하며 평화로운 가을 햇살 아래 ${cropName} ${yieldCount}개를 안정적으로 수확했습니다.`;
 };
