@@ -19,17 +19,3 @@ export interface RoutineState {
 export type RoutineScope = 'single' | 'future';
 export type RoutineAction = 'edit' | 'delete';
 
-export interface HarvestedCrop {
-  id: string; // "YYYY-MM" format
-  year: number;
-  month: number;
-  cropName: string;
-  emoji: string;
-  growth: number;
-  yieldCount: number;
-  quality: '최상급' | '상급' | '보통' | '하급';
-  health: number;
-  harvestedAt: string; // ISO date string
-  comment: string;
-}
-

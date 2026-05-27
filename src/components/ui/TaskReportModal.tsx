@@ -3,8 +3,7 @@ import { Task } from '../../types';
 import { formatDateLabel } from '../../utils/task';
 import { getTaskReport, REPORT_QUADRANTS } from '../../utils/report';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
-import { calculateCropState } from '../../utils/crop';
-import { PixelCrop } from './PixelCrop';
+
 
 export const TaskReportModal = ({
   isOpen,
@@ -27,7 +26,7 @@ export const TaskReportModal = ({
 
   const report = getTaskReport(tasks);
   const averageLabel = report.averageRating === null ? '-' : report.averageRating.toFixed(1);
-  const cropState = calculateCropState(tasksByDate, date);
+
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -60,19 +59,7 @@ export const TaskReportModal = ({
           </div>
         </div>
 
-        {/* 작물 한 줄 일기 (다이어리 로그) */}
-        <div className="mt-4 flex items-start gap-3 rounded-2xl bg-amber-50/60 border border-amber-100 p-3">
-          <div className="shrink-0 flex flex-col items-center bg-white rounded-xl border border-stone-200/50 p-1">
-            <PixelCrop cropState={cropState} size={60} interactive={false} />
-          </div>
-          <div className="relative flex-1 rounded-2xl bg-white border border-stone-200/80 p-3 text-stone-700 text-xs leading-relaxed shadow-sm">
-            {/* Speech bubble tail */}
-            <div className="absolute top-5 -left-1.5 w-2.5 h-2.5 bg-white border-l border-b border-stone-200/80 rotate-45" />
-            <div className="relative z-10 font-medium">
-              {cropState.todayDiary}
-            </div>
-          </div>
-        </div>
+
 
         <div className="mt-4 rounded-2xl border border-stone-200 p-4">
           <div className="flex items-center justify-between">

@@ -5,9 +5,7 @@ import { isCurrentMinuteInsideTask, getCenterTaskProgress, getClockTaskColor, ge
 import { polarToCartesian, describeArc } from '../../utils/geometry';
 import TaskCreationModal from '../ui/TaskCreationModal';
 import CanvasClockSurface from './CanvasClockSurface';
-import { calculateCropState } from '../../utils/crop';
-import { PixelCrop } from '../ui/PixelCrop';
-import PixelAction from '../ui/PixelAction';
+
 
 export const CircleScheduler = ({
   tasks,
@@ -245,7 +243,7 @@ export const CircleScheduler = ({
   const activeTaskProgress = showCurrentTime ? getCenterTaskProgress(displayTask, currentMinutes) : 0;
   const clampedActiveTaskProgress = Math.max(0, Math.min(1, activeTaskProgress));
   const activeTaskColor = displayTask ? getClockTaskColor(displayTask) : '#ff7a91';
-  const cropState = calculateCropState(tasksByDate, date);
+
   const laneCount = getRequiredTrackLaneCount(tasks);
   const trackTasks = assignTasksToTrackLanes(tasks, laneCount);
   const interactionRingRadius = (TRACK_INNER_RADIUS + OUTER_BACKGROUND_RADIUS) / 2;
@@ -666,23 +664,17 @@ export const CircleScheduler = ({
                <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''} flex flex-col items-center justify-center`} aria-hidden="true">
                 {displayTask ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <div className="mb-0.5 pointer-events-none">
-                      <PixelAction actionType={getActionTypeForTask(displayTask)} size={52} />
-                    </div>
                     <div
-                      className="pointer-events-none block w-fit max-w-[120px] truncate whitespace-nowrap rounded-full bg-white/70 px-[0.82rem] pb-[0.46rem] pt-[0.5rem] text-center text-[14px] font-bold leading-none shadow-[0_1px_0_rgba(255,255,255,0.85)_inset,0_6px_14px_rgba(0,0,0,0.08)]"
-                      style={{
-                        color: activeTaskColor,
-                        marginTop: '4px'
-                      }}
+                      className="pointer-events-none block w-fit max-w-[120px] truncate whitespace-nowrap rounded-full bg-white/80 px-[0.82rem] pb-[0.46rem] pt-[0.5rem] text-center text-[14px] font-bold leading-none shadow-[0_1px_0_rgba(255,255,255,0.85)_inset,0_6px_14px_rgba(0,0,0,0.08)]"
+                      style={{ color: activeTaskColor }}
                     >
                       {displayTask.title}
                     </div>
                   </div>
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <div className="pointer-events-auto">
-                      <PixelCrop cropState={cropState} size={96} interactive={true} />
+                    <div className="text-stone-400/80 text-[13px] font-medium tracking-tight">
+                      지금은 일정이 없어요
                     </div>
                   </div>
                 )}

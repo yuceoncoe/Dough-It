@@ -1,11 +1,10 @@
-import { RoutineState, Task, Tag, HarvestedCrop } from '../types';
+import { RoutineState, Task, Tag } from '../types';
 import { INITIAL_ROUTINES, addOrReplaceDateTasks, seedTasksForToday } from './task';
 
 export interface AppStateSnapshot {
   routines: RoutineState;
   tasksByDate: Record<string, Task[]>;
   skippedRatingTaskIds: string[];
-  harvestedCrops: HarvestedCrop[];
 }
 
 const ONE_TIME_PAST_CLEANUP_CUTOFF = '2026-05-11';
@@ -15,7 +14,6 @@ export const createDefaultAppState = (todayStr: string): AppStateSnapshot => ({
   routines: INITIAL_ROUTINES,
   tasksByDate: seedTasksForToday(todayStr, INITIAL_ROUTINES),
   skippedRatingTaskIds: [],
-  harvestedCrops: [],
 });
 
 const removePastDateTasks = (tasksByDate: Record<string, Task[]>, cutoffDate: string) =>
@@ -64,14 +62,12 @@ export const toSerializableAppState = (snapshot: AppStateSnapshot): AppStateSnap
   skippedRatingTaskIds: Array.isArray(snapshot.skippedRatingTaskIds)
     ? snapshot.skippedRatingTaskIds.filter((id): id is string => typeof id === 'string')
     : [],
-  harvestedCrops: Array.isArray(snapshot.harvestedCrops) ? snapshot.harvestedCrops : [],
 });
 
 export const normalizeAppState = (snapshot: AppStateSnapshot, todayStr: string): AppStateSnapshot => {
   const serializableSnapshot = toSerializableAppState(snapshot);
   const routines = serializableSnapshot.routines;
   const skippedRatingTaskIds = serializableSnapshot.skippedRatingTaskIds;
-  const harvestedCrops = serializableSnapshot.harvestedCrops;
   const hasCompletedPastCleanup = skippedRatingTaskIds.includes(ONE_TIME_PAST_CLEANUP_MARKER);
   const sourceTasksByDate = serializableSnapshot.tasksByDate;
   const tasksAfterOneTimeCleanup = hasCompletedPastCleanup
@@ -85,6 +81,5 @@ export const normalizeAppState = (snapshot: AppStateSnapshot, todayStr: string):
     skippedRatingTaskIds: hasCompletedPastCleanup
       ? skippedRatingTaskIds
       : [...skippedRatingTaskIds, ONE_TIME_PAST_CLEANUP_MARKER],
-    harvestedCrops,
   };
 };

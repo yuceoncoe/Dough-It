@@ -446,7 +446,7 @@ canvas {
 }
 
 .center-progress-surface__track {
-  fill: rgba(170, 170, 170, 0.08);
+  fill: rgba(20, 20, 20, 0.03);
 }
 
 .center-progress-surface__value {
