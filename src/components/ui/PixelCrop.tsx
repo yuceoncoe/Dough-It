@@ -1031,18 +1031,84 @@ export const PixelCrop = ({
           }
 
           // Leaves (droop if low health)
-          const l1W = Math.max(1, 8 + leafSizeModifier);
-          drawPixelRect(baseCenterX - 2 - l1W + Math.round(swayX * 0.4), baseCenterY - 20 + leafYOffset, l1W, 3, stemOutline);
-          drawPixelRect(baseCenterX - 1 - l1W + Math.round(swayX * 0.4), baseCenterY - 19 + leafYOffset, l1W - 1, 2, leafColor);
+          if (month === 9) {
+            // Sunflower leaves - Stardew Valley style (pointing upwards, organic shape)
+            const outline = stemOutline;
+            const fill = leafColor;
 
-          const l2W = Math.max(1, 9 + leafSizeModifier);
-          drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 28 + leafYOffset, l2W, 3, stemOutline);
-          drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 27 + leafYOffset, l2W - 1, 2, leafColor);
+            // 1. Bottom-Left Leaf
+            drawPixel(baseCenterX - 2 + Math.round(swayX * 0.3), baseCenterY - 12, outline);
+            drawPixel(baseCenterX - 3 + Math.round(swayX * 0.3), baseCenterY - 13, outline);
+            drawPixel(baseCenterX - 4 + Math.round(swayX * 0.3), baseCenterY - 14, outline);
+            drawPixel(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 15, outline);
+            drawPixel(baseCenterX - 6 + Math.round(swayX * 0.3), baseCenterY - 16, outline);
+            drawPixel(baseCenterX - 7 + Math.round(swayX * 0.3), baseCenterY - 17, outline);
+            drawPixel(baseCenterX - 7 + Math.round(swayX * 0.3), baseCenterY - 18, outline);
+            drawPixel(baseCenterX - 6 + Math.round(swayX * 0.3), baseCenterY - 19, outline);
+            drawPixel(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 19, outline);
+            drawPixel(baseCenterX - 4 + Math.round(swayX * 0.3), baseCenterY - 18, outline);
+            drawPixel(baseCenterX - 3 + Math.round(swayX * 0.3), baseCenterY - 17, outline);
+            drawPixel(baseCenterX - 2 + Math.round(swayX * 0.3), baseCenterY - 16, outline);
+
+            drawPixelRect(baseCenterX - 3 + Math.round(swayX * 0.3), baseCenterY - 16, 1, 3, fill);
+            drawPixelRect(baseCenterX - 4 + Math.round(swayX * 0.3), baseCenterY - 17, 1, 3, fill);
+            drawPixelRect(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 18, 1, 3, fill);
+            drawPixelRect(baseCenterX - 6 + Math.round(swayX * 0.3), baseCenterY - 18, 1, 2, fill);
+
+            // 2. Middle-Right Leaf
+            drawPixel(baseCenterX + 1 + Math.round(swayX * 0.5), baseCenterY - 20, outline);
+            drawPixel(baseCenterX + 2 + Math.round(swayX * 0.5), baseCenterY - 21, outline);
+            drawPixel(baseCenterX + 3 + Math.round(swayX * 0.5), baseCenterY - 22, outline);
+            drawPixel(baseCenterX + 4 + Math.round(swayX * 0.5), baseCenterY - 23, outline);
+            drawPixel(baseCenterX + 5 + Math.round(swayX * 0.5), baseCenterY - 24, outline);
+            drawPixel(baseCenterX + 6 + Math.round(swayX * 0.5), baseCenterY - 25, outline);
+            drawPixel(baseCenterX + 6 + Math.round(swayX * 0.5), baseCenterY - 26, outline);
+            drawPixel(baseCenterX + 5 + Math.round(swayX * 0.5), baseCenterY - 27, outline);
+            drawPixel(baseCenterX + 4 + Math.round(swayX * 0.5), baseCenterY - 27, outline);
+            drawPixel(baseCenterX + 3 + Math.round(swayX * 0.5), baseCenterY - 26, outline);
+            drawPixel(baseCenterX + 2 + Math.round(swayX * 0.5), baseCenterY - 25, outline);
+            drawPixel(baseCenterX + 1 + Math.round(swayX * 0.5), baseCenterY - 24, outline);
+
+            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.5), baseCenterY - 24, 1, 3, fill);
+            drawPixelRect(baseCenterX + 3 + Math.round(swayX * 0.5), baseCenterY - 25, 1, 3, fill);
+            drawPixelRect(baseCenterX + 4 + Math.round(swayX * 0.5), baseCenterY - 26, 1, 3, fill);
+            drawPixelRect(baseCenterX + 5 + Math.round(swayX * 0.5), baseCenterY - 26, 1, 2, fill);
+
+            // 3. Top-Left Leaf
+            drawPixel(baseCenterX - 2 + Math.round(swayX * 0.6), baseCenterY - 28, outline);
+            drawPixel(baseCenterX - 3 + Math.round(swayX * 0.6), baseCenterY - 29, outline);
+            drawPixel(baseCenterX - 4 + Math.round(swayX * 0.6), baseCenterY - 30, outline);
+            drawPixel(baseCenterX - 5 + Math.round(swayX * 0.6), baseCenterY - 31, outline);
+            drawPixel(baseCenterX - 6 + Math.round(swayX * 0.6), baseCenterY - 32, outline);
+            drawPixel(baseCenterX - 6 + Math.round(swayX * 0.6), baseCenterY - 33, outline);
+            drawPixel(baseCenterX - 5 + Math.round(swayX * 0.6), baseCenterY - 34, outline);
+            drawPixel(baseCenterX - 4 + Math.round(swayX * 0.6), baseCenterY - 34, outline);
+            drawPixel(baseCenterX - 3 + Math.round(swayX * 0.6), baseCenterY - 33, outline);
+            drawPixel(baseCenterX - 2 + Math.round(swayX * 0.6), baseCenterY - 32, outline);
+
+            drawPixelRect(baseCenterX - 3 + Math.round(swayX * 0.6), baseCenterY - 32, 1, 3, fill);
+            drawPixelRect(baseCenterX - 4 + Math.round(swayX * 0.6), baseCenterY - 33, 1, 3, fill);
+            drawPixelRect(baseCenterX - 5 + Math.round(swayX * 0.6), baseCenterY - 33, 1, 2, fill);
+          } else {
+            // Droop leaves for Corn
+            const l1W = Math.max(1, 8 + leafSizeModifier);
+            drawPixelRect(baseCenterX - 2 - l1W + Math.round(swayX * 0.4), baseCenterY - 20 + leafYOffset, l1W, 3, stemOutline);
+            drawPixelRect(baseCenterX - 1 - l1W + Math.round(swayX * 0.4), baseCenterY - 19 + leafYOffset, l1W - 1, 2, leafColor);
+
+            const l2W = Math.max(1, 9 + leafSizeModifier);
+            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 28 + leafYOffset, l2W, 3, stemOutline);
+            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 27 + leafYOffset, l2W - 1, 2, leafColor);
+          }
 
           // Q3 spots
           if (isLowQualityQ3) {
-            drawPixel(baseCenterX - 6 + Math.round(swayX * 0.4), baseCenterY - 19 + leafYOffset, '#3e2723');
-            drawPixel(baseCenterX + 6 + Math.round(swayX * 0.8), baseCenterY - 27 + leafYOffset, '#3e2723');
+            if (month === 9) {
+              drawPixel(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 17 + leafYOffset, '#3e2723');
+              drawPixel(baseCenterX + 4 + Math.round(swayX * 0.5), baseCenterY - 25 + leafYOffset, '#3e2723');
+            } else {
+              drawPixel(baseCenterX - 6 + Math.round(swayX * 0.4), baseCenterY - 19 + leafYOffset, '#3e2723');
+              drawPixel(baseCenterX + 6 + Math.round(swayX * 0.8), baseCenterY - 27 + leafYOffset, '#3e2723');
+            }
           }
         } else {
           // --- STANDARD STANDARD (장미) ---
@@ -1313,24 +1379,50 @@ export const PixelCrop = ({
               break;
             }
             case 9: {
-              // 해바라기 🌻 - 8단계 완숙
-              drawPixelRect(fx - 1, fy - 6 - offset, 3, 1, petalOutline);
-              drawPixel(fx, fy - 7 - offset, petalColor); // 상
-              drawPixelRect(fx - 1, fy + 6 + offset, 3, 1, petalOutline);
-              drawPixel(fx, fy + 7 + offset, petalColor); // 하
-              drawPixelRect(fx - 6 - offset, fy - 1, 1, 3, petalOutline);
-              drawPixel(fx - 7 - offset, fy, petalColor); // 좌
-              drawPixelRect(fx + 6 + offset, fy - 1, 1, 3, petalOutline);
-              drawPixel(fx + 7 + offset, fy, petalColor); // 우
+              // 해바라기 🌻 - 8단계 완숙 (Stardew Valley 스타일로 개선)
+              const oCol = '#b35c00'; // Deep golden-brown outline
+              const pCol = '#fbc02d'; // Golden yellow petals
+              const hCol = '#ffeb3b'; // Bright yellow highlight/tips
+
+              // 1. Petal outer outline
+              drawPixel(fx, fy - 7 - offset, oCol); // 상
+              drawPixelRect(fx - 1, fy - 6 - offset, 3, 1, oCol);
+              drawPixel(fx, fy + 7 + offset, oCol); // 하
+              drawPixelRect(fx - 1, fy + 6 + offset, 3, 1, oCol);
+              drawPixel(fx - 7 - offset, fy, oCol); // 좌
+              drawPixelRect(fx - 6 - offset, fy - 1, 1, 3, oCol);
+              drawPixel(fx + 7 + offset, fy, oCol); // 우
+              drawPixelRect(fx + 6 + offset, fy - 1, 1, 3, oCol);
+
+              // Diagonal tips
+              drawPixel(fx - 5 - offset, fy - 5 - offset, oCol);
+              drawPixel(fx + 5 + offset, fy - 5 - offset, oCol);
+              drawPixel(fx - 5 - offset, fy + 5 + offset, oCol);
+              drawPixel(fx + 5 + offset, fy + 5 + offset, oCol);
+
+              // Orange boundary box to ensure outline completeness
+              drawPixelRect(fx - 5 - offset, fy - 4 - offset, 11 + 2 * offset, 9 + 2 * offset, oCol);
+
+              // 2. Petal body (Yellow & Highlight)
+              drawPixelRect(fx - 4 - offset, fy - 3 - offset, 9 + 2 * offset, 7 + 2 * offset, pCol); // base fill
               
-              drawPixel(fx - 5 - offset, fy - 5 - offset, petalColor);
-              drawPixel(fx + 5 + offset, fy - 5 - offset, petalColor);
-              drawPixel(fx - 5 - offset, fy + 5 + offset, petalColor);
-              drawPixel(fx + 5 + offset, fy + 5 + offset, petalColor);
-              
-              drawPixelRect(fx - 5 - offset, fy - 4 - offset, 11 + 2 * offset, 9 + 2 * offset, petalOutline);
-              drawPixelRect(fx - 4 - offset, fy - 3 - offset, 9 + 2 * offset, 7 + 2 * offset, petalColor);
-              
+              // Tips highlight (overwriting inside layer of tips)
+              drawPixel(fx, fy - 6 - offset, hCol);
+              drawPixelRect(fx - 1, fy - 5 - offset, 3, 1, hCol);
+              drawPixel(fx, fy + 6 + offset, hCol);
+              drawPixelRect(fx - 1, fy + 5 - offset, 3, 1, hCol);
+              drawPixel(fx - 6 - offset, fy, hCol);
+              drawPixelRect(fx - 5 - offset, fy - 1, 1, 3, hCol);
+              drawPixel(fx + 6 + offset, fy, hCol);
+              drawPixelRect(fx + 5 - offset, fy - 1, 1, 3, hCol);
+
+              // Diagonal fills
+              drawPixel(fx - 4 - offset, fy - 4 - offset, hCol);
+              drawPixel(fx + 4 + offset, fy - 4 - offset, hCol);
+              drawPixel(fx - 4 - offset, fy + 4 + offset, hCol);
+              drawPixel(fx + 4 + offset, fy + 4 + offset, hCol);
+
+              // 3. Brown seed core (rounded 5x5 center)
               drawPixelRect(fx - 3, fy - 2, 7, 5, coreOutline);
               drawPixelRect(fx - 2, fy - 1, 5, 3, '#3e2723');
               drawPixelRect(fx - 1, fy - 1, 3, 3, '#271c19');
