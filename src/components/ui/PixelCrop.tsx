@@ -744,11 +744,49 @@ export const PixelCrop = ({
                 drawPixel(fx, fy - 1, '#ff8a80'); // 하이라이트
                 drawPixelRect(fx - 1, fy + 2, 3, 1, '#1b5e20'); // 꽃받침
               } else if (month === 9) {
-                // 9월 해바라기 - 7단계 (개화 시작)
-                drawPixelRect(fx - 4, fy - 3, 9, 7, '#f57f17'); // 겉잎 외곽
-                drawPixelRect(fx - 3, fy - 2, 7, 5, '#fdd835'); // 노란 잎
-                drawPixelRect(fx - 2, fy - 1, 5, 3, '#3e2723'); // 씨앗판
-                drawPixel(fx, fy, '#271c19');
+                // 9월 해바라기 - 7단계 (반개화 / 개화 시작)
+                const oCol = '#1a0c02'; // Very dark brown/black outline
+                const pCol = '#fbc02d'; // Golden yellow petals
+                const hCol = '#ffeb3b'; // Bright yellow highlights
+                const shadowCol = '#b35c00'; // Orange/brown backing petals
+
+                // 1. Seed Core (5x5 rounded checkerboard)
+                for (let y = -2; y <= 2; y++) {
+                  for (let x = -2; x <= 2; x++) {
+                    if (Math.abs(x) + Math.abs(y) <= 3) {
+                      const isDark = (x + y) % 2 === 0;
+                      drawPixel(fx + x, fy + y, isDark ? '#271c19' : '#3e2723');
+                    }
+                  }
+                }
+                drawPixel(fx - 1, fy - 1, '#5d4037'); // Core highlight
+
+                // 2. Backing Petals (Orange shadow layer)
+                drawPixel(fx - 2, fy - 3, shadowCol); drawPixel(fx + 2, fy - 3, shadowCol);
+                drawPixel(fx - 2, fy + 3, shadowCol); drawPixel(fx + 2, fy + 3, shadowCol);
+                drawPixel(fx - 3, fy - 2, shadowCol); drawPixel(fx - 3, fy + 2, shadowCol);
+                drawPixel(fx + 3, fy - 2, shadowCol); drawPixel(fx + 3, fy + 2, shadowCol);
+
+                // 3. Golden Yellow Petals (Front layer)
+                drawPixel(fx, fy - 3, pCol); drawPixel(fx, fy + 3, pCol);
+                drawPixel(fx - 3, fy, pCol); drawPixel(fx + 3, fy, pCol);
+
+                // 4. Highlight Tips (Bright yellow)
+                drawPixel(fx, fy - 4, hCol); drawPixel(fx, fy + 4, hCol);
+                drawPixel(fx - 4, fy, hCol); drawPixel(fx + 4, fy, hCol);
+                drawPixel(fx - 2, fy - 2, hCol); drawPixel(fx + 2, fy - 2, hCol);
+                drawPixel(fx - 2, fy + 2, hCol); drawPixel(fx + 2, fy + 2, hCol);
+
+                // 5. Dark Outline
+                drawPixel(fx, fy - 5, oCol); drawPixel(fx - 1, fy - 4, oCol); drawPixel(fx + 1, fy - 4, oCol);
+                drawPixel(fx, fy + 5, oCol); drawPixel(fx - 1, fy + 4, oCol); drawPixel(fx + 1, fy + 4, oCol);
+                drawPixel(fx - 5, fy, oCol); drawPixel(fx - 4, fy - 1, oCol); drawPixel(fx - 4, fy + 1, oCol);
+                drawPixel(fx + 5, fy, oCol); drawPixel(fx + 4, fy - 1, oCol); drawPixel(fx + 4, fy + 1, oCol);
+
+                drawPixel(fx - 3, fy - 3, oCol); drawPixel(fx - 3, fy - 2, oCol); drawPixel(fx - 2, fy - 3, oCol);
+                drawPixel(fx + 3, fy - 3, oCol); drawPixel(fx + 3, fy - 2, oCol); drawPixel(fx + 2, fy - 3, oCol);
+                drawPixel(fx - 3, fy + 3, oCol); drawPixel(fx - 3, fy + 2, oCol); drawPixel(fx - 2, fy + 3, oCol);
+                drawPixel(fx + 3, fy + 3, oCol); drawPixel(fx + 3, fy + 2, oCol); drawPixel(fx + 2, fy + 3, oCol);
               } else if (month === 12) {
                 // 12월 동백꽃 - 7단계 (반개화)
                 drawPixelRect(fx - 3, fy - 2, 7, 5, '#c2185b');
@@ -793,12 +831,31 @@ export const PixelCrop = ({
                 drawPixel(fx + 2, fy, '#1b5e20');
                 drawPixel(fx + 2, fy + 2, '#1b5e20');
               } else if (month === 8) {
-                // 8월 옥수수 - 7단계 (껍질에 싸인 상태)
-                drawPixel(fx, fy - 4, '#8d6e63');
-                drawPixelRect(fx - 2, fy - 3, 4, 8, '#558b2f');
-                drawPixelRect(fx - 1, fy - 2, 2, 6, '#689f38');
-                drawPixel(fx, fy - 1, '#fff176');
-                drawPixel(fx, fy + 1, '#fff176');
+                // 8월 옥수수 - 7단계 (설익음 상태: 줄기 옆에 달린 작은 옥수수들과 꼭대기 개걸이 수태)
+                // 1. 꼭대기 수술 개걸이 (Tassel)
+                drawPixel(fx, fy - 3, '#8d6e63');
+                drawPixel(fx - 1, fy - 2, '#8d6e63');
+                drawPixel(fx + 1, fy - 2, '#8d6e63');
+                drawPixel(fx - 2, fy - 1, '#fdd835');
+                drawPixel(fx + 2, fy - 1, '#fdd835');
+                drawPixel(fx, fy - 1, '#8d6e63');
+                drawPixelRect(fx - 1, fy, 3, 2, '#558b2f');
+
+                // 2. 왼쪽 아래 작은 옥수수 (Left unripe ear at baseCenterY - 12)
+                const lx = baseCenterX - 4 + Math.round(swayX * 0.7);
+                const ly = baseCenterY - 12;
+                drawPixel(lx, ly - 3, '#8d6e63'); // 옥수수 수염
+                drawPixelRect(lx - 2, ly - 2, 3, 6, '#558b2f'); // 겉껍질
+                drawPixelRect(lx - 1, ly - 1, 2, 4, '#689f38'); // 속껍질
+                drawPixel(lx, ly, '#fff176'); // 설익은 알갱이 노출
+
+                // 3. 오른쪽 위 작은 옥수수 (Right unripe ear at baseCenterY - 20)
+                const rx = baseCenterX + 4 + Math.round(swayX * 0.7);
+                const ry = baseCenterY - 20;
+                drawPixel(rx, ry - 3, '#8d6e63');
+                drawPixelRect(rx - 1, ry - 2, 3, 6, '#558b2f');
+                drawPixelRect(rx - 1, ry - 1, 2, 4, '#689f38');
+                drawPixel(rx, ry, '#fff176');
               } else if (month === 10) {
                 // 10월 감 - 7단계 (청감)
                 drawPixel(fx, fy - 3, '#3e2723'); // 감꼭지
