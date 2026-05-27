@@ -418,8 +418,8 @@ export const CircleScheduler = ({
         <circle
           cx={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
           cy={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
-          r={20}
-          fill="#ffffff"
+          r={25}
+          fill="#d90429"
           filter="url(#current-time-dot-shadow)"
           pointerEvents="none"
         />
