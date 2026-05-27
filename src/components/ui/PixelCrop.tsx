@@ -565,34 +565,223 @@ export const PixelCrop = ({
       } else {
         // --- MATURE / HARVEST STAGE (Stage 8) ---
         const swayX = Math.round(swayOffset * 1.2);
-        const stemTopY = baseCenterY - 34;
-
-        // Stem
-        for (let i = 0; i < 31; i++) {
-          const currY = baseCenterY - 34 + i;
-          const tX = isCrooked ? Math.round(Math.sin(i * 0.16) * 3.0) : 0;
-          drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.5) + tX, currY, 4, 1, stemOutline);
-          drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.5) + tX, currY, 2, 1, stemColor);
-        }
-
-        // Leaves (droop if low health)
         const leafYOffset = health < 40 ? 3 : 0;
-        const l1W = Math.max(1, 7 + leafSizeModifier);
-        drawPixelRect(baseCenterX - 2 - l1W + Math.round(swayX * 0.4), baseCenterY - 16 + leafYOffset, l1W, 3, stemOutline);
-        drawPixelRect(baseCenterX - 1 - l1W + Math.round(swayX * 0.4), baseCenterY - 15 + leafYOffset, l1W - 1, 2, leafColor);
+        const isTall = month === 8 || month === 9;
+        
+        let stemH = 31;
+        let bushHeight = 22;
+        let bushWidth = 28;
 
-        const l2W = Math.max(1, 8 + leafSizeModifier);
-        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 24 + leafYOffset, l2W, 3, stemOutline);
-        drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 23 + leafYOffset, l2W - 1, 2, leafColor);
+        if (isVine) {
+          // --- VINE DRAWING (수박, 고구마) ---
+          const vineLength = 38;
+          const amplitude = 5.2;
+          const startX = baseCenterX - Math.round(vineLength / 2);
+          const endX = baseCenterX + Math.round(vineLength / 2);
 
-        // Q3 Dark Spots
-        if (isLowQualityQ3) {
-          drawPixel(baseCenterX - 6 + Math.round(swayX * 0.4), baseCenterY - 15 + leafYOffset, '#3e2723');
-          drawPixel(baseCenterX + 6 + Math.round(swayX * 0.8), baseCenterY - 23 + leafYOffset, '#3e2723');
+          // Draw crawling vine stem
+          for (let vx = startX; vx <= endX; vx++) {
+            const dx = vx - baseCenterX;
+            const wave = Math.sin(dx * 0.3 + swayOffset * 0.08) * amplitude;
+            const vy = baseCenterY - 4 - Math.round(wave);
+
+            drawPixel(vx, vy, stemOutline);
+            drawPixel(vx, vy + 1, stemColor);
+          }
+
+          // Draw vine leaves
+          const leafStep = 5;
+          for (let vx = startX + 2; vx <= endX - 2; vx += leafStep) {
+            const dx = vx - baseCenterX;
+            const wave = Math.sin(dx * 0.3 + swayOffset * 0.08) * amplitude;
+            const vy = baseCenterY - 4 - Math.round(wave);
+
+            const isUp = (vx % 2 === 0);
+            const ly = isUp ? vy - 2 : vy + 2;
+            drawPixelRect(vx - 1, ly, 3, 2, stemOutline);
+            drawPixel(vx, ly + (isUp ? 1 : 0), leafColor);
+
+            // Q3 dark spots on vine leaves
+            if (isLowQualityQ3 && Math.abs(dx) % 3 === 0) {
+              drawPixel(vx, ly + (isUp ? 1 : 0), '#3e2723');
+            }
+          }
+        } else if (isStrawberry) {
+          // --- STRAWBERRY BUSH DRAWING (딸기) ---
+          const swayXS = Math.round(swayOffset * 0.5);
+          const stems = [
+            { tx: -Math.round(bushWidth * 0.35), ty: -Math.round(bushHeight * 0.6) },
+            { tx: 0, ty: -bushHeight },
+            { tx: Math.round(bushWidth * 0.35), ty: -Math.round(bushHeight * 0.6) }
+          ];
+
+          stems.forEach((stem) => {
+            const endX = baseCenterX + stem.tx + swayXS;
+            const endY = baseCenterY - 4 + stem.ty + leafYOffset;
+            
+            ctx.strokeStyle = stemOutline;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(baseCenterX, baseCenterY - 4);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+
+            drawPixelRect(endX - 2, endY - 2, 5, 4, stemOutline);
+            drawPixelRect(endX - 1, endY - 1, 3, 2, leafColor);
+
+            // Q3 dark spot on strawberry leaves
+            if (isLowQualityQ3 && Math.random() < 0.3) {
+              drawPixel(endX, endY - 1, '#3e2723');
+            }
+          });
+        } else if (isGroup) {
+          // --- SPROUT GROUP DRAWING (새싹채소) ---
+          stemH = 28;
+          const offsets = [
+            { dx: -5, h: Math.round(stemH * 0.8), swayF: 0.4 },
+            { dx: 0, h: stemH, swayF: 0.6 },
+            { dx: 5, h: Math.round(stemH * 0.9), swayF: 0.5 }
+          ];
+
+          offsets.forEach((group) => {
+            const sX = Math.round(swayOffset * group.swayF);
+            const curBaseX = baseCenterX + group.dx;
+
+            // Draw stem
+            for (let i = 0; i < group.h; i++) {
+              const currY = baseCenterY - 4 - group.h + i;
+              const tX = isCrooked ? Math.round(Math.sin(i * 0.3) * 1.5) : 0;
+              drawPixelRect(curBaseX - 1 + sX + tX, currY, 3, 1, stemOutline);
+              drawPixel(curBaseX + sX + tX, currY, stemColor);
+            }
+
+            // Draw leaves at the top of each stem
+            const topY = baseCenterY - 4 - group.h + leafYOffset;
+            const tX = isCrooked ? Math.round(Math.sin(0) * 1.5) : 0;
+            drawPixelRect(curBaseX - 3 + sX + tX, topY - 2, 7, 3, stemOutline);
+            drawPixelRect(curBaseX - 2 + sX + tX, topY - 1, 2, 2, leafColor);
+            drawPixelRect(curBaseX + 1 + sX + tX, topY - 1, 2, 2, leafColor);
+
+            // Q3 dark spots on group leaves
+            if (isLowQualityQ3) {
+              drawPixel(curBaseX - 2 + sX + tX, topY - 1, '#3e2723');
+              drawPixel(curBaseX + 2 + sX + tX, topY - 1, '#3e2723');
+            }
+          });
+        } else if (isWoody) {
+          // --- WOODY TREE DRAWING (귤, 벚꽃, 매실, 감, 동백) ---
+          // Draw trunk
+          for (let i = 0; i < 13; i++) {
+            const currY = baseCenterY - 4 - i;
+            drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.2), currY, 4, 1, stemOutline);
+            drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.2), currY, 2, 1, stemColor);
+          }
+
+          // Left branch
+          for (let i = 1; i <= 9; i++) {
+            const currX = baseCenterX - 2 - i + Math.round(swayX * 0.3);
+            const currY = baseCenterY - 16 - Math.round(i * 1.0);
+            drawPixelRect(currX, currY, 2, 2, stemOutline);
+            drawPixel(currX + 1, currY + 1, stemColor);
+          }
+
+          // Right branch
+          for (let i = 1; i <= 9; i++) {
+            const currX = baseCenterX + 1 + i + Math.round(swayX * 0.3);
+            const currY = baseCenterY - 16 - Math.round(i * 1.2);
+            drawPixelRect(currX, currY, 2, 2, stemOutline);
+            drawPixel(currX, currY + 1, stemColor);
+          }
+
+          // Center branch extension
+          for (let i = 0; i < 16; i++) {
+            const currY = baseCenterY - 16 - i;
+            const currX = baseCenterX + Math.round(swayX * 0.4);
+            drawPixelRect(currX - 1, currY, 3, 1, stemOutline);
+            drawPixel(currX, currY, stemColor);
+          }
+
+          // Foliage blocks (green clouds) at the tips
+          const drawFoliage = (cx: number, cy: number, r: number) => {
+            for (let y = -r; y <= r; y++) {
+              const rowW = Math.round(Math.sqrt(r * r - y * y) * 2.0);
+              const lx = cx - Math.floor(rowW / 2);
+              drawPixelRect(lx, cy + y + leafYOffset, rowW, 1, stemOutline);
+              drawPixelRect(lx + 1, cy + y + leafYOffset, rowW - 2, 1, leafColor);
+            }
+          };
+
+          // Draw foliages (draw background ones first)
+          drawFoliage(baseCenterX - 9 + Math.round(swayX * 0.3), baseCenterY - 26, 5 + leafSizeModifier);
+          drawFoliage(baseCenterX + 9 + Math.round(swayX * 0.5), baseCenterY - 28, 6 + leafSizeModifier);
+          drawFoliage(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35, 7 + leafSizeModifier);
+
+          // Q3 spots on foliage
+          if (isLowQualityQ3) {
+            drawPixel(baseCenterX - 8 + Math.round(swayX * 0.3), baseCenterY - 26, '#3e2723');
+            drawPixel(baseCenterX + 8 + Math.round(swayX * 0.5), baseCenterY - 28, '#3e2723');
+            drawPixel(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35, '#3e2723');
+          }
+        } else if (isTall) {
+          // --- TALL CROPS (옥수수, 해바라기) ---
+          stemH = 38;
+          const isCorn = month === 8;
+          const stemW = isCorn ? 6 : 4;
+          const fillW = isCorn ? 4 : 2;
+          const offsetDiff = isCorn ? -3 : -2;
+          const fillDiff = isCorn ? -2 : -1;
+
+          for (let i = 0; i < stemH; i++) {
+            const currY = baseCenterY - 4 - stemH + i;
+            const tX = isCrooked ? Math.round(Math.sin(i * 0.12) * 3.5) : 0;
+            drawPixelRect(baseCenterX + offsetDiff + Math.round(swayX * 0.6) + tX, currY, stemW, 1, stemOutline);
+            drawPixelRect(baseCenterX + fillDiff + Math.round(swayX * 0.6) + tX, currY, fillW, 1, stemColor);
+          }
+
+          // Leaves (droop if low health)
+          const l1W = Math.max(1, 8 + leafSizeModifier);
+          drawPixelRect(baseCenterX - 2 - l1W + Math.round(swayX * 0.4), baseCenterY - 20 + leafYOffset, l1W, 3, stemOutline);
+          drawPixelRect(baseCenterX - 1 - l1W + Math.round(swayX * 0.4), baseCenterY - 19 + leafYOffset, l1W - 1, 2, leafColor);
+
+          const l2W = Math.max(1, 9 + leafSizeModifier);
+          drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 28 + leafYOffset, l2W, 3, stemOutline);
+          drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 27 + leafYOffset, l2W - 1, 2, leafColor);
+
+          // Q3 spots
+          if (isLowQualityQ3) {
+            drawPixel(baseCenterX - 6 + Math.round(swayX * 0.4), baseCenterY - 19 + leafYOffset, '#3e2723');
+            drawPixel(baseCenterX + 6 + Math.round(swayX * 0.8), baseCenterY - 27 + leafYOffset, '#3e2723');
+          }
+        } else {
+          // --- STANDARD STANDARD (장미) ---
+          stemH = 31;
+          for (let i = 0; i < stemH; i++) {
+            const currY = baseCenterY - 4 - stemH + i;
+            const tX = isCrooked ? Math.round(Math.sin(i * 0.16) * 3.0) : 0;
+            drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.5) + tX, currY, 4, 1, stemOutline);
+            drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.5) + tX, currY, 2, 1, stemColor);
+            
+            // Thorns for rose
+            if (isRose) {
+              if (i % 6 === 3) drawPixel(baseCenterX - 3 + Math.round(swayX * 0.5) + tX, currY, '#1b5e20');
+              if (i % 6 === 0) drawPixel(baseCenterX + 2 + Math.round(swayX * 0.5) + tX, currY, '#1b5e20');
+            }
+          }
+
+          // Leaves (droop if low health)
+          const l1W = Math.max(1, 7 + leafSizeModifier);
+          drawPixelRect(baseCenterX - 2 - l1W + Math.round(swayX * 0.4), baseCenterY - 16 + leafYOffset, l1W, 3, stemOutline);
+          drawPixelRect(baseCenterX - 1 - l1W + Math.round(swayX * 0.4), baseCenterY - 15 + leafYOffset, l1W - 1, 2, leafColor);
+
+          const l2W = Math.max(1, 8 + leafSizeModifier);
+          drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 24 + leafYOffset, l2W, 3, stemOutline);
+          drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 23 + leafYOffset, l2W - 1, 2, leafColor);
+
+          if (isLowQualityQ3) {
+            drawPixel(baseCenterX - 6 + Math.round(swayX * 0.4), baseCenterY - 15 + leafYOffset, '#3e2723');
+            drawPixel(baseCenterX + 6 + Math.round(swayX * 0.8), baseCenterY - 23 + leafYOffset, '#3e2723');
+          }
         }
-
-        const isLowYield = yieldCount <= 3;
-        const isMedYield = yieldCount > 3 && yieldCount <= 7;
 
         // Colors
         let fruitColor = '#d32f2f'; // default red
@@ -901,19 +1090,124 @@ export const PixelCrop = ({
           }
         };
 
-        const headX = isCrooked ? Math.round(Math.sin(0 * 0.16) * 3.0) : 0;
+        // Draw the fruits/flowers according to yieldCount
+        let coords: Array<{ dx: number; dy: number; scale: number }> = [];
 
-        // Render quantity based on Yield Bucket
-        if (isLowYield) {
-          drawFruitItem(baseCenterX + swayX + headX, stemTopY, 1.15);
-        } else if (isMedYield) {
-          drawFruitItem(baseCenterX - 7 + Math.round(swayX * 0.7) + headX, stemTopY - 2, 0.9);
-          drawFruitItem(baseCenterX + 7 + Math.round(swayX * 1.1) + headX, stemTopY + 2, 0.9);
-        } else {
-          drawFruitItem(baseCenterX - 8 + Math.round(swayX * 0.6) + headX, stemTopY - 3, 0.85);
-          drawFruitItem(baseCenterX + 8 + Math.round(swayX * 1.2) + headX, stemTopY + 3, 0.85);
-          drawFruitItem(baseCenterX + swayX + headX, stemTopY - 7, 1.0);
+        if (isVine) {
+          const getVineY = (dx: number) => {
+            const wave = Math.sin(dx * 0.3 + swayOffset * 0.08) * 5.2;
+            return baseCenterY - 4 - Math.round(wave);
+          };
+          if (month === 7) {
+            // Watermelon coords (staggered & scaled by yield)
+            const list = [
+              { dx: -12, scale: 0.95 },
+              { dx: 12, scale: 0.95 },
+              { dx: -6, scale: 0.85 },
+              { dx: 6, scale: 0.85 },
+              { dx: 0, scale: 1.1 }
+            ];
+            coords = list.slice(0, Math.min(yieldCount, list.length)).map(c => ({
+              dx: c.dx,
+              dy: getVineY(c.dx) - baseCenterY - 1, // relative to baseCenterY
+              scale: c.scale
+            }));
+          } else {
+            // Sweet Potato coords
+            const list = [
+              { dx: -10, scale: 0.95 },
+              { dx: 10, scale: 0.95 },
+              { dx: -5, scale: 0.9 },
+              { dx: 5, scale: 0.9 },
+              { dx: -15, scale: 0.8 },
+              { dx: 15, scale: 0.8 },
+              { dx: 0, scale: 1.0 }
+            ];
+            coords = list.slice(0, Math.min(yieldCount, list.length)).map(c => ({
+              dx: c.dx,
+              dy: getVineY(c.dx) - baseCenterY - 1,
+              scale: c.scale
+            }));
+          }
+        } else if (isStrawberry) {
+          const list = [
+            { dx: -Math.round(bushWidth * 0.35), dy: -Math.round(bushHeight * 0.6) + leafYOffset + 5, scale: 0.95 },
+            { dx: Math.round(bushWidth * 0.35), dy: -Math.round(bushHeight * 0.6) + leafYOffset + 5, scale: 0.95 },
+            { dx: 4, dy: -Math.round(bushHeight * 0.5) + leafYOffset + 6, scale: 0.90 },
+            { dx: -4, dy: -Math.round(bushHeight * 0.5) + leafYOffset + 6, scale: 0.90 },
+            { dx: -Math.round(bushWidth * 0.45), dy: -Math.round(bushHeight * 0.4) + leafYOffset + 4, scale: 0.85 },
+            { dx: Math.round(bushWidth * 0.45), dy: -Math.round(bushHeight * 0.4) + leafYOffset + 4, scale: 0.85 },
+            { dx: 0, dy: -Math.round(bushHeight * 0.8) + leafYOffset + 5, scale: 0.80 },
+            { dx: 0, dy: -bushHeight + leafYOffset + 7, scale: 1.0 }
+          ];
+          coords = list.slice(0, Math.min(yieldCount, list.length));
+        } else if (isGroup) {
+          const list = [
+            { dx: -5, dy: -Math.round(stemH * 0.8) + leafYOffset, scale: 0.9 },
+            { dx: 5, dy: -Math.round(stemH * 0.9) + leafYOffset, scale: 0.95 },
+            { dx: -3, dy: -Math.round(stemH * 0.5) + leafYOffset, scale: 0.8 },
+            { dx: 3, dy: -Math.round(stemH * 0.6) + leafYOffset, scale: 0.8 },
+            { dx: 0, dy: -stemH + leafYOffset, scale: 1.0 }
+          ];
+          coords = list.slice(0, Math.min(yieldCount, list.length));
+        } else if (isWoody) {
+          const list = [
+            { dx: -9, dy: -26, scale: 0.95 },
+            { dx: 9, dy: -28, scale: 0.95 },
+            { dx: -4, dy: -29, scale: 0.85 },
+            { dx: 4, dy: -31, scale: 0.85 },
+            { dx: -12, dy: -23, scale: 0.8 },
+            { dx: 12, dy: -24, scale: 0.8 },
+            { dx: 0, dy: -40, scale: 0.75 },
+            { dx: 0, dy: -35, scale: 1.1 }
+          ];
+          coords = list.slice(0, Math.min(yieldCount, list.length));
+        } else if (isTall) {
+          if (month === 9) { // Sunflower
+            const list = [
+              { dx: -9, dy: -34, scale: 0.85 },
+              { dx: 9, dy: -30, scale: 0.85 },
+              { dx: -12, dy: -25, scale: 0.7 },
+              { dx: 12, dy: -21, scale: 0.7 },
+              { dx: -6, dy: -46, scale: 0.75 },
+              { dx: 6, dy: -46, scale: 0.75 },
+              { dx: 0, dy: -42, scale: 1.25 }
+            ];
+            coords = list.slice(0, Math.min(yieldCount, list.length));
+          } else { // Corn
+            const list = [
+              { dx: 4, dy: -30, scale: 1.0 },
+              { dx: -4, dy: -14, scale: 0.95 },
+              { dx: 4, dy: -20, scale: 0.9 },
+              { dx: -4, dy: -32, scale: 0.85 },
+              { dx: 4, dy: -12, scale: 0.8 },
+              { dx: -4, dy: -22, scale: 1.0 }
+            ];
+            coords = list.slice(0, Math.min(yieldCount, list.length));
+          }
+        } else { // Standard (Rose)
+          const list = [
+            { dx: -7, dy: -32, scale: 0.9 },
+            { dx: 7, dy: -36, scale: 0.9 },
+            { dx: -8, dy: -29, scale: 0.85 },
+            { dx: 8, dy: -31, scale: 0.85 },
+            { dx: 0, dy: -41, scale: 1.0 },
+            { dx: 0, dy: -34, scale: 1.15 }
+          ];
+          coords = list.slice(0, Math.min(yieldCount, list.length));
         }
+
+        // Sort coordinates so smaller scale (background) items are drawn first
+        const sortedCoords = [...coords].sort((a, b) => a.scale - b.scale);
+
+        const headX = isCrooked ? Math.round(Math.sin(0 * 0.16) * 3.0) : 0;
+        
+        sortedCoords.forEach(coord => {
+          const swayFactor = isVine ? 0.2 : (isStrawberry ? 0.5 : (isGroup ? 0.5 : (isWoody ? 0.6 : (isTall ? 0.8 : 1.0))));
+          const fx = baseCenterX + coord.dx + Math.round(swayX * swayFactor) + headX;
+          const fy = baseCenterY + coord.dy;
+          drawFruitItem(fx, fy, coord.scale);
+        });
       }
 
       // --- 4. Sparkles and particles engine (Quality & Health indicators) ---
@@ -1099,6 +1393,13 @@ export const PixelCrop = ({
     if (stage === 5) return -22;
     if (stage === 6) return -18;
     if (stage === 7) return -14;
+    
+    // Stage 8: custom translation for low-growing plants to stay centered
+    const { month } = cropState;
+    const isVine = month === 7 || month === 11;
+    const isStrawberry = month === 1;
+    if (isVine) return -14;
+    if (isStrawberry) return -12;
     return -6;
   };
 
