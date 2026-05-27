@@ -702,11 +702,15 @@ export const PixelCrop = ({
         const arcAlpha = 0.20 + Math.sin(localFrame * 0.05) * 0.06;
         ctx.globalAlpha = arcAlpha;
 
-        const colors = ['#ff8a80', '#ffe082', '#a5d6a7', '#90caf9', '#b39ddb']; // red, yellow, green, blue, purple
+        // Colors from bottom (Purple) to top (Red)
+        const colors = ['#b39ddb', '#90caf9', '#a5d6a7', '#ffe082', '#ff8a80'];
+        const rainbowOffsets = [
+          -1, 0, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 4, 4, 3, 3, 2, 2, 1, 0, -1
+        ];
 
         for (let dx = -14; dx <= 14; dx++) {
           const x = baseCenterX + dx;
-          const dy = Math.round(Math.sqrt(196 - dx * dx) * 0.38);
+          const dy = rainbowOffsets[dx + 14];
           const y = baseCenterY - 32 - dy;
 
           colors.forEach((col, idx) => {
