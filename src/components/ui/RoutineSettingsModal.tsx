@@ -95,8 +95,8 @@ export const RoutineSettingsModal = ({
     };
     const currentTab = activeTab === 'main' ? 'weekday' : activeTab;
     const currentTasks = Array.isArray(draft[currentTab]) ? draft[currentTab] : [];
-    if (getMaxOverlap([...currentTasks, nextTask]) > 3) {
-      showToast('알림은 한 번에 3개까지만 가능해요!');
+    if (getMaxOverlap([...currentTasks, nextTask]) > 2) {
+      showToast('알림은 한 번에 2개까지만 가능해요!');
       return;
     }
     const nextTasks = [...currentTasks, nextTask].sort((left, right) => timeToMinutes(left.startTime ?? '00:00') - timeToMinutes(right.startTime ?? '00:00'));

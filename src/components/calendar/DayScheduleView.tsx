@@ -137,8 +137,8 @@ export const DayScheduleView = ({
       completed: false,
       isRoutine: false,
     };
-    if (getMaxOverlap([...tasks, newTask]) > 3) {
-      showToast('알림은 한 번에 3개까지만 가능해요!');
+    if (getMaxOverlap([...tasks, newTask]) > 2) {
+      showToast('알림은 한 번에 2개까지만 가능해요!');
       return false;
     }
     onTasksChange([...tasks, newTask]);
@@ -203,8 +203,8 @@ export const DayScheduleView = ({
           duration,
         };
         const updatedTask = { ...current, ...nextValues };
-        if (getMaxOverlap(tasks.map((task) => task.id === editingId ? updatedTask : task)) > 3) {
-          showToast('알림은 한 번에 3개까지만 가능해요!');
+        if (getMaxOverlap(tasks.map((task) => task.id === editingId ? updatedTask : task)) > 2) {
+          showToast('알림은 한 번에 2개까지만 가능해요!');
           return;
         }
         if (current.isRoutine && routineEditScope === 'future') {

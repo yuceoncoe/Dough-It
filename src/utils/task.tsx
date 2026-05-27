@@ -306,7 +306,7 @@ export const getMaxOverlap = (tasks: Task[]) => {
 };
 
 export const getRequiredTrackLaneCount = (tasks: Task[]) => {
-  return DEFAULT_TRACK_LANE_COUNT;
+  return Math.max(DEFAULT_TRACK_LANE_COUNT, getMaxOverlap(tasks));
 };
 
 export const assignTasksToTrackLanes = (tasks: Task[], laneCount: number) => {
