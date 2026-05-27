@@ -309,7 +309,7 @@ canvas {
   top: 50%;
   width: 0;
   height: 0;
-  --center-lens-size: 9.6rem;
+  --center-lens-size: 12.8rem;
   --center-gauge-size: calc(var(--center-lens-size) * 0.95);
   transform-style: preserve-3d;
   pointer-events: none;
@@ -478,7 +478,7 @@ canvas {
 
 @media (max-width: 640px) {
   .center-stack {
-    --center-lens-size: 8.0rem;
+    --center-lens-size: 10.6rem;
     --center-gauge-size: calc(var(--center-lens-size) * 0.95);
   }
 
@@ -490,7 +490,7 @@ canvas {
 
 @media (min-width: 1024px) {
   .center-stack {
-    --center-lens-size: 10.4rem;
+    --center-lens-size: 13.8rem;
     --center-gauge-size: calc(var(--center-lens-size) * 0.95);
   }
 }
