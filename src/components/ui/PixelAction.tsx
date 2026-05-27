@@ -285,14 +285,20 @@ export const PixelAction = ({
           drawPixelRect(  0, -3,  5,  6, '#505050');
 
           // Upper ring: CENTER at local (10, +5) → opens downward
-          // outer 14×12 at (4, 1)-(17, 12)
-          drawPixelRect(  4,   1, 14,  2, '#3c3c3c');  // top wall
-          drawPixelRect(  3,   3,  2,  8, '#3c3c3c');  // left wall
-          drawPixelRect( 16,   3,  2,  8, '#3c3c3c');  // right wall
-          drawPixelRect(  4,  11, 14,  2, '#3c3c3c');  // bottom wall
-          drawPixelRect(  5,   3, 10,  8, '#141414');  // interior
-          drawPixelRect(  4,   1, 14,  1, '#6a6a6a');  // top highlight
-          drawPixelRect(  3,   3,  1,  4, '#585858');  // left highlight
+          // outer 12×12 at (3, 1)-(14, 12)
+          drawPixelRect(  6,   1,  6,  2, '#3c3c3c');  // top wall
+          drawPixelRect(  3,   4,  2,  6, '#3c3c3c');  // left wall
+          drawPixelRect( 13,   4,  2,  6, '#3c3c3c');  // right wall
+          drawPixelRect(  6,  11,  6,  2, '#3c3c3c');  // bottom wall
+          // Corners
+          drawPixelRect(  4,   2,  3,  2, '#3c3c3c');  // top-left corner
+          drawPixelRect( 11,   2,  3,  2, '#3c3c3c');  // top-right corner
+          drawPixelRect(  4,  10,  3,  2, '#3c3c3c');  // bottom-left corner
+          drawPixelRect( 11,  10,  3,  2, '#3c3c3c');  // bottom-right corner
+          // Highlights
+          drawPixelRect(  6,   1,  5,  1, '#6a6a6a');  // top highlight
+          drawPixelRect(  4,   2,  2,  1, '#6a6a6a');  // corner highlight
+          drawPixelRect(  3,   4,  1,  4, '#585858');  // left highlight
 
           ctx.restore();
 
@@ -311,14 +317,20 @@ export const PixelAction = ({
           drawPixelRect(  0, -3,  5,  6, '#404040');
 
           // Lower ring: CENTER at local (10, -5) → opens upward
-          // outer 14×12 at (4, -12)-(17, -1)
-          drawPixelRect(  4, -12, 14,  2, '#3c3c3c');  // top wall
-          drawPixelRect(  3, -10,  2,  8, '#3c3c3c');  // left wall
-          drawPixelRect( 16, -10,  2,  8, '#3c3c3c');  // right wall
-          drawPixelRect(  4,  -2, 14,  2, '#3c3c3c');  // bottom wall
-          drawPixelRect(  5, -10, 10,  8, '#141414');  // interior
-          drawPixelRect(  4, -12, 14,  1, '#525252');  // top wall highlight
-          drawPixelRect( 16, -10,  1,  4, '#525252');  // right highlight
+          // outer 12×12 at (3, -12)-(14, -1)
+          drawPixelRect(  6, -12,  6,  2, '#3c3c3c');  // top wall
+          drawPixelRect(  3,  -9,  2,  6, '#3c3c3c');  // left wall
+          drawPixelRect( 13,  -9,  2,  6, '#3c3c3c');  // right wall
+          drawPixelRect(  6,  -2,  6,  2, '#3c3c3c');  // bottom wall
+          // Corners
+          drawPixelRect(  4, -11,  3,  2, '#3c3c3c');  // top-left corner
+          drawPixelRect( 11, -11,  3,  2, '#3c3c3c');  // top-right corner
+          drawPixelRect(  4,  -3,  3,  2, '#3c3c3c');  // bottom-left corner
+          drawPixelRect( 11,  -3,  3,  2, '#3c3c3c');  // bottom-right corner
+          // Highlights
+          drawPixelRect(  6, -12,  5,  1, '#525252');  // top highlight
+          drawPixelRect(  4, -11,  2,  1, '#525252');  // corner highlight
+          drawPixelRect(  3,  -9,  1,  4, '#484848');  // left highlight
 
           ctx.restore();
 
