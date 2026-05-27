@@ -76,16 +76,16 @@ export const DayTaskEditorModal = ({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <button type="button" onClick={() => onSetTags(getToneTags('urgent-important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-              영양제 (긴급+중요)
+              긴급+중요
             </button>
             <button type="button" onClick={() => onSetTags(getToneTags('urgent'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-yellow-400 bg-yellow-100 text-yellow-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-              가지치기 (긴급)
+              긴급
             </button>
             <button type="button" onClick={() => onSetTags(getToneTags('important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-              물뿌리기 (중요)
+              중요
             </button>
             <button type="button" onClick={() => onSetTags(getToneTags('normal'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
-              땅고르기 (일반)
+              일반
             </button>
           </div>
           <div className="mt-5 grid grid-cols-2 gap-3">

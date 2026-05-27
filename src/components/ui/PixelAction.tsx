@@ -198,7 +198,6 @@ export const PixelAction = ({
           // Scissors cycle
           const loopFrame = frame % 110;
           let shearsX = 42;
-          let shearsY = 25;
           let shearsAngle = 0.7;
           let shearsY = 24;
 
@@ -455,24 +454,24 @@ export const PixelAction = ({
           drawPixelRect(moundX - 10, moundY + 1, 20, 5, '#5d4037');
           drawPixelRect(moundX - 6, moundY + 2, 12, 4, '#8d6e63');
 
-          // Swing hoe loop
-          const loopFrame = frame % 55;
+          // Swing hoe loop - slowed down to 80 frames (approx 1.3s)
+          const loopFrame = frame % 80;
           let hoeAngle = -0.5;
           let isHitting = false;
 
-          if (loopFrame < 22) {
-            const t = loopFrame / 22;
-            hoeAngle = -0.5 - t * 0.45;
-          } else if (loopFrame >= 22 && loopFrame < 29) {
-            const t = (loopFrame - 22) / 7;
-            hoeAngle = -0.95 + t * 2.15;
-            if (loopFrame === 27) {
+          if (loopFrame < 32) {
+            const t = loopFrame / 32;
+            hoeAngle = -0.5 - t * 0.35; // Maximum backswing angle is -0.85 rad
+          } else if (loopFrame >= 32 && loopFrame < 40) {
+            const t = (loopFrame - 32) / 8;
+            hoeAngle = -0.85 + t * 2.05; // Swings down to 1.2 rad
+            if (loopFrame === 38) {
               isHitting = true;
             }
-          } else if (loopFrame >= 29 && loopFrame < 38) {
+          } else if (loopFrame >= 40 && loopFrame < 52) {
             hoeAngle = 1.2;
           } else {
-            const t = (loopFrame - 38) / 17;
+            const t = (loopFrame - 52) / 28;
             hoeAngle = 1.2 - t * 1.7;
           }
 
@@ -501,50 +500,48 @@ export const PixelAction = ({
           particles = particles.filter((p) => p.life < p.maxLife && p.y < 52);
 
           // === Korean Homi (호미) ===
-          // pivot at (moundX+4, 20). At hit angle +1.2 rad:
-          //   head center (24, 8) → canvas y ≈ 45 (moundY=46) ✓
-          //   grip end (-10, -4) → canvas (upper area) ✓
+          // pivot at (20, 22) to avoid top-edge clipping.
           const pivotX = moundX + 4;  // = 20
-          const pivotY = 20;
+          const pivotY = 22;
 
           ctx.save();
           ctx.translate(pivotX, pivotY);
           ctx.rotate(hoeAngle);
 
-          // -- Wooden Handle: grip is upper-left (-10,-4), head end is lower-right (19,7) --
+          // -- Wooden Handle: scaled down (from (-10, -4) -> (19, 7) to (-8, -3) -> (14, 5)) --
           ctx.strokeStyle = '#5c2d0a';
           ctx.lineWidth = 4;
           ctx.lineCap = 'round';
           ctx.beginPath();
-          ctx.moveTo(-10, -4);
-          ctx.lineTo(19, 7);
+          ctx.moveTo(-8, -3);
+          ctx.lineTo(14, 5);
           ctx.stroke();
           ctx.strokeStyle = '#a0522d';
           ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.moveTo(-10, -4);
-          ctx.lineTo(19, 7);
+          ctx.moveTo(-8, -3);
+          ctx.lineTo(14, 5);
           ctx.stroke();
           ctx.strokeStyle = '#d4845a';
           ctx.lineWidth = 1;
           ctx.beginPath();
-          ctx.moveTo(-11, -5);
-          ctx.lineTo(18, 6);
+          ctx.moveTo(-9, -4);
+          ctx.lineTo(13, 4);
           ctx.stroke();
 
-          // -- Metal Socket (where handle meets head) --
-          drawPixelRect(17, 3, 8, 8, '#555555');
-          drawPixelRect(18, 2, 6, 3, '#888888');
+          // -- Metal Socket --
+          drawPixelRect(13, 2, 6, 6, '#555555');
+          drawPixelRect(14, 1, 4, 2, '#888888');
 
-          // -- Round Metal Head (center ~(24,8), hits soil at hoeAngle=+1.2) --
-          drawPixelRect(17,  3, 14, 14, '#3a3a3a');  // dark border
-          drawPixelRect(18,  4, 12, 12, '#7a7a7a');  // main gray
-          drawPixelRect(19,  4,  8,  6, '#b0b0b0');  // highlight
-          drawPixelRect(19,  4, 11,  1, '#c0c0c0');  // top rim
-          drawPixelRect(18, 11, 12,  3, '#2e2e2e');  // lower shadow
-          drawPixelRect(17, 13, 14,  1, '#d0d0d0');  // blade edge
-          drawPixelRect(22,  7,  4,  4, '#505050');  // rivet outer
-          drawPixelRect(23,  8,  2,  2, '#282828');  // rivet inner
+          // -- Round Metal Head: scaled down from 14x14 to 10x10 --
+          drawPixelRect(13,  2, 10, 10, '#3a3a3a');  // dark border
+          drawPixelRect(14,  3,  8,  8, '#7a7a7a');  // main gray
+          drawPixelRect(15,  3,  5,  4, '#b0b0b0');  // highlight
+          drawPixelRect(15,  3,  7,  1, '#c0c0c0');  // top rim
+          drawPixelRect(14,  8,  8,  2, '#2e2e2e');  // lower shadow
+          drawPixelRect(13,  9, 10,  1, '#d0d0d0');  // blade edge
+          drawPixelRect(17,  5,  3,  3, '#505050');  // rivet outer
+          drawPixelRect(18,  6,  1,  1, '#282828');  // rivet inner
 
           ctx.restore();
         }
