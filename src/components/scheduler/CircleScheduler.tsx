@@ -658,7 +658,7 @@ export const CircleScheduler = ({
                       <PixelAction actionType={getActionTypeForTask(displayTask)} size={52} />
                     </div>
                     <div
-                      className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
+                      className="center-lens__title"
                       style={{
                         position: 'relative',
                         left: 'auto',

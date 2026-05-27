@@ -284,21 +284,26 @@ export const PixelAction = ({
           // Neck
           drawPixelRect(  0, -3,  5,  6, '#505050');
 
-          // Upper ring: CENTER at local (10, +5) → opens downward
-          // outer 12×12 at (3, 1)-(14, 12)
-          drawPixelRect(  6,   1,  6,  2, '#3c3c3c');  // top wall
-          drawPixelRect(  3,   4,  2,  6, '#3c3c3c');  // left wall
-          drawPixelRect( 13,   4,  2,  6, '#3c3c3c');  // right wall
-          drawPixelRect(  6,  11,  6,  2, '#3c3c3c');  // bottom wall
-          // Corners
-          drawPixelRect(  4,   2,  3,  2, '#3c3c3c');  // top-left corner
-          drawPixelRect( 11,   2,  3,  2, '#3c3c3c');  // top-right corner
-          drawPixelRect(  4,  10,  3,  2, '#3c3c3c');  // bottom-left corner
-          drawPixelRect( 11,  10,  3,  2, '#3c3c3c');  // bottom-right corner
-          // Highlights
-          drawPixelRect(  6,   1,  5,  1, '#6a6a6a');  // top highlight
-          drawPixelRect(  4,   2,  2,  1, '#6a6a6a');  // corner highlight
-          drawPixelRect(  3,   4,  1,  4, '#585858');  // left highlight
+          // Upper ring (round)
+          const ringColor = '#3c3c3c';
+          drawPixelRect(  6,  1,  6,  1, ringColor);
+          drawPixelRect(  4,  2,  2,  1, ringColor);
+          drawPixelRect( 12,  2,  2,  1, ringColor);
+          drawPixelRect(  3,  3,  2,  1, ringColor);
+          drawPixelRect( 13,  3,  2,  1, ringColor);
+          drawPixelRect(  2,  4,  2,  6, ringColor);
+          drawPixelRect( 14,  4,  2,  6, ringColor);
+          drawPixelRect(  3, 10,  2,  1, ringColor);
+          drawPixelRect( 13, 10,  2,  1, ringColor);
+          drawPixelRect(  4, 11,  2,  1, ringColor);
+          drawPixelRect( 12, 11,  2,  1, ringColor);
+          drawPixelRect(  6, 12,  6,  1, ringColor);
+
+          // Highlights for Upper ring
+          drawPixelRect(  6,  1,  5,  1, '#6a6a6a');
+          drawPixelRect(  4,  2,  1,  1, '#6a6a6a');
+          drawPixelRect(  3,  3,  1,  2, '#6a6a6a');
+          drawPixelRect(  2,  4,  1,  4, '#585858');
 
           ctx.restore();
 
@@ -316,21 +321,25 @@ export const PixelAction = ({
           // Neck
           drawPixelRect(  0, -3,  5,  6, '#404040');
 
-          // Lower ring: CENTER at local (10, -5) → opens upward
-          // outer 12×12 at (3, -12)-(14, -1)
-          drawPixelRect(  6, -12,  6,  2, '#3c3c3c');  // top wall
-          drawPixelRect(  3,  -9,  2,  6, '#3c3c3c');  // left wall
-          drawPixelRect( 13,  -9,  2,  6, '#3c3c3c');  // right wall
-          drawPixelRect(  6,  -2,  6,  2, '#3c3c3c');  // bottom wall
-          // Corners
-          drawPixelRect(  4, -11,  3,  2, '#3c3c3c');  // top-left corner
-          drawPixelRect( 11, -11,  3,  2, '#3c3c3c');  // top-right corner
-          drawPixelRect(  4,  -3,  3,  2, '#3c3c3c');  // bottom-left corner
-          drawPixelRect( 11,  -3,  3,  2, '#3c3c3c');  // bottom-right corner
-          // Highlights
-          drawPixelRect(  6, -12,  5,  1, '#525252');  // top highlight
-          drawPixelRect(  4, -11,  2,  1, '#525252');  // corner highlight
-          drawPixelRect(  3,  -9,  1,  4, '#484848');  // left highlight
+          // Lower ring (round)
+          drawPixelRect(  6, -13,  6,  1, ringColor);
+          drawPixelRect(  4, -12,  2,  1, ringColor);
+          drawPixelRect( 12, -12,  2,  1, ringColor);
+          drawPixelRect(  3, -11,  2,  1, ringColor);
+          drawPixelRect( 13, -11,  2,  1, ringColor);
+          drawPixelRect(  2, -10,  2,  6, ringColor);
+          drawPixelRect( 14, -10,  2,  6, ringColor);
+          drawPixelRect(  3,  -4,  2,  1, ringColor);
+          drawPixelRect( 13,  -4,  2,  1, ringColor);
+          drawPixelRect(  4,  -3,  2,  1, ringColor);
+          drawPixelRect( 12,  -3,  2,  1, ringColor);
+          drawPixelRect(  6,  -2,  6,  1, ringColor);
+
+          // Highlights for Lower ring
+          drawPixelRect(  6, -13,  5,  1, '#525252');
+          drawPixelRect(  4, -12,  1,  1, '#525252');
+          drawPixelRect(  3, -11,  1,  2, '#484848');
+          drawPixelRect(  2, -10,  1,  4, '#484848');
 
           ctx.restore();
 
@@ -367,15 +376,28 @@ export const PixelAction = ({
           let bottleY = 26;
           let bottleAngle = -0.45;
 
+          if (loopFrame >= 15 && loopFrame < 25) {
+            const t = (loopFrame - 15) / 10;
+            bottleAngle = -0.45 - t * 0.8;
+            bottleX = 41 + t * 4;
+          } else if (loopFrame >= 25 && loopFrame <= 65) {
+            bottleAngle = -1.25;
+            bottleX = 45;
+          } else if (loopFrame > 65 && loopFrame <= 75) {
+            const t = (loopFrame - 65) / 10;
+            bottleAngle = -1.25 + t * 0.8;
+            bottleX = 45 - t * 4;
+          }
+
           const isPouring = loopFrame >= 25 && loopFrame <= 65;
 
           if (isPouring) {
             if (frame % 2 === 0) {
               particles.push({
-                x: bottleX - 15 + (Math.random() * 4 - 2),
-                y: bottleY + 5,
-                vx: -1.3 - Math.random() * 0.8,
-                vy: 0.9 + Math.random() * 0.8,
+                x: bottleX - 22 + (Math.random() * 4 - 2),
+                y: bottleY - 6,
+                vx: -0.8 - Math.random() * 0.5,
+                vy: 1.2 + Math.random() * 0.8,
                 color: Math.random() < 0.5 ? '#a8e8d8' : '#3d9e84',
                 life: 1,
                 maxLife: 26,
@@ -383,10 +405,10 @@ export const PixelAction = ({
             }
             if (frame % 4 === 0) {
               particles.push({
-                x: bottleX - 15,
-                y: bottleY + 5,
-                vx: -1.1 - Math.random() * 0.6,
-                vy: 1.1 + Math.random() * 0.6,
+                x: bottleX - 22,
+                y: bottleY - 6,
+                vx: -0.6 - Math.random() * 0.4,
+                vy: 1.4 + Math.random() * 0.6,
                 color: '#7ed8c0',
                 life: 1,
                 maxLife: 22,
