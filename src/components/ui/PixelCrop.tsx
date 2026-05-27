@@ -612,6 +612,12 @@ export const PixelCrop = ({
           const swayX = Math.round(swayOffset * swayF);
           const leafYOffset = health < 40 ? (evolutionStage >= 5 ? 3 : 2) : 0;
 
+          const getStalkOffsetAtY = (y: number) => {
+            const i = y - (baseCenterY - 4 - stemH);
+            const tX = isCrooked ? Math.round(Math.sin(i * (0.5 - evolutionStage * 0.04)) * (1.2 + evolutionStage * 0.2)) : 0;
+            return swayX + tX;
+          };
+
           const isCorn = month === 8;
           const stemW = isCorn ? 6 : 4;
           const fillW = isCorn ? 4 : 2;
@@ -620,70 +626,80 @@ export const PixelCrop = ({
 
           for (let i = 0; i < stemH; i++) {
             const currY = baseCenterY - 4 - stemH + i;
-            const tX = isCrooked ? Math.round(Math.sin(i * (0.5 - evolutionStage * 0.04)) * (1.2 + evolutionStage * 0.2)) : 0;
+            const offset = getStalkOffsetAtY(currY);
             
-            drawPixelRect(baseCenterX + offsetDiff + swayX + tX, currY, stemW, 1, stemOutline);
-            drawPixelRect(baseCenterX + fillDiff + swayX + tX, currY, fillW, 1, stemColor);
+            drawPixelRect(baseCenterX + offsetDiff + offset, currY, stemW, 1, stemOutline);
+            drawPixelRect(baseCenterX + fillDiff + offset, currY, fillW, 1, stemColor);
 
             if (isRose) {
-              if (i === 8) drawPixel(baseCenterX - 3 + swayX + tX, currY, '#1b5e20');
-              if (i === 16) drawPixel(baseCenterX + 2 + swayX + tX, currY, '#1b5e20');
-              if (i === 24) drawPixel(baseCenterX - 3 + swayX + tX, currY, '#1b5e20');
+              if (i === 8) drawPixel(baseCenterX - 3 + offset, currY, '#1b5e20');
+              if (i === 16) drawPixel(baseCenterX + 2 + offset, currY, '#1b5e20');
+              if (i === 24) drawPixel(baseCenterX - 3 + offset, currY, '#1b5e20');
             }
           }
 
           if (evolutionStage === 3) {
             const leftLeafW = Math.max(1, 5 + leafSizeModifier);
-            drawPixelRect(baseCenterX - 2 - leftLeafW + swayX, baseCenterY - 4 - stemH - 3 + leafYOffset, leftLeafW, 3, stemOutline);
-            drawPixelRect(baseCenterX - 1 - leftLeafW + swayX, baseCenterY - 4 - stemH - 2 + leafYOffset, leftLeafW - 1, 2, leafColor);
+            const ly1 = baseCenterY - 4 - stemH - 3 + leafYOffset;
+            drawPixelRect(baseCenterX - 2 - leftLeafW + getStalkOffsetAtY(ly1), ly1, leftLeafW, 3, stemOutline);
+            drawPixelRect(baseCenterX - 1 - leftLeafW + getStalkOffsetAtY(ly1 + 1), ly1 + 1, leftLeafW - 1, 2, leafColor);
 
             const rightLeafW = Math.max(1, 6 + leafSizeModifier);
-            drawPixelRect(baseCenterX + 2 + swayX, baseCenterY - 4 - stemH - 4 + leafYOffset, rightLeafW, 3, stemOutline);
-            drawPixelRect(baseCenterX + 2 + swayX, baseCenterY - 4 - stemH - 3 + leafYOffset, rightLeafW - 1, 2, leafColor);
+            const ly2 = baseCenterY - 4 - stemH - 4 + leafYOffset;
+            drawPixelRect(baseCenterX + 2 + getStalkOffsetAtY(ly2), ly2, rightLeafW, 3, stemOutline);
+            drawPixelRect(baseCenterX + 2 + getStalkOffsetAtY(ly2 + 1), ly2 + 1, rightLeafW - 1, 2, leafColor);
             
             if (isLowQualityQ3) {
-              drawPixel(baseCenterX - 4 + swayX, baseCenterY - 4 - stemH - 2 + leafYOffset, '#3e2723');
-              drawPixel(baseCenterX + 4 + swayX, baseCenterY - 4 - stemH - 3 + leafYOffset, '#3e2723');
+              drawPixel(baseCenterX - 4 + getStalkOffsetAtY(baseCenterY - 4 - stemH - 2 + leafYOffset), baseCenterY - 4 - stemH - 2 + leafYOffset, '#3e2723');
+              drawPixel(baseCenterX + 4 + getStalkOffsetAtY(baseCenterY - 4 - stemH - 3 + leafYOffset), baseCenterY - 4 - stemH - 3 + leafYOffset, '#3e2723');
             }
           } else if (evolutionStage === 4) {
             const leftLeafW = Math.max(1, 5 + leafSizeModifier);
-            drawPixelRect(baseCenterX - 2 - leftLeafW + Math.round(swayX * 0.3), baseCenterY - 4 - stemH + 4 + leafYOffset, leftLeafW, 3, stemOutline);
-            drawPixelRect(baseCenterX - 1 - leftLeafW + Math.round(swayX * 0.3), baseCenterY - 4 - stemH + 5 + leafYOffset, leftLeafW - 1, 2, leafColor);
+            const ly1 = baseCenterY - 4 - stemH + 4 + leafYOffset;
+            drawPixelRect(baseCenterX - 2 - leftLeafW + getStalkOffsetAtY(ly1), ly1, leftLeafW, 3, stemOutline);
+            drawPixelRect(baseCenterX - 1 - leftLeafW + getStalkOffsetAtY(ly1 + 1), ly1 + 1, leftLeafW - 1, 2, leafColor);
 
             const rightLeafW = Math.max(1, 6 + leafSizeModifier);
-            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 4 - stemH + 1 + leafYOffset, rightLeafW, 3, stemOutline);
-            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 4 - stemH + 2 + leafYOffset, rightLeafW - 1, 2, leafColor);
+            const ly2 = baseCenterY - 4 - stemH + 1 + leafYOffset;
+            drawPixelRect(baseCenterX + 2 + getStalkOffsetAtY(ly2), ly2, rightLeafW, 3, stemOutline);
+            drawPixelRect(baseCenterX + 2 + getStalkOffsetAtY(ly2 + 1), ly2 + 1, rightLeafW - 1, 2, leafColor);
 
-            drawPixelRect(baseCenterX - 1 + swayX, baseCenterY - 4 - stemH - 3 + leafYOffset, 3, 3, stemOutline);
-            drawPixelRect(baseCenterX + swayX, baseCenterY - 4 - stemH - 2 + leafYOffset, 2, 2, leafColor);
+            const budY = baseCenterY - 4 - stemH - 3 + leafYOffset;
+            drawPixelRect(baseCenterX - 1 + getStalkOffsetAtY(budY), budY, 3, 3, stemOutline);
+            drawPixelRect(baseCenterX + getStalkOffsetAtY(budY + 1), budY + 1, 2, 2, leafColor);
           } else if (evolutionStage === 5) {
             const lowLeftW = Math.max(1, 6 + leafSizeModifier);
-            drawPixelRect(baseCenterX - 2 - lowLeftW + Math.round(swayX * 0.2), baseCenterY - 4 - stemH + 9 + leafYOffset, lowLeftW, 3, stemOutline);
-            drawPixelRect(baseCenterX - 1 - lowLeftW + Math.round(swayX * 0.2), baseCenterY - 4 - stemH + 10 + leafYOffset, lowLeftW - 1, 2, leafColor);
+            const ly1 = baseCenterY - 4 - stemH + 9 + leafYOffset;
+            drawPixelRect(baseCenterX - 2 - lowLeftW + getStalkOffsetAtY(ly1), ly1, lowLeftW, 3, stemOutline);
+            drawPixelRect(baseCenterX - 1 - lowLeftW + getStalkOffsetAtY(ly1 + 1), ly1 + 1, lowLeftW - 1, 2, leafColor);
 
             const midRightW = Math.max(1, 7 + leafSizeModifier);
-            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.6), baseCenterY - 4 - stemH + 4 + leafYOffset, midRightW, 3, stemOutline);
-            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.6), baseCenterY - 4 - stemH + 5 + leafYOffset, midRightW - 1, 2, leafColor);
+            const ly2 = baseCenterY - 4 - stemH + 4 + leafYOffset;
+            drawPixelRect(baseCenterX + 2 + getStalkOffsetAtY(ly2), ly2, midRightW, 3, stemOutline);
+            drawPixelRect(baseCenterX + 2 + getStalkOffsetAtY(ly2 + 1), ly2 + 1, midRightW - 1, 2, leafColor);
 
             const upLeftW = Math.max(1, 5 + leafSizeModifier);
-            drawPixelRect(baseCenterX - 2 - upLeftW + swayX, baseCenterY - 4 - stemH - 1 + leafYOffset, upLeftW, 3, stemOutline);
-            drawPixelRect(baseCenterX - 1 - upLeftW + swayX, baseCenterY - 4 - stemH + leafYOffset, upLeftW - 1, 2, leafColor);
+            const ly3 = baseCenterY - 4 - stemH - 1 + leafYOffset;
+            drawPixelRect(baseCenterX - 2 - upLeftW + getStalkOffsetAtY(ly3), ly3, upLeftW, 3, stemOutline);
+            drawPixelRect(baseCenterX - 1 - upLeftW + getStalkOffsetAtY(ly3 + 1), ly3 + 1, upLeftW - 1, 2, leafColor);
 
             if (stats.yieldQ2 >= 7) {
-              drawPixel(baseCenterX - 6 + Math.round(swayX * 0.2), baseCenterY - 4 - stemH + 8 + leafYOffset, '#ef5350');
-              drawPixel(baseCenterX + 5 + Math.round(swayX * 0.6), baseCenterY - 4 - stemH + 3 + leafYOffset, '#ef5350');
+              drawPixel(baseCenterX - 6 + getStalkOffsetAtY(baseCenterY - 4 - stemH + 8 + leafYOffset), baseCenterY - 4 - stemH + 8 + leafYOffset, '#ef5350');
+              drawPixel(baseCenterX + 5 + getStalkOffsetAtY(baseCenterY - 4 - stemH + 3 + leafYOffset), baseCenterY - 4 - stemH + 3 + leafYOffset, '#ef5350');
             }
           } else if (evolutionStage === 6) {
             const l1W = Math.max(1, 7 + leafSizeModifier);
-            drawPixelRect(baseCenterX - 2 - l1W + Math.round(swayX * 0.3), baseCenterY - 4 - stemH + 12 + leafYOffset, l1W, 3, stemOutline);
-            drawPixelRect(baseCenterX - 1 - l1W + Math.round(swayX * 0.3), baseCenterY - 4 - stemH + 13 + leafYOffset, l1W - 1, 2, leafColor);
+            const ly1 = baseCenterY - 4 - stemH + 12 + leafYOffset;
+            drawPixelRect(baseCenterX - 2 - l1W + getStalkOffsetAtY(ly1), ly1, l1W, 3, stemOutline);
+            drawPixelRect(baseCenterX - 1 - l1W + getStalkOffsetAtY(ly1 + 1), ly1 + 1, l1W - 1, 2, leafColor);
 
             const l2W = Math.max(1, 7 + leafSizeModifier);
-            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 4 - stemH + 7 + leafYOffset, l2W, 3, stemOutline);
-            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 4 - stemH + 8 + leafYOffset, l2W - 1, 2, leafColor);
+            const ly2 = baseCenterY - 4 - stemH + 7 + leafYOffset;
+            drawPixelRect(baseCenterX + 2 + getStalkOffsetAtY(ly2), ly2, l2W, 3, stemOutline);
+            drawPixelRect(baseCenterX + 2 + getStalkOffsetAtY(ly2 + 1), ly2 + 1, l2W - 1, 2, leafColor);
 
-            const stemHeadX = isCrooked ? Math.round(Math.sin(0 * 0.22) * 2.5) : 0;
             const budY = baseCenterY - 4 - stemH - 6;
+            const stemHeadX = getStalkOffsetAtY(budY);
 
             const isFlowerType = month === 4 || month === 5 || month === 9 || month === 12;
 
@@ -694,43 +710,44 @@ export const PixelCrop = ({
               if (health < 40) budColor = '#bcaaa4';
 
               if (month === 9) {
-                drawPixelRect(baseCenterX - 3 + swayX + stemHeadX, budY + 1, 6, 5, stemOutline);
-                drawPixelRect(baseCenterX - 2 + swayX + stemHeadX, budY + 2, 4, 3, budColor);
+                drawPixelRect(baseCenterX - 3 + stemHeadX, budY + 1, 6, 5, stemOutline);
+                drawPixelRect(baseCenterX - 2 + stemHeadX, budY + 2, 4, 3, budColor);
               } else {
-                drawPixelRect(baseCenterX - 2 + swayX + stemHeadX, budY + 3, 4, 1, stemOutline);
-                drawPixel(baseCenterX - 1 + swayX + stemHeadX, budY + 4, stemOutline);
-                drawPixelRect(baseCenterX - 2 + swayX + stemHeadX, budY, 4, 3, stemOutline);
-                drawPixelRect(baseCenterX - 1 + swayX + stemHeadX, budY + 1, 2, 2, budColor);
+                drawPixelRect(baseCenterX - 2 + stemHeadX, budY + 3, 4, 1, stemOutline);
+                drawPixel(baseCenterX - 1 + stemHeadX, budY + 4, stemOutline);
+                drawPixelRect(baseCenterX - 2 + stemHeadX, budY, 4, 3, stemOutline);
+                drawPixelRect(baseCenterX - 1 + stemHeadX, budY + 1, 2, 2, budColor);
               }
             } else {
               const unripeColor = '#a5d6a7';
               const unripeOutline = '#2e7d32';
-              drawPixelRect(baseCenterX - 2 + swayX + stemHeadX, budY + 1, 4, 3, unripeOutline);
-              drawPixelRect(baseCenterX - 1 + swayX + stemHeadX, budY + 2, 2, 2, unripeColor);
-              drawPixel(baseCenterX + swayX + stemHeadX, budY, unripeOutline);
+              drawPixelRect(baseCenterX - 2 + stemHeadX, budY + 1, 4, 3, unripeOutline);
+              drawPixelRect(baseCenterX - 1 + stemHeadX, budY + 2, 2, 2, unripeColor);
+              drawPixel(baseCenterX + stemHeadX, budY, unripeOutline);
             }
           } else if (evolutionStage === 7) {
             const leaf1W = Math.max(1, 7 + leafSizeModifier);
-            drawPixelRect(baseCenterX - 2 - leaf1W + Math.round(swayX * 0.3), baseCenterY - 4 - stemH + 16 + leafYOffset, leaf1W, 3, stemOutline);
-            drawPixelRect(baseCenterX - 1 - leaf1W + Math.round(swayX * 0.3), baseCenterY - 4 - stemH + 17 + leafYOffset, leaf1W - 1, 2, leafColor);
+            const ly1 = baseCenterY - 4 - stemH + 16 + leafYOffset;
+            drawPixelRect(baseCenterX - 2 - leaf1W + getStalkOffsetAtY(ly1), ly1, leaf1W, 3, stemOutline);
+            drawPixelRect(baseCenterX - 1 - leaf1W + getStalkOffsetAtY(ly1 + 1), ly1 + 1, leaf1W - 1, 2, leafColor);
 
             const leaf2W = Math.max(1, 8 + leafSizeModifier);
-            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 4 - stemH + 9 + leafYOffset, leaf2W, 3, stemOutline);
-            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.7), baseCenterY - 4 - stemH + 10 + leafYOffset, leaf2W - 1, 2, leafColor);
+            const ly2 = baseCenterY - 4 - stemH + 9 + leafYOffset;
+            drawPixelRect(baseCenterX + 2 + getStalkOffsetAtY(ly2), ly2, leaf2W, 3, stemOutline);
+            drawPixelRect(baseCenterX + 2 + getStalkOffsetAtY(ly2 + 1), ly2 + 1, leaf2W - 1, 2, leafColor);
 
             if (stats.yieldQ2 >= 7) {
-              drawPixel(baseCenterX - 6 + Math.round(swayX * 0.3), baseCenterY - 4 - stemH + 15 + leafYOffset, '#ef5350');
-              drawPixel(baseCenterX + 6 + Math.round(swayX * 0.7), baseCenterY - 4 - stemH + 8 + leafYOffset, '#ef5350');
+              drawPixel(baseCenterX - 6 + getStalkOffsetAtY(baseCenterY - 4 - stemH + 15 + leafYOffset), baseCenterY - 4 - stemH + 15 + leafYOffset, '#ef5350');
+              drawPixel(baseCenterX + 6 + getStalkOffsetAtY(baseCenterY - 4 - stemH + 8 + leafYOffset), baseCenterY - 4 - stemH + 8 + leafYOffset, '#ef5350');
             }
 
-            const stemHeadX = isCrooked ? Math.round(Math.sin(0 * 0.18) * 2.8) : 0;
+            const headY = baseCenterY - 4 - stemH - 7;
+            const fx = baseCenterX + getStalkOffsetAtY(headY);
+            const fy = headY;
+
             const isFlowerType = month === 4 || month === 5 || month === 9 || month === 12;
 
             if (isFlowerType) {
-              const headY = baseCenterY - 4 - stemH - 7;
-              const fx = baseCenterX + swayX + stemHeadX;
-              const fy = headY;
-
               if (month === 4) {
                 // 4월 벚꽃 - 7단계 (반개화)
                 drawPixel(fx, fy - 2, '#2e7d32'); // 꽃받침
@@ -794,10 +811,6 @@ export const PixelCrop = ({
                 drawPixel(fx, fy, '#ffca28'); // 작은 노란 수술 한 점
               }
             } else {
-              const headY = baseCenterY - 4 - stemH - 7;
-              const fx = baseCenterX + swayX + stemHeadX;
-              const fy = headY;
-              
               if (month === 1) {
                 // 1월 딸기 - 7단계 (설익은 딸기)
                 drawPixelRect(fx - 2, fy - 2, 5, 1, '#2e7d32'); // 초록 꼭지
@@ -831,7 +844,7 @@ export const PixelCrop = ({
                 drawPixel(fx + 2, fy, '#1b5e20');
                 drawPixel(fx + 2, fy + 2, '#1b5e20');
               } else if (month === 8) {
-                // 8월 옥수수 - 7단계 (설익음 상태: 줄기 옆에 달린 작은 옥수수들과 꼭대기 개걸이 수태)
+                // 8월 옥수수 - 7단계 (설익음 상태: 줄기 옆에 달린 큰 옥수수들과 꼭대기 개걸이 수태)
                 // 1. 꼭대기 수술 개걸이 (Tassel)
                 drawPixel(fx, fy - 3, '#8d6e63');
                 drawPixel(fx - 1, fy - 2, '#8d6e63');
@@ -841,21 +854,63 @@ export const PixelCrop = ({
                 drawPixel(fx, fy - 1, '#8d6e63');
                 drawPixelRect(fx - 1, fy, 3, 2, '#558b2f');
 
-                // 2. 왼쪽 아래 작은 옥수수 (Left unripe ear at baseCenterY - 12)
-                const lx = baseCenterX - 4 + Math.round(swayX * 0.7);
+                // 2. 왼쪽 아래 큰 옥수수 (Left unripe ear at baseCenterY - 12)
                 const ly = baseCenterY - 12;
-                drawPixel(lx, ly - 3, '#8d6e63'); // 옥수수 수염
-                drawPixelRect(lx - 2, ly - 2, 3, 6, '#558b2f'); // 겉껍질
-                drawPixelRect(lx - 1, ly - 1, 2, 4, '#689f38'); // 속껍질
-                drawPixel(lx, ly, '#fff176'); // 설익은 알갱이 노출
+                const lx = baseCenterX - 4 + getStalkOffsetAtY(ly);
+                drawPixel(lx, ly - 5, '#8d6e63'); // 옥수수 수염
+                drawPixel(lx - 1, ly - 4, '#8d6e63');
+                drawPixel(lx + 1, ly - 4, '#8d6e63');
+                drawPixel(lx, ly - 4, '#8d6e63');
+                for (let y = -3; y <= 4; y++) {
+                  if (y >= -2 && y <= 3) {
+                    drawPixel(lx - 2, ly + y, '#558b2f'); // 겉껍질
+                    drawPixel(lx + 2, ly + y, '#558b2f'); // 겉껍질
+                  }
+                  if (y >= 0 && y <= 4) {
+                    drawPixel(lx - 3, ly + y, '#33691e'); // 줄기 연결잎
+                  }
+                  let gw = 3;
+                  if (y === -3 || y === 4) gw = 1;
+                  else if (y === -2 || y === 3) gw = 2;
+                  const gx = lx - Math.floor(gw / 2);
+                  for (let x = gx; x < gx + gw; x++) {
+                    const isGrid = (x + y) % 2 === 0;
+                    drawPixel(x, ly + y, isGrid ? '#fffde7' : '#fff176');
+                  }
+                  if (y >= -1 && y <= 2) {
+                    drawPixel(lx - 1, ly + y, '#689f38'); // 속껍질
+                  }
+                }
+                drawPixelRect(lx - 1, ly + 5, 2, 1, '#33691e');
 
-                // 3. 오른쪽 위 작은 옥수수 (Right unripe ear at baseCenterY - 20)
-                const rx = baseCenterX + 4 + Math.round(swayX * 0.7);
+                // 3. 오른쪽 위 큰 옥수수 (Right unripe ear at baseCenterY - 20)
                 const ry = baseCenterY - 20;
-                drawPixel(rx, ry - 3, '#8d6e63');
-                drawPixelRect(rx - 1, ry - 2, 3, 6, '#558b2f');
-                drawPixelRect(rx - 1, ry - 1, 2, 4, '#689f38');
-                drawPixel(rx, ry, '#fff176');
+                const rx = baseCenterX + 4 + getStalkOffsetAtY(ry);
+                drawPixel(rx, ry - 5, '#8d6e63'); // 옥수수 수염
+                drawPixel(rx - 1, ry - 4, '#8d6e63');
+                drawPixel(rx + 1, ry - 4, '#8d6e63');
+                drawPixel(rx, ry - 4, '#8d6e63');
+                for (let y = -3; y <= 4; y++) {
+                  if (y >= -2 && y <= 3) {
+                    drawPixel(rx - 2, ry + y, '#558b2f'); // 겉껍질
+                    drawPixel(rx + 2, ry + y, '#558b2f');
+                  }
+                  if (y >= 0 && y <= 4) {
+                    drawPixel(rx + 3, ry + y, '#33691e'); // 줄기 연결잎
+                  }
+                  let gw = 3;
+                  if (y === -3 || y === 4) gw = 1;
+                  else if (y === -2 || y === 3) gw = 2;
+                  const gx = rx - Math.floor(gw / 2);
+                  for (let x = gx; x < gx + gw; x++) {
+                    const isGrid = (x + y) % 2 === 0;
+                    drawPixel(x, ry + y, isGrid ? '#fffde7' : '#fff176');
+                  }
+                  if (y >= -1 && y <= 2) {
+                    drawPixel(rx - 1, ry + y, '#689f38'); // 속껍질
+                  }
+                }
+                drawPixelRect(rx - 1, ry + 5, 2, 1, '#33691e');
               } else if (month === 10) {
                 // 10월 감 - 7단계 (청감)
                 drawPixel(fx, fy - 3, '#3e2723'); // 감꼭지
@@ -1085,11 +1140,17 @@ export const PixelCrop = ({
           const offsetDiff = isCorn ? -3 : -2;
           const fillDiff = isCorn ? -2 : -1;
 
+          const getStalkOffsetAtY = (y: number) => {
+            const i = y - (baseCenterY - 4 - stemH);
+            const tX = isCrooked ? Math.round(Math.sin(i * 0.12) * 3.5) : 0;
+            return Math.round(swayX * 0.6) + tX;
+          };
+
           for (let i = 0; i < stemH; i++) {
             const currY = baseCenterY - 4 - stemH + i;
-            const tX = isCrooked ? Math.round(Math.sin(i * 0.12) * 3.5) : 0;
-            drawPixelRect(baseCenterX + offsetDiff + Math.round(swayX * 0.6) + tX, currY, stemW, 1, stemOutline);
-            drawPixelRect(baseCenterX + fillDiff + Math.round(swayX * 0.6) + tX, currY, fillW, 1, stemColor);
+            const offset = getStalkOffsetAtY(currY);
+            drawPixelRect(baseCenterX + offsetDiff + offset, currY, stemW, 1, stemOutline);
+            drawPixelRect(baseCenterX + fillDiff + offset, currY, fillW, 1, stemColor);
           }
 
           // Leaves (droop if low health)
@@ -1099,108 +1160,134 @@ export const PixelCrop = ({
             const fill = leafColor;
 
             // 1. Bottom-Left Leaf
-            drawPixel(baseCenterX - 2 + Math.round(swayX * 0.3), baseCenterY - 12, outline);
-            drawPixel(baseCenterX - 3 + Math.round(swayX * 0.3), baseCenterY - 13, outline);
-            drawPixel(baseCenterX - 4 + Math.round(swayX * 0.3), baseCenterY - 14, outline);
-            drawPixel(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 15, outline);
-            drawPixel(baseCenterX - 6 + Math.round(swayX * 0.3), baseCenterY - 16, outline);
-            drawPixel(baseCenterX - 7 + Math.round(swayX * 0.3), baseCenterY - 17, outline);
-            drawPixel(baseCenterX - 7 + Math.round(swayX * 0.3), baseCenterY - 18, outline);
-            drawPixel(baseCenterX - 6 + Math.round(swayX * 0.3), baseCenterY - 19, outline);
-            drawPixel(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 19, outline);
-            drawPixel(baseCenterX - 4 + Math.round(swayX * 0.3), baseCenterY - 18, outline);
-            drawPixel(baseCenterX - 3 + Math.round(swayX * 0.3), baseCenterY - 17, outline);
-            drawPixel(baseCenterX - 2 + Math.round(swayX * 0.3), baseCenterY - 16, outline);
+            const ly1 = baseCenterY - 12;
+            const offset1 = getStalkOffsetAtY(ly1);
+            drawPixel(baseCenterX - 2 + offset1, ly1, outline);
+            drawPixel(baseCenterX - 3 + offset1, ly1 - 1, outline);
+            drawPixel(baseCenterX - 4 + offset1, ly1 - 2, outline);
+            drawPixel(baseCenterX - 5 + offset1, ly1 - 3, outline);
+            drawPixel(baseCenterX - 6 + offset1, ly1 - 4, outline);
+            drawPixel(baseCenterX - 7 + offset1, ly1 - 5, outline);
+            drawPixel(baseCenterX - 7 + offset1, ly1 - 6, outline);
+            drawPixel(baseCenterX - 6 + offset1, ly1 - 7, outline);
+            drawPixel(baseCenterX - 5 + offset1, ly1 - 7, outline);
+            drawPixel(baseCenterX - 4 + offset1, ly1 - 6, outline);
+            drawPixel(baseCenterX - 3 + offset1, ly1 - 5, outline);
+            drawPixel(baseCenterX - 2 + offset1, ly1 - 4, outline);
 
-            drawPixelRect(baseCenterX - 3 + Math.round(swayX * 0.3), baseCenterY - 16, 1, 3, fill);
-            drawPixelRect(baseCenterX - 4 + Math.round(swayX * 0.3), baseCenterY - 17, 1, 3, fill);
-            drawPixelRect(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 18, 1, 3, fill);
-            drawPixelRect(baseCenterX - 6 + Math.round(swayX * 0.3), baseCenterY - 18, 1, 2, fill);
+            drawPixelRect(baseCenterX - 3 + offset1, ly1 - 4, 1, 3, fill);
+            drawPixelRect(baseCenterX - 4 + offset1, ly1 - 5, 1, 3, fill);
+            drawPixelRect(baseCenterX - 5 + offset1, ly1 - 6, 1, 3, fill);
+            drawPixelRect(baseCenterX - 6 + offset1, ly1 - 6, 1, 2, fill);
 
             // 2. Middle-Right Leaf
-            drawPixel(baseCenterX + 1 + Math.round(swayX * 0.5), baseCenterY - 20, outline);
-            drawPixel(baseCenterX + 2 + Math.round(swayX * 0.5), baseCenterY - 21, outline);
-            drawPixel(baseCenterX + 3 + Math.round(swayX * 0.5), baseCenterY - 22, outline);
-            drawPixel(baseCenterX + 4 + Math.round(swayX * 0.5), baseCenterY - 23, outline);
-            drawPixel(baseCenterX + 5 + Math.round(swayX * 0.5), baseCenterY - 24, outline);
-            drawPixel(baseCenterX + 6 + Math.round(swayX * 0.5), baseCenterY - 25, outline);
-            drawPixel(baseCenterX + 6 + Math.round(swayX * 0.5), baseCenterY - 26, outline);
-            drawPixel(baseCenterX + 5 + Math.round(swayX * 0.5), baseCenterY - 27, outline);
-            drawPixel(baseCenterX + 4 + Math.round(swayX * 0.5), baseCenterY - 27, outline);
-            drawPixel(baseCenterX + 3 + Math.round(swayX * 0.5), baseCenterY - 26, outline);
-            drawPixel(baseCenterX + 2 + Math.round(swayX * 0.5), baseCenterY - 25, outline);
-            drawPixel(baseCenterX + 1 + Math.round(swayX * 0.5), baseCenterY - 24, outline);
+            const ly2 = baseCenterY - 20;
+            const offset2 = getStalkOffsetAtY(ly2);
+            drawPixel(baseCenterX + 1 + offset2, ly2, outline);
+            drawPixel(baseCenterX + 2 + offset2, ly2 - 1, outline);
+            drawPixel(baseCenterX + 3 + offset2, ly2 - 2, outline);
+            drawPixel(baseCenterX + 4 + offset2, ly2 - 3, outline);
+            drawPixel(baseCenterX + 5 + offset2, ly2 - 4, outline);
+            drawPixel(baseCenterX + 6 + offset2, ly2 - 5, outline);
+            drawPixel(baseCenterX + 6 + offset2, ly2 - 6, outline);
+            drawPixel(baseCenterX + 5 + offset2, ly2 - 7, outline);
+            drawPixel(baseCenterX + 4 + offset2, ly2 - 7, outline);
+            drawPixel(baseCenterX + 3 + offset2, ly2 - 6, outline);
+            drawPixel(baseCenterX + 2 + offset2, ly2 - 5, outline);
+            drawPixel(baseCenterX + 1 + offset2, ly2 - 4, outline);
 
-            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.5), baseCenterY - 24, 1, 3, fill);
-            drawPixelRect(baseCenterX + 3 + Math.round(swayX * 0.5), baseCenterY - 25, 1, 3, fill);
-            drawPixelRect(baseCenterX + 4 + Math.round(swayX * 0.5), baseCenterY - 26, 1, 3, fill);
-            drawPixelRect(baseCenterX + 5 + Math.round(swayX * 0.5), baseCenterY - 26, 1, 2, fill);
+            drawPixelRect(baseCenterX + 2 + offset2, ly2 - 4, 1, 3, fill);
+            drawPixelRect(baseCenterX + 3 + offset2, ly2 - 5, 1, 3, fill);
+            drawPixelRect(baseCenterX + 4 + offset2, ly2 - 6, 1, 3, fill);
+            drawPixelRect(baseCenterX + 5 + offset2, ly2 - 6, 1, 2, fill);
 
             // 3. Top-Left Leaf
-            drawPixel(baseCenterX - 2 + Math.round(swayX * 0.6), baseCenterY - 28, outline);
-            drawPixel(baseCenterX - 3 + Math.round(swayX * 0.6), baseCenterY - 29, outline);
-            drawPixel(baseCenterX - 4 + Math.round(swayX * 0.6), baseCenterY - 30, outline);
-            drawPixel(baseCenterX - 5 + Math.round(swayX * 0.6), baseCenterY - 31, outline);
-            drawPixel(baseCenterX - 6 + Math.round(swayX * 0.6), baseCenterY - 32, outline);
-            drawPixel(baseCenterX - 6 + Math.round(swayX * 0.6), baseCenterY - 33, outline);
-            drawPixel(baseCenterX - 5 + Math.round(swayX * 0.6), baseCenterY - 34, outline);
-            drawPixel(baseCenterX - 4 + Math.round(swayX * 0.6), baseCenterY - 34, outline);
-            drawPixel(baseCenterX - 3 + Math.round(swayX * 0.6), baseCenterY - 33, outline);
-            drawPixel(baseCenterX - 2 + Math.round(swayX * 0.6), baseCenterY - 32, outline);
+            const ly3 = baseCenterY - 28;
+            const offset3 = getStalkOffsetAtY(ly3);
+            drawPixel(baseCenterX - 2 + offset3, ly3, outline);
+            drawPixel(baseCenterX - 3 + offset3, ly3 - 1, outline);
+            drawPixel(baseCenterX - 4 + offset3, ly3 - 2, outline);
+            drawPixel(baseCenterX - 5 + offset3, ly3 - 3, outline);
+            drawPixel(baseCenterX - 6 + offset3, ly3 - 4, outline);
+            drawPixel(baseCenterX - 6 + offset3, ly3 - 5, outline);
+            drawPixel(baseCenterX - 5 + offset3, ly3 - 6, outline);
+            drawPixel(baseCenterX - 4 + offset3, ly3 - 6, outline);
+            drawPixel(baseCenterX - 3 + offset3, ly3 - 5, outline);
+            drawPixel(baseCenterX - 2 + offset3, ly3 - 4, outline);
 
-            drawPixelRect(baseCenterX - 3 + Math.round(swayX * 0.6), baseCenterY - 32, 1, 3, fill);
-            drawPixelRect(baseCenterX - 4 + Math.round(swayX * 0.6), baseCenterY - 33, 1, 3, fill);
-            drawPixelRect(baseCenterX - 5 + Math.round(swayX * 0.6), baseCenterY - 33, 1, 2, fill);
+            drawPixelRect(baseCenterX - 3 + offset3, ly3 - 4, 1, 3, fill);
+            drawPixelRect(baseCenterX - 4 + offset3, ly3 - 5, 1, 3, fill);
+            drawPixelRect(baseCenterX - 5 + offset3, ly3 - 5, 1, 2, fill);
           } else {
             // Droop leaves for Corn
+            const ly1 = baseCenterY - 20 + leafYOffset;
+            const offset1 = getStalkOffsetAtY(ly1);
             const l1W = Math.max(1, 8 + leafSizeModifier);
-            drawPixelRect(baseCenterX - 2 - l1W + Math.round(swayX * 0.4), baseCenterY - 20 + leafYOffset, l1W, 3, stemOutline);
-            drawPixelRect(baseCenterX - 1 - l1W + Math.round(swayX * 0.4), baseCenterY - 19 + leafYOffset, l1W - 1, 2, leafColor);
+            drawPixelRect(baseCenterX - 2 - l1W + offset1, ly1, l1W, 3, stemOutline);
+            drawPixelRect(baseCenterX - 1 - l1W + offset1, ly1 + 1, l1W - 1, 2, leafColor);
 
+            const ly2 = baseCenterY - 28 + leafYOffset;
+            const offset2 = getStalkOffsetAtY(ly2);
             const l2W = Math.max(1, 9 + leafSizeModifier);
-            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 28 + leafYOffset, l2W, 3, stemOutline);
-            drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 27 + leafYOffset, l2W - 1, 2, leafColor);
+            drawPixelRect(baseCenterX + 2 + offset2, ly2, l2W, 3, stemOutline);
+            drawPixelRect(baseCenterX + 2 + offset2, ly2 + 1, l2W - 1, 2, leafColor);
           }
 
           // Q3 spots
           if (isLowQualityQ3) {
             if (month === 9) {
-              drawPixel(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 17 + leafYOffset, '#3e2723');
-              drawPixel(baseCenterX + 4 + Math.round(swayX * 0.5), baseCenterY - 25 + leafYOffset, '#3e2723');
+              const ly1 = baseCenterY - 17 + leafYOffset;
+              const ly2 = baseCenterY - 25 + leafYOffset;
+              drawPixel(baseCenterX - 5 + getStalkOffsetAtY(ly1), ly1, '#3e2723');
+              drawPixel(baseCenterX + 4 + getStalkOffsetAtY(ly2), ly2, '#3e2723');
             } else {
-              drawPixel(baseCenterX - 6 + Math.round(swayX * 0.4), baseCenterY - 19 + leafYOffset, '#3e2723');
-              drawPixel(baseCenterX + 6 + Math.round(swayX * 0.8), baseCenterY - 27 + leafYOffset, '#3e2723');
+              const ly1 = baseCenterY - 19 + leafYOffset;
+              const ly2 = baseCenterY - 27 + leafYOffset;
+              drawPixel(baseCenterX - 6 + getStalkOffsetAtY(ly1), ly1, '#3e2723');
+              drawPixel(baseCenterX + 6 + getStalkOffsetAtY(ly2), ly2, '#3e2723');
             }
           }
         } else {
           // --- STANDARD STANDARD (장미) ---
           stemH = 31;
+          const getStalkOffsetAtY = (y: number) => {
+            const i = y - (baseCenterY - 4 - stemH);
+            const tX = isCrooked ? Math.round(Math.sin(i * 0.16) * 3.0) : 0;
+            return Math.round(swayX * 0.5) + tX;
+          };
+
           for (let i = 0; i < stemH; i++) {
             const currY = baseCenterY - 4 - stemH + i;
-            const tX = isCrooked ? Math.round(Math.sin(i * 0.16) * 3.0) : 0;
-            drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.5) + tX, currY, 4, 1, stemOutline);
-            drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.5) + tX, currY, 2, 1, stemColor);
+            const offset = getStalkOffsetAtY(currY);
+            drawPixelRect(baseCenterX - 2 + offset, currY, 4, 1, stemOutline);
+            drawPixelRect(baseCenterX - 1 + offset, currY, 2, 1, stemColor);
             
             // Thorns for rose
             if (isRose) {
-              if (i === 8) drawPixel(baseCenterX - 3 + Math.round(swayX * 0.5) + tX, currY, '#1b5e20');
-              if (i === 16) drawPixel(baseCenterX + 2 + Math.round(swayX * 0.5) + tX, currY, '#1b5e20');
-              if (i === 24) drawPixel(baseCenterX - 3 + Math.round(swayX * 0.5) + tX, currY, '#1b5e20');
+              if (i === 8) drawPixel(baseCenterX - 3 + offset, currY, '#1b5e20');
+              if (i === 16) drawPixel(baseCenterX + 2 + offset, currY, '#1b5e20');
+              if (i === 24) drawPixel(baseCenterX - 3 + offset, currY, '#1b5e20');
             }
           }
 
           // Leaves (droop if low health)
+          const ly1 = baseCenterY - 16 + leafYOffset;
+          const offset1 = getStalkOffsetAtY(ly1);
           const l1W = Math.max(1, 7 + leafSizeModifier);
-          drawPixelRect(baseCenterX - 2 - l1W + Math.round(swayX * 0.4), baseCenterY - 16 + leafYOffset, l1W, 3, stemOutline);
-          drawPixelRect(baseCenterX - 1 - l1W + Math.round(swayX * 0.4), baseCenterY - 15 + leafYOffset, l1W - 1, 2, leafColor);
+          drawPixelRect(baseCenterX - 2 - l1W + offset1, ly1, l1W, 3, stemOutline);
+          drawPixelRect(baseCenterX - 1 - l1W + offset1, ly1 + 1, l1W - 1, 2, leafColor);
 
+          const ly2 = baseCenterY - 24 + leafYOffset;
+          const offset2 = getStalkOffsetAtY(ly2);
           const l2W = Math.max(1, 8 + leafSizeModifier);
-          drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 24 + leafYOffset, l2W, 3, stemOutline);
-          drawPixelRect(baseCenterX + 2 + Math.round(swayX * 0.8), baseCenterY - 23 + leafYOffset, l2W - 1, 2, leafColor);
+          drawPixelRect(baseCenterX + 2 + offset2, ly2, l2W, 3, stemOutline);
+          drawPixelRect(baseCenterX + 2 + offset2, ly2 + 1, l2W - 1, 2, leafColor);
 
           if (isLowQualityQ3) {
-            drawPixel(baseCenterX - 6 + Math.round(swayX * 0.4), baseCenterY - 15 + leafYOffset, '#3e2723');
-            drawPixel(baseCenterX + 6 + Math.round(swayX * 0.8), baseCenterY - 23 + leafYOffset, '#3e2723');
+            const ly_q3_1 = baseCenterY - 15 + leafYOffset;
+            const ly_q3_2 = baseCenterY - 23 + leafYOffset;
+            drawPixel(baseCenterX - 6 + getStalkOffsetAtY(ly_q3_1), ly_q3_1, '#3e2723');
+            drawPixel(baseCenterX + 6 + getStalkOffsetAtY(ly_q3_2), ly_q3_2, '#3e2723');
           }
         }
 
@@ -1801,12 +1888,49 @@ export const PixelCrop = ({
         // Sort coordinates so smaller scale (background) items are drawn first
         const sortedCoords = [...coords].sort((a, b) => a.scale - b.scale);
 
-        const headX = isCrooked ? Math.round(Math.sin(0 * 0.16) * 3.0) : 0;
-        
         sortedCoords.forEach(coord => {
-          const swayFactor = isVine ? 0.2 : (isStrawberry ? 0.5 : (isGroup ? 0.5 : (isWoody ? 0.6 : (isTall ? 0.8 : 1.0))));
-          const fx = baseCenterX + coord.dx + Math.round(swayX * swayFactor) + headX;
           const fy = baseCenterY + coord.dy;
+          let offset = 0;
+
+          if (isVine) {
+            // Vine fruits have no horizontal sway, matching the vine stem
+            offset = 0;
+          } else if (isStrawberry) {
+            // Strawberry fruits sway by the same 0.5 factor as stem tips
+            offset = Math.round(swayOffset * 0.5);
+          } else if (isGroup) {
+            // Sprout Group: match the sway of the stem it belongs to
+            let swayF = 0.6; // center stem default
+            if (coord.dx === -5 || coord.dx === -3) {
+              swayF = 0.4; // left stem
+            } else if (coord.dx === 5 || coord.dx === 3) {
+              swayF = 0.5; // right stem
+            }
+            offset = Math.round(swayOffset * swayF);
+          } else if (isWoody) {
+            // Woody trees: match the sway of the branch tip it belongs to
+            let swayF = 0.4; // center branch default
+            if (coord.dx < -4) {
+              swayF = 0.3; // left branch
+            } else if (coord.dx > 4) {
+              swayF = 0.5; // right branch
+            }
+            offset = Math.round(swayX * swayF);
+          } else if (isTall) {
+            // Tall crops (Corn, Sunflower): use Y-dependent sway offset
+            const stemH_local = 38;
+            const i = fy - (baseCenterY - 4 - stemH_local);
+            const tX = isCrooked ? Math.round(Math.sin(i * 0.12) * 3.5) : 0;
+            offset = Math.round(swayX * 0.6) + tX;
+          } else {
+            // Standard vertical crops (Rose): use Y-dependent sway offset
+            const stemH_local = 31;
+            const i = fy - (baseCenterY - 4 - stemH_local);
+            const tX = isCrooked ? Math.round(Math.sin(i * 0.16) * 3.0) : 0;
+            offset = Math.round(swayX * 0.5) + tX;
+          }
+
+          const fx = baseCenterX + coord.dx + offset;
           drawFruitItem(fx, fy, coord.scale);
         });
       }

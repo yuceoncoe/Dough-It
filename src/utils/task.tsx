@@ -5,7 +5,7 @@ import { AlertCircle, Calendar as CalendarIcon, Check, ChevronLeft, ChevronRight
 import React from 'react';
 
 export const CENTER = 300;
-export const RADIUS = 248;
+export const RADIUS = 278;
 
 export const INITIAL_ROUTINES: RoutineState = {
   weekday: [],
@@ -87,8 +87,8 @@ export const OUTER_HOUR_LABELS = Array.from({ length: 24 }, (_, index) => {
   const angle = index * 15;
   const point = polarToCartesian(CENTER, CENTER, OUTER_HOUR_LABEL_RADIUS, angle);
   return { value, angle, point };
-});
-export const SVG_VIEWBOX_PADDING = 72;
+}).filter(({ value }) => Number(value) % 2 === 0);
+export const SVG_VIEWBOX_PADDING = 80;
 export const SVG_VIEWBOX_MIN = -SVG_VIEWBOX_PADDING;
 export const SVG_VIEWBOX_SIZE = 600 + SVG_VIEWBOX_PADDING * 2;
 

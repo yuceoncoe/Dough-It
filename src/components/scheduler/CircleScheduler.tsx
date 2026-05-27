@@ -350,7 +350,7 @@ export const CircleScheduler = ({
               y={point.y}
               textAnchor="middle"
               dominantBaseline="middle"
-              className="fill-black text-[16px] font-semibold"
+              className="fill-black text-[18px] font-semibold"
               opacity={opacity}
               style={{ filter: `blur(${blur}px)` }}
             >
