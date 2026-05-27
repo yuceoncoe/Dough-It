@@ -7,6 +7,7 @@ import TaskCreationModal from '../ui/TaskCreationModal';
 import CanvasClockSurface from './CanvasClockSurface';
 import { calculateCropState } from '../../utils/crop';
 import { PixelCrop } from '../ui/PixelCrop';
+import PixelAction from '../ui/PixelAction';
 
 export const CircleScheduler = ({
   tasks,
@@ -26,6 +27,22 @@ export const CircleScheduler = ({
     onClick: () => void;
   };
 }) => {
+  const getActionTypeForTask = (task: Task): 'pruning' | 'watering' | 'fertilizing' | 'tilling' => {
+    const tags = task.tags || [];
+    const hasUrgent = tags.includes('urgent');
+    const hasImportant = tags.includes('important');
+    if (hasUrgent && hasImportant) {
+      return 'pruning';
+    }
+    if (hasUrgent) {
+      return 'watering';
+    }
+    if (hasImportant) {
+      return 'fertilizing';
+    }
+    return 'tilling';
+  };
+
   const squareRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const sliderDragStartRef = useRef<number | null>(null);
@@ -638,7 +655,7 @@ export const CircleScheduler = ({
                 {displayTask ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <div className="mb-0.5 pointer-events-none">
-                      <PixelCrop cropState={cropState} size={52} interactive={false} />
+                      <PixelAction actionType={getActionTypeForTask(displayTask)} size={52} />
                     </div>
                     <div
                       className={`center-lens__title ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''}`}
