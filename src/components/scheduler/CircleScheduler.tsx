@@ -410,17 +410,25 @@ export const CircleScheduler = ({
       )}
 
       {showCurrentTime ? (
-        <line
-          x1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).x}
-          y1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).y}
-          x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
-          y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
-          stroke="#d90429"
-          strokeWidth="2.8"
-          strokeLinecap="round"
-          opacity="0.96"
-          pointerEvents="none"
-        />
+        <g pointerEvents="none">
+          <circle
+            cx={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
+            cy={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
+            r={10}
+            fill="#ffffff"
+            stroke="#d90429"
+            strokeWidth="3.5"
+            style={{
+              filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2))',
+            }}
+          />
+          <circle
+            cx={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
+            cy={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
+            r={3.5}
+            fill="#d90429"
+          />
+        </g>
       ) : null}
     </>
   );
@@ -655,7 +663,7 @@ export const CircleScheduler = ({
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <div className="pointer-events-auto">
-                      <PixelCrop cropState={cropState} size={132} interactive={true} />
+                      <PixelCrop cropState={cropState} size={96} interactive={true} />
                     </div>
                   </div>
                 )}
