@@ -353,7 +353,7 @@ export const PixelAction = ({
                 y: bottleY + 5,
                 vx: -1.3 - Math.random() * 0.8,
                 vy: 0.9 + Math.random() * 0.8,
-                color: Math.random() < 0.5 ? '#e1bee7' : '#ab47bc',
+                color: Math.random() < 0.5 ? '#a8e8d8' : '#3d9e84',
                 life: 1,
                 maxLife: 26,
               });
@@ -364,7 +364,7 @@ export const PixelAction = ({
                 y: bottleY + 5,
                 vx: -1.1 - Math.random() * 0.6,
                 vy: 1.1 + Math.random() * 0.6,
-                color: '#ffd54f',
+                color: '#7ed8c0',
                 life: 1,
                 maxLife: 22,
               });
@@ -385,23 +385,51 @@ export const PixelAction = ({
           });
           particles = particles.filter((p) => p.life < p.maxLife);
 
-          // Render Stardew-Style Glass Potion Bottle (UPSCALED: 14x11 main body)
+          // === Round Cyan Potion Bottle (matching reference image) ===
           ctx.save();
           ctx.translate(bottleX, bottleY);
           ctx.rotate(bottleAngle);
 
-          // Glass outline (deep violet-black)
-          drawPixelRect(-7, -3, 14, 11, '#4a148c');
-          drawPixelRect(-5, -7, 10, 4, '#4a148c');
-          drawPixelRect(-3, -9, 6, 2, '#4a148c'); // neck
+          // -- Neck --
+          drawPixelRect(-2, -14,  4,  3, '#4a7c6f');  // neck shadow
+          drawPixelRect(-1, -14,  3,  3, '#5fa08a');  // neck main
+          drawPixelRect( 0, -14,  1,  3, '#7ec8b0');  // neck highlight
 
-          // Glowing liquid inside
-          drawPixelRect(-6, -2, 12, 9, '#7b1fa2');
-          drawPixelRect(-5, -1, 10, 7, '#ab47bc');
-          drawPixelRect(-3, -1, 3, 5, '#e1bee7'); // shiny highlight
+          // -- Cork stopper --
+          drawPixelRect(-3, -17,  6,  4, '#6b4226');  // cork dark
+          drawPixelRect(-2, -17,  4,  3, '#8b5a2b');  // cork main
+          drawPixelRect(-2, -17,  2,  2, '#a87040');  // cork highlight
+          drawPixelRect(-3, -14,  6,  1, '#4a2f1a');  // cork bottom rim
 
-          // Cork stopper
-          drawPixelRect(-2, -11, 4, 2, '#8d6e63');
+          // -- Round Body: outer dark border (approximated circle 14x14) --
+          drawPixelRect(-5, -12,  10,  1, '#2a6b5a');  // top border
+          drawPixelRect(-6, -11,  12,  1, '#2a6b5a');
+          drawPixelRect(-7, -10,  14, 10, '#2a6b5a');  // sides
+          drawPixelRect(-6,   0,  12,  1, '#2a6b5a');
+          drawPixelRect(-5,   1,  10,  1, '#2a6b5a');  // bottom border
+
+          // -- Body fill (mid cyan-teal) --
+          drawPixelRect(-6, -11,  12,  1, '#3d9e84');
+          drawPixelRect(-7, -10,  14, 10, '#3d9e84');
+          drawPixelRect(-6,   0,  12,  1, '#3d9e84');
+
+          // -- Inner lighter fill --
+          drawPixelRect(-5,  -9,  10,  8, '#52c4a0');
+
+          // -- Bright highlight (upper-left quadrant) --
+          drawPixelRect(-4,  -9,   5,  1, '#a8e8d8');
+          drawPixelRect(-5,  -8,   6,  3, '#7ed8c0');
+          drawPixelRect(-4,  -8,   4,  2, '#b8f0e0');  // brightest spot
+          drawPixelRect(-3,  -7,   2,  1, '#d4f8f0');  // specular
+
+          // -- Decorative ring (middle band) --
+          drawPixelRect(-7,  -3,  14,  2, '#2a6b5a');  // ring dark
+          drawPixelRect(-6,  -3,  12,  1, '#60b898');  // ring lighter top
+          drawPixelRect(-6,  -2,  12,  1, '#2e8065');  // ring darker bottom
+
+          // -- Lower shadow on body --
+          drawPixelRect(-6,   -1,  12,  1, '#2a6b5a');
+          drawPixelRect(-4,   -1,   8,  2, '#236055');
 
           ctx.restore();
 
