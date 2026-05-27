@@ -52,6 +52,7 @@ export const CircleScheduler = ({
   const arcDragMovedRef = useRef(false);
   const dragPreviewFrameRef = useRef<number | null>(null);
   const dragPreviewPointRef = useRef<{ x: number; y: number } | null>(null);
+  const lastHapticAngleRef = useRef<number | null>(null);
   const [pendingArc, setPendingArc] = useState<{ startAngle: number; endAngle: number } | null>(null);
   const [hasPendingArcEnd, setHasPendingArcEnd] = useState(false);
   const [activeArcHandle, setActiveArcHandle] = useState<'start' | 'end' | null>(null);
@@ -214,6 +215,14 @@ export const CircleScheduler = ({
     if (angle === null) {
       return;
     }
+    
+    if (lastHapticAngleRef.current !== angle) {
+      lastHapticAngleRef.current = angle;
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(2);
+      }
+    }
+    
     arcDragMovedRef.current = true;
     updateDragPreviewPoint(event.clientX, event.clientY);
     updatePendingArcHandle(handle, angle);
