@@ -260,6 +260,11 @@ export const CircleScheduler = ({
 
   const renderClockSvgLayers = (interactive: boolean) => (
     <>
+      <defs>
+        <filter id="current-time-dot-shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#000000" floodOpacity="0.32" />
+        </filter>
+      </defs>
       {interactive ? (
         <circle
           cx={CENTER}
@@ -415,9 +420,7 @@ export const CircleScheduler = ({
           cy={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
           r={20}
           fill="#ffffff"
-          style={{
-            filter: 'drop-shadow(0px 3px 8px rgba(0, 0, 0, 0.25))',
-          }}
+          filter="url(#current-time-dot-shadow)"
           pointerEvents="none"
         />
       ) : null}
