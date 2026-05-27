@@ -30,7 +30,7 @@ export const TaskReportModal = ({
   const cropState = calculateCropState(tasksByDate, date);
 
   return (
-    <div className="modal-backdrop items-center" onClick={onClose}>
+    <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-shell max-w-[28rem] p-6" onClick={(event) => event.stopPropagation()}>
         <div className="mb-5">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Day Report</p>

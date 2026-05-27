@@ -32,7 +32,7 @@ export const TaskActionSheet = ({
   }
 
   return (
-    <div className="modal-backdrop items-center" onClick={onClose}>
+    <div className="modal-backdrop" onClick={onClose}>
       <div className="action-sheet" onClick={(event) => event.stopPropagation()}>
         <div className="sheet-header">
           <h3 className="sheet-header__title font-hand text-2xl text-stone-800">{task.title}</h3>

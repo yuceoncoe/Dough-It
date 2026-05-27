@@ -140,7 +140,7 @@ export const RoutineSettingsModal = ({
   };
 
   return (
-    <div className="modal-backdrop items-center" onClick={onClose}>
+    <div className="modal-backdrop" onClick={onClose}>
       {activeTab === 'main' ? (
         <div className="action-sheet mx-auto flex h-auto w-full max-w-md flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
           <div className="shrink-0 border-b border-stone-200 px-5 py-4">
