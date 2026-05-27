@@ -69,12 +69,6 @@ export const PixelCrop = ({
         ctx.fillRect(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h));
       };
 
-      // 1. Draw Shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.06)';
-      ctx.beginPath();
-      ctx.ellipse(baseCenterX, baseCenterY + 3, 22, 4, 0, 0, Math.PI * 2);
-      ctx.fill();
-
       // 2. Draw Soil Mound (Q4: healthQ4 <= 2 - Cracked, healthQ4 >= 7 - Clovers)
       const soilDark = '#433022';
       const soilLight = '#5c4033';
