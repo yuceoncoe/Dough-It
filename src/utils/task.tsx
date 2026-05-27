@@ -487,6 +487,10 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
   ctx.save();
   ctx.beginPath();
   ctx.arc(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, 0, Math.PI * 2);
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.06)';
+  ctx.shadowBlur = 36;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 12;
   ctx.fillStyle = '#ffffff';
   ctx.fill();
   ctx.restore();
