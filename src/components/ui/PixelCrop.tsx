@@ -477,68 +477,87 @@ export const PixelCrop = ({
             const isFlowerType = month === 4 || month === 5 || month === 9 || month === 12;
 
             if (isFlowerType) {
-              let budColor = '#f48fb1';
-              let budCore = '#fff59d';
-              if (month === 5 || month === 12) {
-                budColor = '#ef5350';
-              } else if (month === 8 || month === 9) {
-                budColor = '#fdd835';
-              } else if (month === 2 || month === 10) {
-                budColor = '#ffb74d';
-              }
+              const headY = baseCenterY - 4 - stemH - 7;
+              const fx = baseCenterX + swayX + stemHeadX;
+              const fy = headY;
 
-              if (health < 40) {
-                budColor = '#bcaaa4';
-                budCore = '#d7ccc8';
-              }
-
-              if (month === 9) {
-                const headY = baseCenterY - 4 - stemH - 9;
-                drawPixelRect(baseCenterX - 7 + swayX + stemHeadX, headY, 14, 10, stemOutline);
-                drawPixelRect(baseCenterX - 6 + swayX + stemHeadX, headY + 1, 12, 8, '#f57f17');
-                drawPixelRect(baseCenterX - 5 + swayX + stemHeadX, headY + 2, 10, 6, '#ffeb3b');
-                drawPixelRect(baseCenterX - 2 + swayX + stemHeadX, headY + 3, 4, 4, '#3e2723');
-              } else {
-                const headY = baseCenterY - 4 - stemH - 9;
-                drawPixelRect(baseCenterX - 5 + swayX + stemHeadX, headY, 10, 9, stemOutline);
-                drawPixelRect(baseCenterX - 4 + swayX + stemHeadX, headY + 1, 8, 7, budColor);
-                drawPixelRect(baseCenterX - 2 + swayX + stemHeadX, headY + 3, 4, 3, budCore);
+              if (month === 4) {
+                // 4월 벚꽃 - 7단계 (반개화)
+                drawPixel(fx, fy - 2, '#2e7d32'); // 꽃받침
+                drawPixelRect(fx - 2, fy - 1, 5, 3, '#c2185b'); // 외곽
+                drawPixelRect(fx - 1, fy - 1, 3, 2, '#e91e63'); // 잎
+                drawPixel(fx, fy, '#f8bbd0'); // 연분홍 코어
+              } else if (month === 5) {
+                // 5월 장미 - 7단계 (장미 봉오리)
+                drawPixelRect(fx - 2, fy - 2, 5, 4, '#880e4f'); // 외곽
+                drawPixelRect(fx - 1, fy - 1, 3, 3, '#d32f2f'); // 붉은 겹
+                drawPixel(fx, fy - 1, '#ff8a80'); // 하이라이트
+                drawPixelRect(fx - 1, fy + 2, 3, 1, '#1b5e20'); // 꽃받침
+              } else if (month === 9) {
+                // 9월 해바라기 - 7단계 (개화 시작)
+                drawPixelRect(fx - 4, fy - 3, 9, 7, '#f57f17'); // 겉잎 외곽
+                drawPixelRect(fx - 3, fy - 2, 7, 5, '#fdd835'); // 노란 잎
+                drawPixelRect(fx - 2, fy - 1, 5, 3, '#3e2723'); // 씨앗판
+                drawPixel(fx, fy, '#271c19');
+              } else if (month === 12) {
+                // 12월 동백꽃 - 7단계 (반개화)
+                drawPixelRect(fx - 3, fy - 2, 7, 5, '#c2185b');
+                drawPixelRect(fx - 2, fy - 1, 5, 3, '#d81b60');
+                drawPixel(fx, fy, '#ffca28'); // 작은 노란 수술 한 점
               }
             } else {
               const headY = baseCenterY - 4 - stemH - 7;
               const fx = baseCenterX + swayX + stemHeadX;
               const fy = headY;
               
-              if (month === 1) { // Strawberry
-                drawPixelRect(fx - 4, fy, 8, 2, '#2e7d32');
-                drawPixelRect(fx - 4, fy + 2, 8, 7, '#7b2e1a');
-                drawPixelRect(fx - 3, fy + 2, 6, 7, '#ff8a80');
-                drawPixelRect(fx - 1, fy + 2, 2, 2, '#c8e6c9');
-              } else if (month === 2) { // Tangerine
-                drawPixelRect(fx - 4, fy + 1, 8, 8, '#5d4037');
-                drawPixelRect(fx - 3, fy + 2, 6, 6, '#ffd54f');
-                drawPixelRect(fx - 2, fy + 2, 3, 3, '#a5d6a7');
-              } else if (month === 3) { // Sprout cluster
-                drawPixelRect(fx - 5, fy + 2, 10, 6, '#2e7d32');
-                drawPixelRect(fx - 4, fy + 3, 8, 4, '#81c784');
-              } else if (month === 6) { // Plum
-                drawPixelRect(fx - 3, fy + 2, 6, 6, '#1b5e20');
-                drawPixelRect(fx - 2, fy + 3, 4, 4, '#9ccc65');
-              } else if (month === 7) { // Watermelon
-                drawPixelRect(fx - 6, fy + 1, 12, 7, '#1b5e20');
-                drawPixelRect(fx - 5, fy + 2, 10, 5, '#a5d6a7');
-                drawPixel(fx - 2, fy + 3, '#388e3c');
-                drawPixel(fx + 2, fy + 3, '#388e3c');
-              } else if (month === 8) { // Corn
-                drawPixelRect(fx - 2, fy + 1, 4, 9, '#5d4037');
-                drawPixelRect(fx - 1, fy + 1, 2, 9, '#c0ca33');
-              } else if (month === 10) { // Persimmon
-                drawPixelRect(fx - 4, fy + 2, 8, 6, '#5d4037');
-                drawPixelRect(fx - 3, fy + 3, 6, 4, '#ffb74d');
-                drawPixel(fx - 1, fy + 1, '#2e7d32');
-              } else { // Sweet potato or fallback
-                drawPixelRect(fx - 5, fy + 2, 10, 5, '#5d4037');
-                drawPixelRect(fx - 4, fy + 3, 8, 3, '#8d6e63');
+              if (month === 1) {
+                // 1월 딸기 - 7단계 (설익은 딸기)
+                drawPixelRect(fx - 2, fy - 2, 5, 1, '#2e7d32'); // 초록 꼭지
+                drawPixelRect(fx - 3, fy - 1, 7, 5, '#c62828'); // 몸체 외곽
+                drawPixelRect(fx - 2, fy - 1, 5, 2, '#c8e6c9'); // 상단 설익은 연두빛
+                drawPixelRect(fx - 2, fy + 1, 5, 2, '#ff8a80'); // 하단 핑크빛
+                drawPixel(fx, fy + 3, '#ff8a80');
+                drawPixel(fx, fy + 4, '#c62828'); // 꼬리 끝
+              } else if (month === 2) {
+                // 2월 귤 - 7단계 (청귤)
+                drawPixel(fx, fy - 3, '#4e372e'); // 꼭지
+                drawPixelRect(fx - 2, fy - 2, 5, 5, '#558b2f'); // 청록 외곽
+                drawPixelRect(fx - 1, fy - 1, 3, 3, '#8bc34a'); // 내부 연두
+                drawPixel(fx + 1, fy - 2, '#9ccc65'); // 하이라이트
+              } else if (month === 3) {
+                // 3월 새싹채소 - 7단계
+                drawPixelRect(fx - 4, fy - 2, 9, 4, '#2e7d32');
+                drawPixelRect(fx - 3, fy - 1, 7, 2, '#81c784');
+              } else if (month === 6) {
+                // 6월 매실 - 7단계 (풋매실)
+                drawPixelRect(fx - 2, fy - 2, 5, 4, '#1b5e20');
+                drawPixelRect(fx - 1, fy - 1, 3, 2, '#4caf50');
+                drawPixel(fx - 1, fy - 1, '#81c784'); // 하이라이트
+              } else if (month === 7) {
+                // 7월 수박 - 7단계 (설익은 수박)
+                drawPixelRect(fx - 4, fy - 2, 9, 6, '#1b5e20');
+                drawPixelRect(fx - 3, fy - 1, 7, 4, '#a5d6a7');
+                // 줄무늬
+                drawPixel(fx - 1, fy - 1, '#1b5e20');
+                drawPixel(fx - 1, fy + 1, '#1b5e20');
+                drawPixel(fx + 2, fy, '#1b5e20');
+                drawPixel(fx + 2, fy + 2, '#1b5e20');
+              } else if (month === 8) {
+                // 8월 옥수수 - 7단계 (껍질에 싸인 상태)
+                drawPixel(fx, fy - 4, '#8d6e63');
+                drawPixelRect(fx - 2, fy - 3, 4, 8, '#558b2f');
+                drawPixelRect(fx - 1, fy - 2, 2, 6, '#689f38');
+                drawPixel(fx, fy - 1, '#fff176');
+                drawPixel(fx, fy + 1, '#fff176');
+              } else if (month === 10) {
+                // 10월 감 - 7단계 (청감)
+                drawPixel(fx, fy - 3, '#3e2723'); // 감꼭지
+                drawPixelRect(fx - 3, fy - 2, 7, 5, '#689f38'); // 청록 외형
+                drawPixelRect(fx - 2, fy - 1, 5, 3, '#9ccc65'); // 연두 내부
+              } else {
+                // 11월 고구마 - 7단계
+                drawPixelRect(fx - 4, fy - 1, 9, 4, '#4a148c');
+                drawPixelRect(fx - 3, fy, 7, 2, '#7b1fa2');
               }
             }
           }
@@ -590,96 +609,293 @@ export const PixelCrop = ({
         }
 
         const drawFruitItem = (fx: number, fy: number, scale = 1.0) => {
+          const isSmall = scale < 0.95;
+          const isLarge = scale > 1.05;
+          const offset = isSmall ? -1 : (isLarge ? 1 : 0);
+
+          // Shared floral color palettes
+          const petalColor = '#fdd835';
+          const petalOutline = '#f57f17';
+          const coreOutline = '#3e2723';
+          const coreColor = '#271c19';
+
           switch (month) {
             case 1: {
-              // Strawberry 🍓
-              const w = Math.round(12 * scale);
-              const h = Math.round(11 * scale);
-              drawPixelRect(fx - w / 2, fy, w, 2, '#388e3c'); // Calyx
-              drawPixelRect(fx - w / 2 - 1, fy + 2, w + 2, h, '#2b0c0c'); // Outline
-              drawPixelRect(fx - w / 2, fy + 2, w, h, fruitColor);
-              drawPixelRect(fx - w / 2 + 2, fy + 3, Math.round(3 * scale), 2, fruitLight); // shine
-              drawPixel(fx - 2, fy + 5, fruitAccent); // seeds
-              drawPixel(fx + 2, fy + 5, fruitAccent);
-              drawPixel(fx, fy + 8, fruitAccent);
+              // 딸기 🍓 - 8단계 완숙
+              // 꼭지 (Calyx)
+              drawPixelRect(fx - 3 - offset, fy - 2, 7 + 2 * offset, 1, '#1b5e20');
+              drawPixelRect(fx - 2 - offset, fy - 1, 5 + 2 * offset, 1, '#388e3c');
+              drawPixel(fx, fy - 3, '#1b5e20');
+              
+              // 빨간 몸체 (역삼각형 쉐입)
+              drawPixelRect(fx - 3 - offset, fy, 7 + 2 * offset, 1, '#b71c1c');
+              drawPixelRect(fx - 2 - offset, fy, 5 + 2 * offset, 1, fruitColor);
+              drawPixelRect(fx - 4 - offset, fy + 1, 9 + 2 * offset, 1, '#b71c1c');
+              drawPixelRect(fx - 3 - offset, fy + 1, 7 + 2 * offset, 1, fruitColor);
+              drawPixel(fx - 1, fy + 1, fruitLight); // 하이라이트
+              drawPixelRect(fx - 4 - offset, fy + 2, 9 + 2 * offset, 1, '#b71c1c');
+              drawPixelRect(fx - 3 - offset, fy + 2, 7 + 2 * offset, 1, fruitColor);
+              drawPixelRect(fx - 3 - offset, fy + 3, 7 + 2 * offset, 1, '#b71c1c');
+              drawPixelRect(fx - 2 - offset, fy + 3, 5 + 2 * offset, 1, fruitColor);
+              drawPixelRect(fx - 2 - offset, fy + 4, 5 + 2 * offset, 1, '#b71c1c');
+              drawPixelRect(fx - 1 - offset, fy + 4, 3 + 2 * offset, 1, fruitColor);
+              drawPixelRect(fx - 1 - offset, fy + 5, 3 + 2 * offset, 1, '#b71c1c');
+              drawPixel(fx, fy + 5, fruitColor);
+              drawPixel(fx, fy + 6, '#b71c1c');
+
+              // 노란 씨앗 (Seeds)
+              drawPixel(fx - 2, fy + 2, fruitAccent);
+              drawPixel(fx + 2, fy + 2, fruitAccent);
+              drawPixel(fx - 1, fy + 4, fruitAccent);
+              drawPixel(fx + 1, fy + 4, fruitAccent);
+              drawPixel(fx, fy + 1, fruitAccent);
               break;
             }
             case 2: {
-              // Tangerine 🍊
-              const r = Math.round(6 * scale);
-              drawPixelRect(fx - r, fy - r, r * 2, r * 2, '#3e2723'); // outline
-              drawPixelRect(fx - r + 1, fy - r + 1, r * 2 - 2, r * 2 - 2, '#ef6c00');
-              drawPixelRect(fx - 2, fy - 3, 2, 2, '#fff176'); // shine
+              // 귤 🍊 - 8단계 완숙
+              const r = Math.round(5 * scale);
+              // 잎과 꼭지
+              drawPixel(fx, fy - r - 2, '#4e342e'); // 꼭지 갈색
+              drawPixelRect(fx + 1, fy - r - 1, 2, 1, '#2e7d32'); // 잎사귀 초록
+              
+              // 주황색 몸체 (둥글 납작하게)
+              for (let y = -r; y <= r; y++) {
+                let w = r * 2;
+                if (y === -r || y === r) w = r * 2 - 2;
+                const leftX = fx - Math.floor(w / 2);
+                drawPixelRect(leftX, fy + y, w, 1, '#e65100');
+                drawPixelRect(leftX + 1, fy + y, w - 2, 1, '#ff9800');
+              }
+              // 하이라이트
+              drawPixelRect(fx - 1, fy - r + 1, 2, 1, '#ffb74d');
               break;
             }
             case 3: {
-              // Sprout Cluster 🌱
-              drawPixelRect(fx - 7, fy - 4, 14, 9, '#2e7d32');
-              drawPixelRect(fx - 6, fy - 3, 12, 7, '#4caf50');
-              drawPixelRect(fx - 3, fy - 2, 6, 5, '#a5d6a7');
+              // 새싹채소 🌱 - 8단계 다층 레이어 잎 군락
+              const w = isSmall ? 8 : (isLarge ? 12 : 10);
+              const h = isSmall ? 5 : (isLarge ? 8 : 7);
+              
+              // 왼쪽 위 잎
+              drawPixelRect(fx - Math.round(w * 0.5), fy - Math.round(h * 0.6), Math.round(w * 0.4), 3, '#2e7d32');
+              drawPixelRect(fx - Math.round(w * 0.4), fy - Math.round(h * 0.6) + 1, Math.round(w * 0.3), 1, '#81c784');
+              // 오른쪽 위 잎
+              drawPixelRect(fx + Math.round(w * 0.1), fy - Math.round(h * 0.7), Math.round(w * 0.4), 3, '#2e7d32');
+              drawPixelRect(fx + Math.round(w * 0.2), fy - Math.round(h * 0.7) + 1, Math.round(w * 0.3), 1, '#81c784');
+              // 중앙 큰 잎사귀
+              drawPixelRect(fx - Math.round(w * 0.3), fy - Math.round(h * 0.3), Math.round(w * 0.7), Math.round(h * 0.8), '#1b5e20');
+              drawPixelRect(fx - Math.round(w * 0.2), fy - Math.round(h * 0.3) + 1, Math.round(w * 0.5), Math.round(h * 0.8) - 2, '#4caf50');
+              drawPixelRect(fx - 1, fy - Math.round(h * 0.3) + 2, 2, 1, '#a5d6a7'); // 하이라이트
               break;
             }
             case 4: {
-              // Cherry Blossom 🌸
-              drawPixelRect(fx - 8, fy - 5, 16, 10, '#c2185b');
-              drawPixelRect(fx - 7, fy - 4, 14, 8, '#e91e63');
-              drawPixelRect(fx - 4, fy - 3, 8, 6, '#f8bbd0');
+              // 벚꽃 🌸 - 8단계 만개
+              const w = isSmall ? 7 : (isLarge ? 11 : 9);
+              const outline = '#c2185b'; // 짙은 분홍
+              const pink = '#e91e63';
+              const lightPink = '#f8bbd0';
+              const core = '#ff80ab';
+              
+              // 꽃잎 형태 그리기
+              drawPixelRect(fx - Math.floor(w / 2), fy - Math.floor(w / 2), w, w, outline);
+              drawPixelRect(fx - Math.floor(w / 2) + 1, fy - Math.floor(w / 2) + 1, w - 2, w - 2, pink);
+              drawPixelRect(fx - Math.floor(w / 4), fy - Math.floor(w / 4), Math.floor(w / 2) + 1, Math.floor(w / 2) + 1, lightPink);
+              
+              // 외곽 톱니 표현
+              drawPixel(fx - Math.floor(w / 2), fy, outline);
+              drawPixel(fx + Math.floor(w / 2), fy, outline);
+              drawPixel(fx, fy - Math.floor(w / 2), '#fff');
+              drawPixel(fx, fy + Math.floor(w / 2), '#fff');
+              
+              // 꽃수술
+              drawPixelRect(fx - 1, fy, 3, 1, core);
+              drawPixel(fx, fy - 1, core);
+              drawPixel(fx, fy + 1, core);
+              drawPixel(fx, fy, '#fff176');
               break;
             }
             case 5: {
-              // Rose 🌹
-              drawPixelRect(fx - 7, fy - 5, 14, 10, '#880e4f');
-              drawPixelRect(fx - 6, fy - 4, 12, 8, '#d32f2f');
-              drawPixelRect(fx - 3, fy - 2, 6, 4, '#ff8a80');
+              // 장미 🌹 - 8단계 만개
+              const darkRed = '#880e4f';
+              const red = '#d32f2f';
+              const brightRed = '#ef5350';
+              const rosePink = '#ff8a80';
+              const w = isSmall ? 7 : (isLarge ? 11 : 9);
+              const h = isSmall ? 6 : (isLarge ? 9 : 8);
+              
+              // 꽃받침
+              drawPixelRect(fx - 2, fy + Math.floor(h / 2) - 1, 5, 1, '#1b5e20');
+              drawPixel(fx - 3, fy + Math.floor(h / 2) - 2, '#2e7d32');
+              drawPixel(fx + 3, fy + Math.floor(h / 2) - 2, '#2e7d32');
+              
+              // 장미 나선형 겹꽃
+              drawPixelRect(fx - Math.floor(w / 2), fy - Math.floor(h / 2), w, h, darkRed);
+              drawPixelRect(fx - Math.floor(w / 2) + 1, fy - Math.floor(h / 2) + 1, w - 2, h - 2, red);
+              
+              // 꽃잎 주름
+              drawPixelRect(fx - 2, fy - 1, 4, 1, brightRed);
+              drawPixelRect(fx, fy + 1, 3, 1, brightRed);
+              drawPixel(fx - 1, fy - 2, rosePink);
+              drawPixel(fx + 1, fy - 2, rosePink);
+              drawPixel(fx + 2, fy, rosePink);
               break;
             }
             case 6: {
-              // Plum 🟢
+              // 매실 🟢 - 8단계 완숙
               const r = Math.round(4 * scale);
-              drawPixelRect(fx - r, fy - r, r * 2, r * 2, '#1b5e20');
-              drawPixelRect(fx - r + 1, fy - r + 1, r * 2 - 2, r * 2 - 2, '#4caf50');
+              drawPixel(fx, fy - r - 1, '#4e342e');
+              
+              for (let y = -r; y <= r; y++) {
+                let w = r * 2;
+                if (y === -r || y === r) w = r * 2 - 2;
+                const leftX = fx - Math.floor(w / 2);
+                drawPixelRect(leftX, fy + y, w, 1, '#1b5e20');
+                drawPixelRect(leftX + 1, fy + y, w - 2, 1, '#4caf50');
+              }
+              // 매실 살구색 홍조
+              drawPixel(fx + 1, fy, '#ffc107');
+              drawPixel(fx + 1, fy - 1, '#ffeb3b');
+              
+              // 매실 골선
+              drawPixel(fx - 1, fy - r + 1, '#0d533a');
+              drawPixel(fx - 1, fy, '#0d533a');
+              drawPixel(fx - 1, fy + r - 1, '#0d533a');
               break;
             }
             case 7: {
-              // Watermelon 🍉
-              drawPixelRect(fx - 9, fy, 18, 10, '#1b5e20');
-              drawPixelRect(fx - 8, fy + 1, 16, 8, '#388e3c');
-              drawPixelRect(fx - 6, fy + 1, 2, 8, '#a5d6a7'); // stripes
-              drawPixelRect(fx + 2, fy + 1, 2, 8, '#a5d6a7');
+              // 수박 🍉 - 8단계 완숙
+              const w = isSmall ? 9 : (isLarge ? 13 : 11);
+              const h = isSmall ? 7 : (isLarge ? 11 : 9);
+              
+              drawPixel(fx, fy - Math.floor(h / 2) - 2, '#2e7d32');
+              drawPixel(fx - 1, fy - Math.floor(h / 2) - 1, '#2e7d32');
+              
+              for (let y = -Math.floor(h / 2); y <= Math.floor(h / 2); y++) {
+                let curW = w;
+                if (y === -Math.floor(h / 2) || y === Math.floor(h / 2)) curW = w - 4;
+                else if (y === -Math.floor(h / 2) + 1 || y === Math.floor(h / 2) - 1) curW = w - 2;
+                
+                const leftX = fx - Math.floor(curW / 2);
+                drawPixelRect(leftX, fy + y, curW, 1, '#1b5e20');
+                drawPixelRect(leftX + 1, fy + y, curW - 2, 1, '#a5d6a7');
+                
+                const stripeOffset = (y % 2 === 0) ? 0 : 1;
+                drawPixel(fx - 3 + stripeOffset, fy + y, '#1b5e20');
+                drawPixel(fx + stripeOffset, fy + y, '#1b5e20');
+                drawPixel(fx + 3 + stripeOffset, fy + y, '#1b5e20');
+              }
               break;
             }
             case 8: {
-              // Corn 🌽
-              drawPixelRect(fx - 3, fy, 6, 12, '#f57f17');
-              drawPixelRect(fx - 2, fy, 4, 12, '#fbc02d');
-              drawPixelRect(fx - 1, fy + 2, 2, 8, '#fff176');
+              // 옥수수 🌽 - 8단계 완숙
+              drawPixel(fx, fy - 6, '#5d4037');
+              drawPixel(fx - 1, fy - 5, '#8d6e63');
+              drawPixel(fx + 1, fy - 5, '#8d6e63');
+              
+              for (let y = -4; y <= 6; y++) {
+                let kw = 4;
+                if (y === -4 || y === 6) kw = 2;
+                const kx = fx - Math.floor(kw / 2);
+                
+                for (let x = kx; x < kx + kw; x++) {
+                  const isGrid = (x + y) % 2 === 0;
+                  drawPixel(x, fy + y, isGrid ? '#fbc02d' : '#fff176');
+                }
+                
+                if (y >= -3 && y <= 4) {
+                  drawPixel(fx - 3, fy + y, '#558b2f');
+                  drawPixel(fx + 3, fy + y, '#558b2f');
+                }
+                if (y >= 1) {
+                  drawPixel(fx - 4, fy + y, '#689f38');
+                  drawPixel(fx + 4, fy + y, '#689f38');
+                }
+              }
+              drawPixelRect(fx - 1, fy + 7, 3, 1, '#33691e');
               break;
             }
             case 9: {
-              // Sunflower 🌻
-              drawPixelRect(fx - 8, fy - 8, 16, 16, '#f57f17');
-              drawPixelRect(fx - 7, fy - 7, 14, 14, '#ffeb3b');
-              drawPixelRect(fx - 3, fy - 3, 6, 6, '#3e2723'); // core
+              // 해바라기 🌻 - 8단계 완숙
+              drawPixelRect(fx - 1, fy - 6 - offset, 3, 1, petalOutline);
+              drawPixel(fx, fy - 7 - offset, petalColor); // 상
+              drawPixelRect(fx - 1, fy + 6 + offset, 3, 1, petalOutline);
+              drawPixel(fx, fy + 7 + offset, petalColor); // 하
+              drawPixelRect(fx - 6 - offset, fy - 1, 1, 3, petalOutline);
+              drawPixel(fx - 7 - offset, petalColor); // 좌
+              drawPixelRect(fx + 6 + offset, fy - 1, 1, 3, petalOutline);
+              drawPixel(fx + 7 + offset, petalColor); // 우
+              
+              drawPixel(fx - 5 - offset, fy - 5 - offset, petalColor);
+              drawPixel(fx + 5 + offset, fy - 5 - offset, petalColor);
+              drawPixel(fx - 5 - offset, fy + 5 + offset, petalColor);
+              drawPixel(fx + 5 + offset, fy + 5 + offset, petalColor);
+              
+              drawPixelRect(fx - 5 - offset, fy - 4 - offset, 11 + 2 * offset, 9 + 2 * offset, petalOutline);
+              drawPixelRect(fx - 4 - offset, fy - 3 - offset, 9 + 2 * offset, 7 + 2 * offset, petalColor);
+              
+              drawPixelRect(fx - 3, fy - 2, 7, 5, coreOutline);
+              for (let sy = -1; sy <= 1; sy++) {
+                for (let sx = -2; sx <= 2; sx++) {
+                  const isGrid = (sx + sy) % 2 === 0;
+                  drawPixel(fx + sx, fy + sy, isGrid ? coreColor : '#5d4037');
+                }
+              }
               break;
             }
             case 10: {
-              // Persimmon 🍅
-              drawPixelRect(fx - 5, fy - 4, 10, 8, '#3e2723');
-              drawPixelRect(fx - 4, fy - 3, 8, 6, '#e65100');
-              drawPixel(fx - 1, fy - 4, '#263238'); // stem
+              // 감 🍅 - 8단계 완숙
+              drawPixel(fx, fy - 4, '#1a0c02');
+              drawPixelRect(fx - 3, fy - 3, 7, 1, '#3e2723');
+              drawPixel(fx, fy - 2, '#3e2723');
+              
+              for (let y = -2; y <= 2; y++) {
+                let w = 9;
+                if (y === -2 || y === 2) w = 7;
+                const leftX = fx - Math.floor(w / 2);
+                drawPixelRect(leftX, fy + y, w, 1, '#d84315');
+                drawPixelRect(leftX + 1, fy + y, w - 2, 1, '#ff6d00');
+              }
+              drawPixelRect(fx - 2, fy - 1, 2, 1, '#ffb74d');
               break;
             }
             case 11: {
-              // Sweet Potato 🍠
-              drawPixelRect(fx - 7, fy, 14, 6, '#4a148c');
-              drawPixelRect(fx - 6, fy + 1, 12, 4, '#7b1fa2');
+              // 고구마 🍠 - 8단계 완숙
+              const shellDark = '#4a148c';
+              const shellLight = '#7b1fa2';
+              const innerColor = '#ffb74d';
+              
+              drawPixelRect(fx - 3 - offset, fy - 2, 7 + 2 * offset, 1, shellDark);
+              drawPixelRect(fx - 2 - offset, fy - 2, 5 + 2 * offset, 1, shellLight);
+              drawPixelRect(fx - 5 - offset, fy - 1, 11 + 2 * offset, 1, shellDark);
+              drawPixelRect(fx - 4 - offset, fy - 1, 9 + 2 * offset, 1, shellLight);
+              drawPixel(fx - 6 - offset, fy - 1, shellDark);
+              drawPixelRect(fx - 5 - offset, fy, 11 + 2 * offset, 1, shellDark);
+              drawPixelRect(fx - 4 - offset, fy, 9 + 2 * offset, 1, shellLight);
+              drawPixelRect(fx - 1, fy, 3, 1, innerColor);
+              drawPixelRect(fx - 4 - offset, fy + 1, 9 + 2 * offset, 1, shellDark);
+              drawPixelRect(fx - 3 - offset, fy + 1, 7 + 2 * offset, 1, shellLight);
+              drawPixel(fx + 5 + offset, fy + 1, shellDark);
+              drawPixelRect(fx - 3 - offset, fy + 2, 7 + 2 * offset, 1, shellDark);
+              drawPixelRect(fx - 2 - offset, fy + 2, 5 + 2 * offset, 1, shellLight);
               break;
             }
             case 12: {
-              // Camellia 🌺
-              drawPixelRect(fx - 6, fy - 4, 12, 8, '#880e4f');
-              drawPixelRect(fx - 5, fy - 3, 10, 6, '#c2185b');
-              drawPixel(fx, fy - 1, '#ffca28'); // gold core
+              // 동백꽃 🌺 - 8단계 만개
+              const petalRed = '#c2185b';
+              const petalBright = '#d81b60';
+              const goldPistil = '#ffca28';
+              const w = isSmall ? 7 : (isLarge ? 11 : 9);
+              
+              drawPixelRect(fx - Math.floor(w / 2) - 1, fy - 2, 2, 2, '#0d533a');
+              drawPixelRect(fx + Math.floor(w / 2), fy + 1, 2, 2, '#0d533a');
+              
+              drawPixelRect(fx - Math.floor(w / 2), fy - 2, w, 5, petalRed);
+              drawPixelRect(fx - Math.floor(w / 2) + 1, fy - 1, w - 2, 3, petalBright);
+              
+              drawPixelRect(fx - 1, fy - 1, 3, 1, goldPistil);
+              drawPixel(fx - 2, fy, goldPistil);
+              drawPixel(fx + 2, fy, goldPistil);
+              drawPixelRect(fx - 1, fy + 1, 3, 1, goldPistil);
+              drawPixel(fx, fy, '#fff');
               break;
             }
           }
