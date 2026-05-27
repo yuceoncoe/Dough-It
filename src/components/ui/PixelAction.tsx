@@ -199,16 +199,16 @@ export const PixelAction = ({
           const loopFrame = frame % 110;
           let shearsX = 42;
           let shearsY = 25;
-          let shearsAngle = 0.45;
+          let shearsAngle = 0.6;
 
           if (loopFrame < 35) {
             const t = loopFrame / 35;
             shearsX = 42 - t * 22; // 42 -> 20
-            shearsAngle = 0.45;
+            shearsAngle = 0.6;
           } else if (loopFrame >= 35 && loopFrame < 45) {
             shearsX = 20;
             const t = (loopFrame - 35) / 10;
-            shearsAngle = 0.45 * (1 - t);
+            shearsAngle = 0.6 * (1 - t);
             if (loopFrame === 40) {
               cutLeaf.active = true;
               cutLeaf.vx = -0.5;
@@ -231,7 +231,7 @@ export const PixelAction = ({
           } else {
             const t = (loopFrame - 55) / 55;
             shearsX = 20 + t * 22;
-            shearsAngle = 0.45 * t;
+            shearsAngle = 0.6 * t;
           }
 
           // Cut leaf falling
@@ -265,56 +265,63 @@ export const PixelAction = ({
           });
           particles = particles.filter((p) => p.life < p.maxLife);
 
-          // === Dark Iron Scissors (matching reference image) ===
-          // Upper blade + ring handle
+          // === Dark Iron Scissors (enlarged, clear ring handles) ===
+
+          // ── Upper half (rotates +shearsAngle) ──
           ctx.save();
           ctx.translate(shearsX, shearsY);
           ctx.rotate(shearsAngle);
 
-          // -- Upper Blade (going left, tapers to point) --
-          drawPixelRect(-16,  -2, 16, 2, '#5a5a5a');   // blade body
-          drawPixelRect(-16,  -3,  8,  1, '#888888');  // top edge highlight
-          drawPixelRect(-16,  -2,  1,  1, '#cccccc');  // tip bright
-          drawPixelRect(-14,  -2, 10,  1, '#6e6e6e');  // mid tone
-          drawPixelRect( -8,   0,  8,  1, '#3a3a3a');  // lower shadow
+          // Blade: 22px long, 3px tall, tapered
+          drawPixelRect(-22,  -3, 22,  3, '#606060');  // body
+          drawPixelRect(-22,  -4, 12,  1, '#909090');  // top edge
+          drawPixelRect(-22,  -3,  2,  1, '#d8d8d8');  // tip bright
+          drawPixelRect(-12,  -1, 12,  1, '#3a3a3a');  // lower shadow
 
-          // -- Upper Ring Handle (right side, oval loop) --
-          drawPixelRect(  2,  -5,  8,  2, '#3a3a3a');  // top arc
-          drawPixelRect(  1,  -4,  1,  6, '#3a3a3a');  // left side
-          drawPixelRect( 10,  -4,  1,  6, '#3a3a3a');  // right side
-          drawPixelRect(  2,   2,  8,  2, '#3a3a3a');  // bottom arc
-          drawPixelRect(  3,  -4,  6,  6, '#1a1a1a');  // ring interior (dark)
-          drawPixelRect(  2,  -5,  8,  1, '#666666');  // top rim highlight
-          drawPixelRect(  1,  -4,  1,  2, '#555555');  // left rim highlight
+          // Neck connector
+          drawPixelRect(  0,  -2,  3,  4, '#505050');
+
+          // Ring handle: 13px wide × 12px tall, 2px walls
+          // Upper ring sits higher (y: -7 to +5)
+          drawPixelRect(  3,  -7, 13,  2, '#3c3c3c');  // top wall
+          drawPixelRect(  2,  -6,  2, 11, '#3c3c3c');  // left wall
+          drawPixelRect( 14,  -6,  2, 11, '#3c3c3c');  // right wall
+          drawPixelRect(  3,   4, 13,  2, '#3c3c3c');  // bottom wall
+          drawPixelRect(  4,  -5,  9,  9, '#141414');  // interior
+          drawPixelRect(  3,  -7, 13,  1, '#6a6a6a');  // top highlight
+          drawPixelRect(  2,  -6,  1,  4, '#585858');  // left highlight
 
           ctx.restore();
 
-          // Lower blade + ring handle
+          // ── Lower half (rotates -shearsAngle) ──
           ctx.save();
           ctx.translate(shearsX, shearsY);
           ctx.rotate(-shearsAngle);
 
-          // -- Lower Blade (going left, tapers to point) --
-          drawPixelRect(-16,   0, 16, 2, '#444444');   // blade body
-          drawPixelRect(-16,   2,  8,  1, '#2a2a2a');  // bottom shadow
-          drawPixelRect(-16,   0,  1,  1, '#aaaaaa');  // tip bright
-          drawPixelRect(-12,   0,  8,  1, '#5a5a5a');  // mid tone
+          // Blade
+          drawPixelRect(-22,   0, 22,  3, '#484848');  // body
+          drawPixelRect(-22,   2, 12,  1, '#282828');  // bottom shadow
+          drawPixelRect(-22,   0,  2,  1, '#b8b8b8');  // tip bright
+          drawPixelRect(-12,   0, 12,  1, '#565656');  // upper mid
 
-          // -- Lower Ring Handle (right side, oval loop) --
-          drawPixelRect(  2,  -3,  8,  2, '#3a3a3a');  // top arc
-          drawPixelRect(  1,  -2,  1,  6, '#3a3a3a');  // left side
-          drawPixelRect( 10,  -2,  1,  6, '#3a3a3a');  // right side
-          drawPixelRect(  2,   4,  8,  2, '#3a3a3a');  // bottom arc
-          drawPixelRect(  3,  -2,  6,  6, '#1a1a1a');  // ring interior (dark)
-          drawPixelRect(  2,   5,  8,  1, '#555555');  // bottom rim shadow
-          drawPixelRect( 10,  -2,  1,  2, '#555555');  // right rim
+          // Neck connector
+          drawPixelRect(  0,  -2,  3,  4, '#404040');
+
+          // Ring handle: sits lower (y: -5 to +7)
+          drawPixelRect(  3,  -5, 13,  2, '#3c3c3c');  // top wall
+          drawPixelRect(  2,  -4,  2, 11, '#3c3c3c');  // left wall
+          drawPixelRect( 14,  -4,  2, 11, '#3c3c3c');  // right wall
+          drawPixelRect(  3,   6, 13,  2, '#3c3c3c');  // bottom wall
+          drawPixelRect(  4,  -3,  9,  9, '#141414');  // interior
+          drawPixelRect(  3,   7, 13,  1, '#282828');  // bottom shadow
+          drawPixelRect( 14,  -4,  1,  4, '#525252');  // right highlight
 
           ctx.restore();
 
-          // -- Center pivot screw --
-          drawPixelRect(shearsX - 2, shearsY - 2, 4, 4, '#4a4a4a');
-          drawPixelRect(shearsX - 1, shearsY - 1, 2, 2, '#888888');
-          drawPixel(shearsX, shearsY, '#aaaaaa');
+          // ── Center pivot screw ──
+          drawPixelRect(shearsX - 2, shearsY - 2, 5, 5, '#505050');
+          drawPixelRect(shearsX - 1, shearsY - 1, 3, 3, '#909090');
+          drawPixel(shearsX, shearsY, '#d0d0d0');
 
         } else if (actionType === 'fertilizing') {
           // --- 3. POTION BOTTLE SCENE (Magical Elixir/Fertilizer Bottle) ---

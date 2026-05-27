@@ -70,7 +70,7 @@ export const TaskCreationModal = ({
             className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
           >
             <div className="flex items-center gap-2 font-medium">
-              영양제 (긴급+중요)
+              긴급+중요
             </div>
             <div className="mt-1 text-xs opacity-80">가장 먼저 챙겨야 해요</div>
           </button>
@@ -79,7 +79,7 @@ export const TaskCreationModal = ({
             className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'urgent' ? 'border-yellow-400 bg-yellow-100 text-yellow-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
           >
             <div className="flex items-center gap-2 font-medium">
-              가지치기 (긴급)
+              긴급
             </div>
             <div className="mt-1 text-xs opacity-80">빠르게 처리해야 해요</div>
           </button>
@@ -88,7 +88,7 @@ export const TaskCreationModal = ({
             className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
           >
             <div className="flex items-center gap-2 font-medium">
-              물뿌리기 (중요)
+              중요
             </div>
             <div className="mt-1 text-xs opacity-80">가치가 큰 시간이에요</div>
           </button>
@@ -97,7 +97,7 @@ export const TaskCreationModal = ({
             className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
           >
             <div className="flex items-center gap-2 font-medium">
-              땅고르기 (일반)
+              일반
             </div>
             <div className="mt-1 text-xs opacity-80">부담 없이 진행해요</div>
           </button>

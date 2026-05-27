@@ -31,7 +31,7 @@ export const TaskReportModal = ({
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-shell max-w-[28rem] p-6" onClick={(event) => event.stopPropagation()}>
+      <div className="modal-shell max-w-[28rem] max-h-[88dvh] overflow-y-auto p-6" onClick={(event) => event.stopPropagation()}>
         <div className="mb-5">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Day Report</p>
           <h3 className="mt-1 font-hand text-2xl text-stone-900">{formatDateLabel(date)} 보고서</h3>
