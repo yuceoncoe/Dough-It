@@ -432,8 +432,8 @@ export const CircleScheduler = ({
       {showCurrentTime ? (
         <>
           <line
-            x1={CENTER}
-            y1={CENTER}
+            x1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).x}
+            y1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).y}
             x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
             y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
             stroke="#1c1917"
