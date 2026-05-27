@@ -444,57 +444,51 @@ export const PixelAction = ({
           });
           particles = particles.filter((p) => p.life < p.maxLife && p.y < 52);
 
-          // === Korean Homi (호미) — absolute coords on 60x60 canvas ===
-          const pivotX = moundX + 20;
-          const pivotY = 18;
+          // === Korean Homi (호미) ===
+          // pivot at (moundX+4, 20). At hit angle +1.2 rad:
+          //   head center (24, 8) → canvas y ≈ 45 (moundY=46) ✓
+          //   grip end (-10, -4) → canvas (upper area) ✓
+          const pivotX = moundX + 4;  // = 20
+          const pivotY = 20;
 
           ctx.save();
           ctx.translate(pivotX, pivotY);
           ctx.rotate(hoeAngle);
 
-          // -- Wooden Handle --
-          // Shadow layer
+          // -- Wooden Handle: grip is upper-left (-10,-4), head end is lower-right (19,7) --
           ctx.strokeStyle = '#5c2d0a';
           ctx.lineWidth = 4;
           ctx.lineCap = 'round';
           ctx.beginPath();
-          ctx.moveTo(1, 3);
-          ctx.lineTo(22, 24);
+          ctx.moveTo(-10, -4);
+          ctx.lineTo(19, 7);
           ctx.stroke();
-          // Main wood color
           ctx.strokeStyle = '#a0522d';
           ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.moveTo(0, 2);
-          ctx.lineTo(21, 23);
+          ctx.moveTo(-10, -4);
+          ctx.lineTo(19, 7);
           ctx.stroke();
-          // Highlight
           ctx.strokeStyle = '#d4845a';
           ctx.lineWidth = 1;
           ctx.beginPath();
-          ctx.moveTo(-1, 1);
-          ctx.lineTo(20, 22);
+          ctx.moveTo(-11, -5);
+          ctx.lineTo(18, 6);
           ctx.stroke();
 
-          // -- Metal Socket / Neck --
-          drawPixelRect(-5, -5, 8, 7, '#555555');
-          drawPixelRect(-4, -6, 6, 2, '#888888');
+          // -- Metal Socket (where handle meets head) --
+          drawPixelRect(17, 3, 8, 8, '#555555');
+          drawPixelRect(18, 2, 6, 3, '#888888');
 
-          // -- Round Metal Head (homi blade) --
-          // Outer shadow
-          drawPixelRect(-14, -10, 14, 13, '#3a3a3a');
-          // Main gray
-          drawPixelRect(-13,  -9, 12, 11, '#7a7a7a');
-          // Upper highlight (bright)
-          drawPixelRect(-12,  -8,  8,  5, '#b0b0b0');
-          drawPixelRect(-12,  -9, 11,  1, '#c0c0c0');
-          // Lower shadow
-          drawPixelRect(-13,   0, 12,  3, '#2e2e2e');
-          // Sharp bottom edge
-          drawPixelRect(-14,   2, 14,  1, '#d0d0d0');
-          // Rivet detail
-          drawPixelRect(-8,  -5,  4,  4, '#505050');
-          drawPixelRect(-7,  -4,  2,  2, '#282828');
+          // -- Round Metal Head (center ~(24,8), hits soil at hoeAngle=+1.2) --
+          drawPixelRect(17,  3, 14, 14, '#3a3a3a');  // dark border
+          drawPixelRect(18,  4, 12, 12, '#7a7a7a');  // main gray
+          drawPixelRect(19,  4,  8,  6, '#b0b0b0');  // highlight
+          drawPixelRect(19,  4, 11,  1, '#c0c0c0');  // top rim
+          drawPixelRect(18, 11, 12,  3, '#2e2e2e');  // lower shadow
+          drawPixelRect(17, 13, 14,  1, '#d0d0d0');  // blade edge
+          drawPixelRect(22,  7,  4,  4, '#505050');  // rivet outer
+          drawPixelRect(23,  8,  2,  2, '#282828');  // rivet inner
 
           ctx.restore();
         }
