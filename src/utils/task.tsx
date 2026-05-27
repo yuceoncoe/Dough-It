@@ -494,7 +494,6 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
   if (minuteAngle !== null) {
     ctx.save();
     ctx.beginPath();
-    ctx.moveTo(CENTER, CENTER);
     ctx.arc(
       CENTER,
       CENTER,
@@ -503,6 +502,15 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
       (minuteAngle - 90) * (Math.PI / 180),
       false
     );
+    ctx.arc(
+      CENTER,
+      CENTER,
+      TRACK_INNER_RADIUS,
+      (minuteAngle - 90) * (Math.PI / 180),
+      -Math.PI / 2,
+      true
+    );
+    ctx.closePath();
     ctx.fillStyle = 'rgba(0, 0, 0, 0.035)';
     ctx.fill();
     ctx.restore();
