@@ -105,6 +105,13 @@ export const PixelCrop = ({
         drawPixel(baseCenterX + 12, baseCenterY - 4, cloverStem);
       }
 
+      // Draw fallen Camellia petals in winter (12월 8단계)
+      if (month === 12 && evolutionStage === 8) {
+        drawPixel(baseCenterX - 7, baseCenterY - 5, '#c2185b');
+        drawPixel(baseCenterX - 6, baseCenterY - 5, '#d81b60');
+        drawPixel(baseCenterX + 9, baseCenterY - 5, '#d81b60');
+      }
+
       // Plant styling by month
       const isWoody = month === 2 || month === 4 || month === 6 || month === 10 || month === 12;
       const isVine = month === 7 || month === 11;
@@ -614,8 +621,8 @@ export const PixelCrop = ({
             drawPixelRect(baseCenterX + fillDiff + swayX + tX, currY, fillW, 1, stemColor);
 
             if (isRose) {
-              if (i % 6 === 3) drawPixel(baseCenterX - 3 + swayX + tX, currY, '#e53935');
-              if (i % 6 === 0) drawPixel(baseCenterX + 2 + swayX + tX, currY, '#e53935');
+              if (i % 6 === 3) drawPixel(baseCenterX - 3 + swayX + tX, currY, '#1b5e20');
+              if (i % 6 === 0) drawPixel(baseCenterX + 2 + swayX + tX, currY, '#1b5e20');
             }
           }
 
@@ -966,13 +973,13 @@ export const PixelCrop = ({
 
           // Foliage blocks (green/pink clouds) at the tips
           const leafOutline = month === 4 ? (health < 45 ? '#ad1457' : '#c2185b') : (health < 45 ? '#33691e' : '#1b5e20');
-          const drawFoliage = (cx: number, cy: number, r: number) => {
+          const drawFoliage = (cx: number, cy: number, r: number, outlineCol = leafOutline, fillCol = leafColor) => {
             // Draw outer circle with outline
             for (let y = -r; y <= r; y++) {
               const rowW = Math.round(Math.sqrt(r * r - y * y) * 2.0);
               if (rowW > 0) {
                 const lx = cx - Math.floor(rowW / 2);
-                drawPixelRect(lx, cy + y + leafYOffset, rowW, 1, leafOutline);
+                drawPixelRect(lx, cy + y + leafYOffset, rowW, 1, outlineCol);
               }
             }
             // Draw inner circle with fill
@@ -981,21 +988,30 @@ export const PixelCrop = ({
               const rowW = Math.round(Math.sqrt(rInner * rInner - y * y) * 2.0);
               if (rowW > 0) {
                 const lx = cx - Math.floor(rowW / 2);
-                drawPixelRect(lx, cy + y + leafYOffset, rowW, 1, leafColor);
+                drawPixelRect(lx, cy + y + leafYOffset, rowW, 1, fillCol);
               }
             }
           };
 
-          // Draw foliages (draw background ones first) - larger radii (10, 11, 13) to look like a real tree canopy
-          drawFoliage(baseCenterX - 9 + Math.round(swayX * 0.3), baseCenterY - 26, 10 + leafSizeModifier);
-          drawFoliage(baseCenterX + 9 + Math.round(swayX * 0.5), baseCenterY - 28, 11 + leafSizeModifier);
-          drawFoliage(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35, 13 + leafSizeModifier);
+          if (month === 10) {
+            // 10월 감나무 - 가을 낙엽이 지는 앙상한 가지망 표현 (아주 작고 듬성듬성한 주황빛 단풍잎 클러스터)
+            const autumnOutline = '#bf360c';
+            const autumnFill = '#ffb74d';
+            drawFoliage(baseCenterX - 9 + Math.round(swayX * 0.3), baseCenterY - 26, 3 + leafSizeModifier, autumnOutline, autumnFill);
+            drawFoliage(baseCenterX + 9 + Math.round(swayX * 0.5), baseCenterY - 28, 4 + leafSizeModifier, autumnOutline, autumnFill);
+            drawFoliage(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35, 4 + leafSizeModifier, autumnOutline, autumnFill);
+          } else {
+            // Draw standard tree foliages (draw background ones first) - larger radii (10, 11, 13) to look like a real tree canopy
+            drawFoliage(baseCenterX - 9 + Math.round(swayX * 0.3), baseCenterY - 26, 10 + leafSizeModifier);
+            drawFoliage(baseCenterX + 9 + Math.round(swayX * 0.5), baseCenterY - 28, 11 + leafSizeModifier);
+            drawFoliage(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35, 13 + leafSizeModifier);
 
-          // Q3 spots on foliage
-          if (isLowQualityQ3) {
-            drawPixel(baseCenterX - 8 + Math.round(swayX * 0.3), baseCenterY - 26, '#3e2723');
-            drawPixel(baseCenterX + 8 + Math.round(swayX * 0.5), baseCenterY - 28, '#3e2723');
-            drawPixel(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35, '#3e2723');
+            // Q3 spots on foliage
+            if (isLowQualityQ3) {
+              drawPixel(baseCenterX - 8 + Math.round(swayX * 0.3), baseCenterY - 26, '#3e2723');
+              drawPixel(baseCenterX + 8 + Math.round(swayX * 0.5), baseCenterY - 28, '#3e2723');
+              drawPixel(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35, '#3e2723');
+            }
           }
         } else if (isTall) {
           // --- TALL CROPS (옥수수, 해바라기) ---
@@ -1406,6 +1422,14 @@ export const PixelCrop = ({
               drawPixel(fx + 5 + offset, fy + 1, shellDark);
               drawPixelRect(fx - 3 - offset, fy + 2, 7 + 2 * offset, 1, shellDark);
               drawPixelRect(fx - 2 - offset, fy + 2, 5 + 2 * offset, 1, shellLight);
+
+              // Partially buried effect: overlay soil pixels on the very bottom rows if it is low enough
+              if (fy + 2 >= baseCenterY - 5) {
+                const soilCol = health < 30 ? '#6d5c50' : '#5c4033'; // currentSoilLight
+                drawPixelRect(fx - 2 - offset, fy + 2, 5 + 2 * offset, 1, soilCol);
+                drawPixel(fx - 3 - offset, fy + 1, soilCol);
+                drawPixel(fx + 3 + offset, fy + 1, soilCol);
+              }
               break;
             }
             case 12: {
@@ -1509,7 +1533,7 @@ export const PixelCrop = ({
           ];
           coords = list.slice(0, Math.min(yieldCount, list.length));
         } else if (isWoody) {
-          const list = [
+          let list = [
             { dx: -9, dy: -26, scale: 0.95 },
             { dx: 9, dy: -28, scale: 0.95 },
             { dx: -4, dy: -29, scale: 0.85 },
@@ -1519,6 +1543,19 @@ export const PixelCrop = ({
             { dx: 0, dy: -40, scale: 0.75 },
             { dx: 0, dy: -35, scale: 1.1 }
           ];
+          if (month === 10) {
+            // 10월 감나무: 새들이 먹을 까치밥용으로 꼭대기의 단감들을 먼저 배치하여 우선적으로 렌더링되게 설정
+            list = [
+              { dx: 0, dy: -40, scale: 0.75 },
+              { dx: 4, dy: -31, scale: 0.85 },
+              { dx: -9, dy: -26, scale: 0.95 },
+              { dx: 9, dy: -28, scale: 0.95 },
+              { dx: -4, dy: -29, scale: 0.85 },
+              { dx: -12, dy: -23, scale: 0.8 },
+              { dx: 12, dy: -24, scale: 0.8 },
+              { dx: 0, dy: -35, scale: 1.1 }
+            ];
+          }
           coords = list.slice(0, Math.min(yieldCount, list.length));
         } else if (isTall) {
           if (month === 9) { // Sunflower
