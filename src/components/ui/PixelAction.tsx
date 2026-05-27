@@ -81,37 +81,29 @@ export const PixelAction = ({
         drawPixelRect(0, 51, 60, 1, soilLight);
 
         if (actionType === 'watering') {
-          // --- 1. WATERING CAN SCENE (Copper Watering Can) ---
+          // --- 1. WATERING CAN SCENE ---
           drawPixelRect(0, 50, 60, 1, grassGreen);
           drawPixelRect(0, 51, 60, 1, grassDark);
 
-          // Can tilts to pour water, then returns
+          // Tilt angle oscillates
           const canAngle = 0.2 + Math.sin(frame * 0.06) * 0.28 + 0.28;
-          const canCenterX = 34;
-          const canCenterY = 24;
-
-          const rad = canAngle;
-          const roseX = canCenterX - Math.round(19 * Math.cos(rad)) + Math.round(2 * Math.sin(rad));
-          const roseY = canCenterY + Math.round(19 * Math.sin(rad)) + Math.round(2 * Math.cos(rad));
-
           const isPouring = canAngle > 0.4;
+
+          // Water particles from nozzle area
           if (isPouring && frame % 2 === 0) {
             particles.push({
-              x: roseX - 1 + Math.random() * 3,
-              y: roseY + 1,
-              vx: -0.8 - Math.random() * 0.8,
-              vy: 2.0 + Math.random() * 0.8,
+              x: 10 + Math.random() * 3,
+              y: 28,
+              vx: -0.3 - Math.random() * 0.5,
+              vy: 1.5 + Math.random() * 1.0,
               color: Math.random() < 0.4 ? '#e0f7fa' : '#29b6f6',
               life: 1,
-              maxLife: 35,
+              maxLife: 30,
             });
           }
-
-          // Draw falling water drops and splash ripples
           particles.forEach((p) => {
             p.x += p.vx;
             p.y += p.vy;
-
             if (p.y >= 50) {
               p.life = 0;
               drawPixel(p.x - 1, 50, '#e0f7fa');
@@ -123,63 +115,55 @@ export const PixelAction = ({
           });
           particles = particles.filter((p) => p.life > 0);
 
-          // === Gray Steel Watering Can (matching reference image) ===
+          // === Gray Steel Watering Can — absolute coords on 60x60 canvas ===
+          // Gentle bob animation
+          const bob = Math.round(Math.sin(frame * 0.06) * 2);
+          const cx = 32; // horizontal center of body
+          const cy = 22 + bob;
+
+          // -- Main body (wide rectangle) --
+          drawPixelRect(cx - 11, cy - 6, 22, 14, '#4a4a4a');   // dark border
+          drawPixelRect(cx - 10, cy - 5, 20, 12, '#787878');   // base gray
+          drawPixelRect(cx - 9,  cy - 4, 12,  6, '#9e9e9e');   // upper highlight
+          drawPixelRect(cx - 10, cy + 4, 20,  3, '#363636');   // bottom shadow
+          drawPixelRect(cx - 10, cy - 5, 20,  1, '#aaaaaa');   // top rim line
+
+          // -- Top arch handle --
+          drawPixelRect(cx - 6, cy - 10, 12, 2, '#363636');    // top bar
+          drawPixelRect(cx - 7, cy -  9,  1, 4, '#363636');    // left leg
+          drawPixelRect(cx + 6, cy -  9,  1, 4, '#363636');    // right leg
+          drawPixelRect(cx - 6, cy - 10, 12, 1, '#888888');    // highlight on bar
+
+          // -- Right side handle (C-shape) --
+          drawPixelRect(cx + 11, cy - 4,  1, 9, '#363636');    // right bar
+          drawPixelRect(cx + 11, cy - 5,  5, 2, '#363636');    // top hook
+          drawPixelRect(cx + 11, cy + 4,  5, 2, '#363636');    // bottom hook
+          drawPixelRect(cx + 15, cy - 3,  1, 7, '#363636');    // far right edge
+
+          // -- Spout (angled left from body) --
+          // Rotate spout based on pour angle
           ctx.save();
-          ctx.translate(canCenterX, canCenterY);
-          ctx.rotate(-canAngle);
-
-          // --- Main Body ---
-          // Dark outline / shadow bottom
-          drawPixelRect(-9, -5, 18, 11, '#4a4a4a');
-          // Main body fill (mid gray)
-          drawPixelRect(-8, -4, 16, 9, '#7a7a7a');
-          // Body highlight (lighter gray on upper-left)
-          drawPixelRect(-7, -3, 8, 4, '#9e9e9e');
-          drawPixelRect(-7, -4, 14, 1, '#9e9e9e'); // top highlight row
-          // Dark shadow on lower body
-          drawPixelRect(-8, 3, 16, 2, '#3a3a3a');
-          // Rivets / detailing
-          drawPixelRect(-5, -1, 2, 2, '#5a5a5a');
-          drawPixelRect(3, -1, 2, 2, '#5a5a5a');
-
-          // --- Top Handle (arch) ---
-          drawPixelRect(-5, -9, 10, 2, '#3a3a3a');   // top bar
-          drawPixelRect(-6, -8, 1, 4, '#3a3a3a');    // left side
-          drawPixelRect(5, -8, 1, 4, '#3a3a3a');     // right side
-          drawPixelRect(-5, -9, 10, 1, '#6a6a6a');   // top highlight
-
-          // --- Right Handle (pour grip) ---
-          drawPixelRect(9, -3, 1, 7, '#3a3a3a');  // vertical bar
-          drawPixelRect(9, -4, 4, 1, '#3a3a3a');  // top hook
-          drawPixelRect(9, 4, 4, 1, '#3a3a3a');   // bottom hook
-          drawPixelRect(12, -3, 1, 7, '#3a3a3a'); // right edge
-
-          // --- Spout (extends left-downward) ---
-          drawPixelRect(-18, 0, 10, 2, '#6a6a6a');  // spout shaft
-          drawPixelRect(-18, 1, 10, 1, '#3a3a3a');  // spout shadow bottom
-          drawPixelRect(-17, -1, 8, 1, '#8a8a8a'); // spout top highlight
-          // Spout connection to body
-          drawPixelRect(-9, -1, 2, 4, '#5a5a5a');
-
-          // --- Nozzle / Rose Head ---
-          drawPixelRect(-22, -3, 5, 6, '#4a4a4a');  // rose outer
-          drawPixelRect(-21, -2, 3, 4, '#7a7a7a');  // rose inner
-          // Hole dots on rose
-          drawPixel(-21, -1, '#2a2a2a');
-          drawPixel(-19, -1, '#2a2a2a');
-          drawPixel(-20, 0, '#2a2a2a');
-          drawPixel(-21, 1, '#2a2a2a');
-          drawPixel(-19, 1, '#2a2a2a');
-
+          ctx.translate(cx - 11, cy);
+          ctx.rotate(canAngle * 0.4);
+          drawPixelRect(-13,  0, 14, 3, '#666666');  // shaft
+          drawPixelRect(-13,  2, 14, 1, '#2a2a2a');  // shadow
+          drawPixelRect(-12, -1, 12, 1, '#909090');  // highlight
+          // Nozzle head
+          drawPixelRect(-17, -4,  5, 7, '#4a4a4a');  // outer
+          drawPixelRect(-16, -3,  3, 5, '#747474');  // inner
+          drawPixel(-16, -2, '#222222');
+          drawPixel(-14, -2, '#222222');
+          drawPixel(-15, -1, '#222222');
+          drawPixel(-16,  0, '#222222');
+          drawPixel(-14,  0, '#222222');
           ctx.restore();
 
           // Growing sprout on the left
-          const sproutX = 12;
+          const sproutX = 8;
           drawPixelRect(sproutX, 44, 2, 6, '#2e7d32');
           drawPixelRect(sproutX, 44, 1, 6, '#4caf50');
           drawPixelRect(sproutX - 2, 42, 2, 2, '#81c784');
           drawPixelRect(sproutX + 1, 42, 2, 2, '#81c784');
-
           if (isPouring && frame % 8 === 0) {
             drawPixel(sproutX + (frame % 3 - 1) * 3, 39, '#fff176');
           }
@@ -460,56 +444,57 @@ export const PixelAction = ({
           });
           particles = particles.filter((p) => p.life < p.maxLife && p.y < 52);
 
-          // === Korean Homi (호미) pixel art ===
-          const pivotX = moundX + 18;
-          const pivotY = 20;
+          // === Korean Homi (호미) — absolute coords on 60x60 canvas ===
+          const pivotX = moundX + 20;
+          const pivotY = 18;
 
           ctx.save();
           ctx.translate(pivotX, pivotY);
           ctx.rotate(hoeAngle);
 
-          // --- Wooden Handle (diagonal, going lower-left) ---
-          // Handle shadow
-          ctx.strokeStyle = '#6d3b1e';
+          // -- Wooden Handle --
+          // Shadow layer
+          ctx.strokeStyle = '#5c2d0a';
+          ctx.lineWidth = 4;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(1, 3);
+          ctx.lineTo(22, 24);
+          ctx.stroke();
+          // Main wood color
+          ctx.strokeStyle = '#a0522d';
           ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.moveTo(2, 2);
-          ctx.lineTo(26, 22);
+          ctx.moveTo(0, 2);
+          ctx.lineTo(21, 23);
           ctx.stroke();
-          // Handle main color
-          ctx.strokeStyle = '#a0522d';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(1, 1);
-          ctx.lineTo(25, 21);
-          ctx.stroke();
-          // Handle highlight
-          ctx.strokeStyle = '#c8834a';
+          // Highlight
+          ctx.strokeStyle = '#d4845a';
           ctx.lineWidth = 1;
           ctx.beginPath();
-          ctx.moveTo(0, 1);
-          ctx.lineTo(24, 21);
+          ctx.moveTo(-1, 1);
+          ctx.lineTo(20, 22);
           ctx.stroke();
 
-          // --- Metal Neck (connects handle to head) ---
-          drawPixelRect(-4, -3, 7, 5, '#5a5a5a');
-          drawPixelRect(-3, -4, 5, 2, '#7a7a7a'); // top highlight
+          // -- Metal Socket / Neck --
+          drawPixelRect(-5, -5, 8, 7, '#555555');
+          drawPixelRect(-4, -6, 6, 2, '#888888');
 
-          // --- Round Metal Head (flat disc / homi blade) ---
-          // Outer dark ring
-          drawPixelRect(-11, -8, 12, 10, '#4a4a4a');
-          // Main body (mid gray)
-          drawPixelRect(-10, -7, 10, 8, '#7e7e7e');
-          // Inner highlight (top-left quadrant brighter)
-          drawPixelRect(-9, -6, 6, 4, '#ababab');
-          drawPixelRect(-9, -7, 9, 1, '#b0b0b0');
+          // -- Round Metal Head (homi blade) --
+          // Outer shadow
+          drawPixelRect(-14, -10, 14, 13, '#3a3a3a');
+          // Main gray
+          drawPixelRect(-13,  -9, 12, 11, '#7a7a7a');
+          // Upper highlight (bright)
+          drawPixelRect(-12,  -8,  8,  5, '#b0b0b0');
+          drawPixelRect(-12,  -9, 11,  1, '#c0c0c0');
           // Lower shadow
-          drawPixelRect(-10, 0, 10, 2, '#3a3a3a');
-          // Blade edge (bottom) - slightly lighter to show sharpness
-          drawPixelRect(-11, 1, 12, 1, '#cccccc');
-          // Rivet / center detail
-          drawPixelRect(-6, -3, 3, 3, '#5a5a5a');
-          drawPixelRect(-5, -2, 1, 1, '#2a2a2a');
+          drawPixelRect(-13,   0, 12,  3, '#2e2e2e');
+          // Sharp bottom edge
+          drawPixelRect(-14,   2, 14,  1, '#d0d0d0');
+          // Rivet detail
+          drawPixelRect(-8,  -5,  4,  4, '#505050');
+          drawPixelRect(-7,  -4,  2,  2, '#282828');
 
           ctx.restore();
         }
