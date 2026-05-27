@@ -265,40 +265,56 @@ export const PixelAction = ({
           });
           particles = particles.filter((p) => p.life < p.maxLife);
 
-          // Render Stardew-Style Shears (UPSCALED)
-          // Upper Blade/Handle
+          // === Dark Iron Scissors (matching reference image) ===
+          // Upper blade + ring handle
           ctx.save();
           ctx.translate(shearsX, shearsY);
           ctx.rotate(shearsAngle);
 
-          // Blade (Larger steel)
-          drawPixelRect(-14, -1, 14, 1, '#cfd8dc');
-          drawPixelRect(-13, -2, 7, 1, '#b0bec5');
-          // Handle (Larger red handles)
-          drawPixelRect(0, 1, 13, 3, '#ef5350');
-          drawPixelRect(9, 4, 5, 1, '#ef5350');
-          drawPixelRect(13, 0, 1, 5, '#b71c1c');
-          drawPixelRect(0, 0, 4, 1, '#b71c1c');
+          // -- Upper Blade (going left, tapers to point) --
+          drawPixelRect(-16,  -2, 16, 2, '#5a5a5a');   // blade body
+          drawPixelRect(-16,  -3,  8,  1, '#888888');  // top edge highlight
+          drawPixelRect(-16,  -2,  1,  1, '#cccccc');  // tip bright
+          drawPixelRect(-14,  -2, 10,  1, '#6e6e6e');  // mid tone
+          drawPixelRect( -8,   0,  8,  1, '#3a3a3a');  // lower shadow
+
+          // -- Upper Ring Handle (right side, oval loop) --
+          drawPixelRect(  2,  -5,  8,  2, '#3a3a3a');  // top arc
+          drawPixelRect(  1,  -4,  1,  6, '#3a3a3a');  // left side
+          drawPixelRect( 10,  -4,  1,  6, '#3a3a3a');  // right side
+          drawPixelRect(  2,   2,  8,  2, '#3a3a3a');  // bottom arc
+          drawPixelRect(  3,  -4,  6,  6, '#1a1a1a');  // ring interior (dark)
+          drawPixelRect(  2,  -5,  8,  1, '#666666');  // top rim highlight
+          drawPixelRect(  1,  -4,  1,  2, '#555555');  // left rim highlight
+
           ctx.restore();
 
-          // Lower Blade/Handle
+          // Lower blade + ring handle
           ctx.save();
           ctx.translate(shearsX, shearsY);
           ctx.rotate(-shearsAngle);
 
-          // Blade
-          drawPixelRect(-14, 0, 14, 1, '#90a4ae');
-          drawPixelRect(-13, 1, 7, 1, '#78909c');
-          // Handle
-          drawPixelRect(0, -4, 13, 3, '#b71c1c');
-          drawPixelRect(9, -5, 5, 1, '#b71c1c');
-          drawPixelRect(13, -5, 1, 5, '#7f0000');
-          drawPixelRect(0, -1, 4, 1, '#7f0000');
+          // -- Lower Blade (going left, tapers to point) --
+          drawPixelRect(-16,   0, 16, 2, '#444444');   // blade body
+          drawPixelRect(-16,   2,  8,  1, '#2a2a2a');  // bottom shadow
+          drawPixelRect(-16,   0,  1,  1, '#aaaaaa');  // tip bright
+          drawPixelRect(-12,   0,  8,  1, '#5a5a5a');  // mid tone
+
+          // -- Lower Ring Handle (right side, oval loop) --
+          drawPixelRect(  2,  -3,  8,  2, '#3a3a3a');  // top arc
+          drawPixelRect(  1,  -2,  1,  6, '#3a3a3a');  // left side
+          drawPixelRect( 10,  -2,  1,  6, '#3a3a3a');  // right side
+          drawPixelRect(  2,   4,  8,  2, '#3a3a3a');  // bottom arc
+          drawPixelRect(  3,  -2,  6,  6, '#1a1a1a');  // ring interior (dark)
+          drawPixelRect(  2,   5,  8,  1, '#555555');  // bottom rim shadow
+          drawPixelRect( 10,  -2,  1,  2, '#555555');  // right rim
+
           ctx.restore();
 
-          // Brass screw
-          drawPixel(shearsX, shearsY, '#ffd54f');
-          drawPixelRect(shearsX - 1, shearsY - 1, 2, 2, '#ffb300');
+          // -- Center pivot screw --
+          drawPixelRect(shearsX - 2, shearsY - 2, 4, 4, '#4a4a4a');
+          drawPixelRect(shearsX - 1, shearsY - 1, 2, 2, '#888888');
+          drawPixel(shearsX, shearsY, '#aaaaaa');
 
         } else if (actionType === 'fertilizing') {
           // --- 3. POTION BOTTLE SCENE (Magical Elixir/Fertilizer Bottle) ---
