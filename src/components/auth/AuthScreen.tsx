@@ -20,7 +20,7 @@ export const AuthScreen = ({
   const [lastSignUpEmail, setLastSignUpEmail] = useState('');
 
   return (
-    <div className="min-h-screen bg-[#e8e8ed] px-6 py-10 text-stone-900">
+    <div className="min-h-screen bg-[#f0f0f4] px-6 py-10 text-stone-900">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-md items-center">
         <div className="w-full rounded-[28px] border border-white/80 bg-white px-6 py-7 shadow-[0_24px_80px_rgba(73,54,31,0.12)]">
           <div className="mb-6">

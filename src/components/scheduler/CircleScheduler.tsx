@@ -477,7 +477,7 @@ export const CircleScheduler = ({
     });
   };
   return (
-    <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[2rem] bg-[#e8e8ed]">
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[2rem] bg-[#f0f0f4]">
       <TaskCreationModal
         isOpen={showCreateModal}
         initialTimeRange={{

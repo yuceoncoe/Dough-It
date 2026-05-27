@@ -398,7 +398,7 @@ const AppShell = ({
 
   if (isBootstrapping) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#e8e8ed] text-stone-500">
+      <div className="flex min-h-screen items-center justify-center bg-[#f0f0f4] text-stone-500">
         <div className="inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 shadow-sm ring-1 ring-black/5">
           <Loader2 size={18} className="animate-spin" />
           데이터를 불러오는 중...
@@ -408,7 +408,7 @@ const AppShell = ({
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-stone-100 text-stone-900">
+    <div className="flex min-h-screen flex-col bg-[#f0f0f4] text-stone-900">
       <RoutineSettingsModal
         isOpen={settingsOpen}
         routines={routines}
@@ -514,7 +514,7 @@ const AppShell = ({
 };
 
 const SupabaseConfigNotice = () => (
-  <div className="min-h-screen bg-[#e8e8ed] px-6 py-10 text-stone-900">
+  <div className="min-h-screen bg-[#f0f0f4] px-6 py-10 text-stone-900">
     <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-xl items-center">
       <div className="w-full rounded-[28px] border border-white/80 bg-white px-6 py-7 shadow-[0_24px_80px_rgba(73,54,31,0.12)]">
         <h1 className="font-hand text-3xl text-stone-900">Supabase 설정이 필요합니다</h1>
@@ -680,7 +680,7 @@ const App = () => {
 
   if (isAuthLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#e8e8ed] text-stone-500">
+      <div className="flex min-h-screen items-center justify-center bg-[#f0f0f4] text-stone-500">
         <div className="inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 shadow-sm ring-1 ring-black/5">
           <Loader2 size={18} className="animate-spin" />
           인증 상태를 확인하는 중...

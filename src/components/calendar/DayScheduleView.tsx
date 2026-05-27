@@ -222,7 +222,7 @@ export const DayScheduleView = ({
   };
 
   return (
-    <section className="flex h-full flex-col bg-[#e8e8ed]">
+    <section className="flex h-full flex-col bg-[#f0f0f4]">
       <TaskActionSheet
         task={sheetTask}
         onClose={() => setSheetTask(null)}
@@ -337,7 +337,7 @@ export const DayScheduleView = ({
         onSubmit={submitForm}
       />
 
-      <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-stone-200/0 bg-[#e8e8ed]/95 px-4 pb-3 pt-4 backdrop-blur md:px-6">
+      <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-stone-200/0 bg-[#f0f0f4]/95 px-4 pb-3 pt-4 backdrop-blur md:px-6">
         <div className="flex items-center gap-3">
           <div className="flex min-w-0 items-center gap-2">
             <button
