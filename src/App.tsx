@@ -674,8 +674,8 @@ const App = () => {
 
   if (!isSupabaseConfigured) {
     // Supabase 설정이 없는 로컬 환경에서는 UI 테스트를 위해 가짜 세션으로 앱을 엽니다.
-    const mockSession = { user: { email: 'local@test.com' } } as any;
-    return <AppShell session={mockSession} onSignOut={() => {}} />;
+    const mockUser = { email: 'local@test.com', id: 'local-123' } as any;
+    return <AppShell user={mockUser} onSignOut={async () => {}} />;
   }
 
   if (isAuthLoading) {
