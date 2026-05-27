@@ -15,6 +15,7 @@ import { supabase, isSupabaseConfigured } from './lib/supabase';
 import AuthScreen from './components/auth/AuthScreen';
 import { AppStateSnapshot, createDefaultAppState, normalizeAppState } from './utils/appState';
 import { loadCachedAppState, loadRemoteAppState, loadRemoteAppStateUpdatedAt, persistCachedAppState, persistRemoteAppState } from './utils/cloudStorage';
+import CropSpritePreview from './components/ui/CropSpritePreview';
 
 const collectEndedUnratedTasks = (
   tasksByDate: Record<string, Task[]>,
@@ -603,6 +604,12 @@ const SupabaseConfigNotice = () => (
 );
 
 const App = () => {
+  const isPreviewMode = window.location.search.includes('preview=true');
+
+  if (isPreviewMode) {
+    return <CropSpritePreview />;
+  }
+
   const [session, setSession] = useState<Session | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
