@@ -351,8 +351,8 @@ export const PixelAction = ({
 
           // Potion bottle movement
           const loopFrame = frame % 90;
-          let bottleX = 38;
-          let bottleY = 24;
+          let bottleX = 41;
+          let bottleY = 26;
           let bottleAngle = -0.45;
 
           const isPouring = loopFrame >= 25 && loopFrame <= 65;
@@ -396,51 +396,51 @@ export const PixelAction = ({
           });
           particles = particles.filter((p) => p.life < p.maxLife);
 
-          // === Round Cyan Potion Bottle (enlarged 18×16px body) ===
+          // === Round Cyan Potion Bottle (enlarged 22×24px body) ===
           ctx.save();
           ctx.translate(bottleX, bottleY);
           ctx.rotate(bottleAngle);
 
-          // -- Neck (5×4px) --
-          drawPixelRect(-3, -18,  6,  4, '#3d6b5e');  // neck shadow
-          drawPixelRect(-2, -18,  4,  4, '#5fa08a');  // neck main
-          drawPixelRect(-1, -18,  2,  4, '#7ec8b0');  // neck highlight
+          // -- Neck (8×5px) --
+          drawPixelRect(-4, -23,  8,  5, '#3d6b5e');  // neck shadow
+          drawPixelRect(-3, -23,  6,  5, '#5fa08a');  // neck main
+          drawPixelRect(-1, -23,  2,  5, '#7ec8b0');  // neck highlight
 
-          // -- Cork stopper (8×6px) --
-          drawPixelRect(-4, -23,  8,  6, '#5a3520');  // cork dark
-          drawPixelRect(-3, -23,  6,  5, '#8b5a2b');  // cork main
-          drawPixelRect(-3, -23,  3,  3, '#b07840');  // cork highlight
-          drawPixelRect(-4, -18,  8,  1, '#3a2010');  // cork base rim
+          // -- Cork stopper (10×7px) --
+          drawPixelRect(-5, -30, 10,  7, '#5a3520');  // cork dark
+          drawPixelRect(-4, -30,  8,  6, '#8b5a2b');  // cork main
+          drawPixelRect(-3, -30,  4,  4, '#b07840');  // cork highlight
+          drawPixelRect(-5, -23, 10,  1, '#3a2010');  // cork base rim
 
-          // -- Round Body outer border (18×16px, rounded corners) --
-          drawPixelRect(-6, -16, 12,  1, '#2a6b5a');  // top narrow
-          drawPixelRect(-8, -15, 16,  1, '#2a6b5a');
-          drawPixelRect(-9, -14, 18, 16, '#2a6b5a');  // sides
-          drawPixelRect(-8,   2, 16,  1, '#2a6b5a');
-          drawPixelRect(-6,   3, 12,  1, '#2a6b5a');  // bottom narrow
+          // -- Round Body outer border (22×24px, rounded corners) --
+          drawPixelRect(-7, -18, 14,  1, '#2a6b5a');  // top narrow
+          drawPixelRect(-10, -17, 20,  1, '#2a6b5a');
+          drawPixelRect(-11, -16, 22, 21, '#2a6b5a');  // sides
+          drawPixelRect(-10,   5, 20,  1, '#2a6b5a');
+          drawPixelRect(-7,   6, 14,  1, '#2a6b5a');  // bottom narrow
 
           // -- Body fill (mid teal) --
-          drawPixelRect(-8, -15, 16,  1, '#3d9e84');
-          drawPixelRect(-9, -14, 18, 16, '#3d9e84');
-          drawPixelRect(-8,   2, 16,  1, '#3d9e84');
+          drawPixelRect(-10, -17, 20,  1, '#3d9e84');
+          drawPixelRect(-11, -16, 22, 21, '#3d9e84');
+          drawPixelRect(-10,   5, 20,  1, '#3d9e84');
 
           // -- Inner lighter fill --
-          drawPixelRect(-7, -13, 14, 14, '#52c4a0');
+          drawPixelRect(-9, -15, 18, 19, '#52c4a0');
 
           // -- Bright highlight (upper-left) --
-          drawPixelRect(-5, -13,  7,  1, '#a8e8d8');
-          drawPixelRect(-7, -12,  9,  5, '#7ed8c0');
-          drawPixelRect(-5, -12,  6,  4, '#b8f0e0');  // bright spot
-          drawPixelRect(-3, -10,  3,  1, '#d4f8f0');  // specular
+          drawPixelRect(-7, -15, 11,  1, '#a8e8d8');
+          drawPixelRect(-9, -14, 13,  6, '#7ed8c0');
+          drawPixelRect(-7, -14,  9,  5, '#b8f0e0');  // bright spot
+          drawPixelRect(-5, -12,  5,  2, '#d4f8f0');  // specular
 
           // -- Decorative ring band (middle) --
-          drawPixelRect(-9,  -2, 18,  3, '#2a6b5a');  // ring outer
-          drawPixelRect(-8,  -2, 16,  1, '#60b898');  // ring top lighter
-          drawPixelRect(-8,  -1, 16,  1, '#2e8065');  // ring bottom darker
+          drawPixelRect(-11,  -3, 22,  4, '#2a6b5a');  // ring outer
+          drawPixelRect(-10,  -3, 20,  1, '#60b898');  // ring top lighter
+          drawPixelRect(-10,  -2, 20,  2, '#2e8065');  // ring bottom darker
 
           // -- Lower shadow --
-          drawPixelRect(-8,   0, 16,  3, '#2a6b5a');
-          drawPixelRect(-5,   1, 10,  2, '#236055');
+          drawPixelRect(-10,   2, 20,  4, '#2a6b5a');
+          drawPixelRect(-7,   3, 14,  3, '#236055');
 
           ctx.restore();
 
