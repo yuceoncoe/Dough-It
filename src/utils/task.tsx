@@ -511,7 +511,7 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
       true
     );
     ctx.closePath();
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.045)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.02)';
     ctx.fill();
     ctx.restore();
   }
