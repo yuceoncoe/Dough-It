@@ -259,13 +259,13 @@ export const PixelCrop = ({
           }
         } else if (isStrawberry) {
           // --- 1월 딸기: 포복형 짧은 수풀 스타일 ---
-          let bushHeight = 6;
+          let bushHeight = 4;
           let bushWidth = 10;
-          if (evolutionStage === 3) { bushHeight = 7; bushWidth = 12; }
-          else if (evolutionStage === 4) { bushHeight = 10; bushWidth = 16; }
-          else if (evolutionStage === 5) { bushHeight = 14; bushWidth = 20; }
-          else if (evolutionStage === 6) { bushHeight = 17; bushWidth = 24; }
-          else if (evolutionStage === 7) { bushHeight = 19; bushWidth = 26; }
+          if (evolutionStage === 3) { bushHeight = 4; bushWidth = 12; }
+          else if (evolutionStage === 4) { bushHeight = 6; bushWidth = 16; }
+          else if (evolutionStage === 5) { bushHeight = 8; bushWidth = 20; }
+          else if (evolutionStage === 6) { bushHeight = 10; bushWidth = 24; }
+          else if (evolutionStage === 7) { bushHeight = 12; bushWidth = 26; }
 
           const swayX = Math.round(swayOffset * 0.45);
           const leafYOffset = health < 40 ? 2 : 0;
@@ -569,7 +569,7 @@ export const PixelCrop = ({
         const isTall = month === 8 || month === 9;
         
         let stemH = 31;
-        let bushHeight = 22;
+        let bushHeight = 12;
         let bushWidth = 28;
 
         if (isVine) {
@@ -712,10 +712,10 @@ export const PixelCrop = ({
             }
           };
 
-          // Draw foliages (draw background ones first)
-          drawFoliage(baseCenterX - 9 + Math.round(swayX * 0.3), baseCenterY - 26, 5 + leafSizeModifier);
-          drawFoliage(baseCenterX + 9 + Math.round(swayX * 0.5), baseCenterY - 28, 6 + leafSizeModifier);
-          drawFoliage(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35, 7 + leafSizeModifier);
+          // Draw foliages (draw background ones first) - larger radii (10, 11, 13) to look like a real tree canopy
+          drawFoliage(baseCenterX - 9 + Math.round(swayX * 0.3), baseCenterY - 26, 10 + leafSizeModifier);
+          drawFoliage(baseCenterX + 9 + Math.round(swayX * 0.5), baseCenterY - 28, 11 + leafSizeModifier);
+          drawFoliage(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35, 13 + leafSizeModifier);
 
           // Q3 spots on foliage
           if (isLowQualityQ3) {
