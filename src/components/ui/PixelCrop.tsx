@@ -346,6 +346,180 @@ export const PixelCrop = ({
             drawPixelRect(baseCenterX + Math.round(swayOffset * 0.5) - 2, topY - 4, 5, 3, '#a5d6a7');
             drawPixelRect(baseCenterX + Math.round(swayOffset * 0.5) - 1, topY - 3, 3, 1, '#fff');
           }
+        } else if (isWoody) {
+          // --- WOODY TREE PROGRESSION (귤, 벚꽃, 매실, 감, 동백) ---
+          const swayX = Math.round(swayOffset * (evolutionStage === 3 ? 0.4 : (evolutionStage === 4 ? 0.55 : (evolutionStage === 5 ? 0.7 : (evolutionStage === 6 ? 0.85 : 1.0)))));
+          const leafYOffset = health < 40 ? (evolutionStage >= 5 ? 3 : 2) : 0;
+          const leafOutline = health < 45 ? '#33691e' : '#1b5e20';
+
+          const drawFoliage = (cx: number, cy: number, r: number) => {
+            for (let y = -r; y <= r; y++) {
+              const rowW = Math.round(Math.sqrt(r * r - y * y) * 2.0);
+              const lx = cx - Math.floor(rowW / 2);
+              drawPixelRect(lx, cy + y + leafYOffset, rowW, 1, leafOutline);
+              drawPixelRect(lx + 1, cy + y + leafYOffset, rowW - 2, 1, leafColor);
+            }
+          };
+
+          if (evolutionStage === 3) {
+            // Stage 3: Small woody sprout
+            const stemH = 8;
+            for (let i = 0; i < stemH; i++) {
+              const currY = baseCenterY - 4 - stemH + i;
+              const tX = isCrooked ? Math.round(Math.sin(i * 0.4) * 1.2) : 0;
+              drawPixelRect(baseCenterX - 1 + swayX + tX, currY, 3, 1, stemOutline);
+              drawPixel(baseCenterX + swayX + tX, currY, stemColor);
+            }
+            // Leaves at top
+            drawPixelRect(baseCenterX - 3 + swayX, baseCenterY - 4 - stemH + leafYOffset, 7, 3, stemOutline);
+            drawPixelRect(baseCenterX - 2 + swayX, baseCenterY - 4 - stemH + 1 + leafYOffset, 5, 2, leafColor);
+          } else if (evolutionStage === 4) {
+            // Stage 4: Small sapling with a thick base and tiny foliage
+            const trunkH = 8;
+            for (let i = 0; i < trunkH; i++) {
+              const currY = baseCenterY - 4 - i;
+              drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.3), currY, 4, 1, stemOutline);
+              drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.3), currY, 2, 1, stemColor);
+            }
+            // Extension stem
+            for (let i = 0; i < 4; i++) {
+              const currY = baseCenterY - 12 - i;
+              drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.5), currY, 3, 1, stemOutline);
+              drawPixel(baseCenterX + Math.round(swayX * 0.5), currY, stemColor);
+            }
+            // Small foliage canopy at top
+            drawFoliage(baseCenterX + Math.round(swayX * 0.5), baseCenterY - 16, 5 + leafSizeModifier);
+          } else if (evolutionStage === 5) {
+            // Stage 5: Growing tree with 2 small branches
+            // Trunk
+            for (let i = 0; i < 10; i++) {
+              const currY = baseCenterY - 4 - i;
+              drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.2), currY, 4, 1, stemOutline);
+              drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.2), currY, 2, 1, stemColor);
+            }
+            // Left branch (short)
+            for (let i = 1; i <= 5; i++) {
+              const currX = baseCenterX - 2 - i + Math.round(swayX * 0.3);
+              const currY = baseCenterY - 13 - i;
+              drawPixelRect(currX, currY, 2, 2, stemOutline);
+              drawPixel(currX + 1, currY + 1, stemColor);
+            }
+            // Right branch (short)
+            for (let i = 1; i <= 5; i++) {
+              const currX = baseCenterX + 1 + i + Math.round(swayX * 0.3);
+              const currY = baseCenterY - 13 - Math.round(i * 1.2);
+              drawPixelRect(currX, currY, 2, 2, stemOutline);
+              drawPixel(currX, currY + 1, stemColor);
+            }
+            // Center branch
+            for (let i = 0; i < 8; i++) {
+              const currY = baseCenterY - 13 - i;
+              drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.4), currY, 3, 1, stemOutline);
+              drawPixel(baseCenterX + Math.round(swayX * 0.4), currY, stemColor);
+            }
+            // Foliages
+            drawFoliage(baseCenterX - 5 + Math.round(swayX * 0.3), baseCenterY - 18, 5 + leafSizeModifier);
+            drawFoliage(baseCenterX + 5 + Math.round(swayX * 0.3), baseCenterY - 19, 5 + leafSizeModifier);
+            drawFoliage(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 21, 6 + leafSizeModifier);
+          } else {
+            // Stage 6 and 7: Trees are nearly full size with branching and flowers/fruit budding
+            // Trunk
+            for (let i = 0; i < 13; i++) {
+              const currY = baseCenterY - 4 - i;
+              drawPixelRect(baseCenterX - 2 + Math.round(swayX * 0.2), currY, 4, 1, stemOutline);
+              drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.2), currY, 2, 1, stemColor);
+            }
+            // Left branch
+            for (let i = 1; i <= 9; i++) {
+              const currX = baseCenterX - 2 - i + Math.round(swayX * 0.3);
+              const currY = baseCenterY - 16 - Math.round(i * 1.0);
+              drawPixelRect(currX, currY, 2, 2, stemOutline);
+              drawPixel(currX + 1, currY + 1, stemColor);
+            }
+            // Right branch
+            for (let i = 1; i <= 9; i++) {
+              const currX = baseCenterX + 1 + i + Math.round(swayX * 0.3);
+              const currY = baseCenterY - 16 - Math.round(i * 1.2);
+              drawPixelRect(currX, currY, 2, 2, stemOutline);
+              drawPixel(currX, currY + 1, stemColor);
+            }
+            // Center branch
+            for (let i = 0; i < 16; i++) {
+              const currY = baseCenterY - 16 - i;
+              drawPixelRect(baseCenterX - 1 + Math.round(swayX * 0.4), currY, 3, 1, stemOutline);
+              drawPixel(baseCenterX + Math.round(swayX * 0.4), currY, stemColor);
+            }
+
+            // Foliages
+            const fRadL = evolutionStage === 6 ? 7 : 9;
+            const fRadR = evolutionStage === 6 ? 8 : 10;
+            const fRadC = evolutionStage === 6 ? 9 : 12;
+
+            drawFoliage(baseCenterX - 9 + Math.round(swayX * 0.3), baseCenterY - 26, fRadL + leafSizeModifier);
+            drawFoliage(baseCenterX + 9 + Math.round(swayX * 0.5), baseCenterY - 28, fRadR + leafSizeModifier);
+            drawFoliage(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35, fRadC + leafSizeModifier);
+
+            // Buds or Flowers/Unripe fruits drawing on branches
+            const drawBudOrFlower = (fx: number, fy: number) => {
+              if (evolutionStage === 6) {
+                // Stage 6 Buds (unripe or pink/red flower buds)
+                const isFlowerType = month === 4 || month === 12;
+                if (isFlowerType) {
+                  let budColor = month === 12 ? '#ef5350' : '#f48fb1';
+                  drawPixelRect(fx - 2, fy + 3, 4, 1, stemOutline);
+                  drawPixel(fx - 1, fy + 4, stemOutline);
+                  drawPixelRect(fx - 2, fy, 4, 3, stemOutline);
+                  drawPixelRect(fx - 1, fy + 1, 2, 2, budColor);
+                } else {
+                  // Fruits: green baby buds
+                  const unripeColor = '#a5d6a7';
+                  const unripeOutline = '#2e7d32';
+                  drawPixelRect(fx - 2, fy + 1, 4, 3, unripeOutline);
+                  drawPixelRect(fx - 1, fy + 2, 2, 2, unripeColor);
+                  drawPixel(fx, fy, unripeOutline);
+                }
+              } else if (evolutionStage === 7) {
+                // Stage 7 flowers/unripe fruits
+                if (month === 2) {
+                  // Tangerine - 7단계 (청귤)
+                  const r = 4;
+                  drawPixel(fx, fy - r - 2, '#4e342e'); // 꼭지
+                  for (let y = -r; y <= r; y++) {
+                    let w = r * 2;
+                    if (y === -r || y === r) w = r * 2 - 2;
+                    const leftX = fx - Math.floor(w / 2);
+                    drawPixelRect(leftX, fy + y, w, 1, '#2e7d32');
+                    drawPixelRect(leftX + 1, fy + y, w - 2, 1, '#689f38');
+                  }
+                } else if (month === 4) {
+                  // Cherry blossom - 7단계 (반개화)
+                  drawPixel(fx, fy - 2, '#2e7d32'); // 꽃받침
+                  drawPixelRect(fx - 2, fy - 1, 5, 3, '#c2185b'); // 외곽
+                  drawPixelRect(fx - 1, fy - 1, 3, 2, '#e91e63'); // 잎
+                  drawPixel(fx, fy, '#f8bbd0'); // 연분홍 코어
+                } else if (month === 6) {
+                  // Plum - 7단계 (아기청매실)
+                  drawPixelRect(fx - 2, fy - 2, 5, 4, '#1b5e20');
+                  drawPixelRect(fx - 1, fy - 1, 3, 2, '#a5d6a7');
+                } else if (month === 10) {
+                  // Persimmon - 7단계 (청감)
+                  drawPixel(fx, fy - 3, '#3e2723'); // 감꼭지
+                  drawPixelRect(fx - 3, fy - 2, 7, 5, '#689f38'); // 청록 외형
+                  drawPixelRect(fx - 2, fy - 1, 5, 3, '#9ccc65'); // 연두 내부
+                } else if (month === 12) {
+                  // Camellia - 7단계 (동백 봉오리)
+                  drawPixelRect(fx - 2, fy - 2, 5, 4, '#1b5e20');
+                  drawPixelRect(fx - 1, fy - 1, 3, 3, '#c2185b');
+                  drawPixel(fx, fy - 1, '#d81b60');
+                }
+              }
+            };
+
+            // Draw buds/flowers at three tip coordinates
+            drawBudOrFlower(baseCenterX - 9 + Math.round(swayX * 0.3), baseCenterY - 26);
+            drawBudOrFlower(baseCenterX + 9 + Math.round(swayX * 0.5), baseCenterY - 28);
+            drawBudOrFlower(baseCenterX + Math.round(swayX * 0.4), baseCenterY - 35);
+          }
         } else {
           // --- STANDARD VERTICAL CROP (기타 모든 곧은 식물들) ---
           let stemH = 8;
