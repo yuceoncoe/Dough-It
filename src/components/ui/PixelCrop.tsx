@@ -621,8 +621,9 @@ export const PixelCrop = ({
             drawPixelRect(baseCenterX + fillDiff + swayX + tX, currY, fillW, 1, stemColor);
 
             if (isRose) {
-              if (i % 6 === 3) drawPixel(baseCenterX - 3 + swayX + tX, currY, '#1b5e20');
-              if (i % 6 === 0) drawPixel(baseCenterX + 2 + swayX + tX, currY, '#1b5e20');
+              if (i === 8) drawPixel(baseCenterX - 3 + swayX + tX, currY, '#1b5e20');
+              if (i === 16) drawPixel(baseCenterX + 2 + swayX + tX, currY, '#1b5e20');
+              if (i === 24) drawPixel(baseCenterX - 3 + swayX + tX, currY, '#1b5e20');
             }
           }
 
@@ -1054,8 +1055,9 @@ export const PixelCrop = ({
             
             // Thorns for rose
             if (isRose) {
-              if (i % 6 === 3) drawPixel(baseCenterX - 3 + Math.round(swayX * 0.5) + tX, currY, '#1b5e20');
-              if (i % 6 === 0) drawPixel(baseCenterX + 2 + Math.round(swayX * 0.5) + tX, currY, '#1b5e20');
+              if (i === 8) drawPixel(baseCenterX - 3 + Math.round(swayX * 0.5) + tX, currY, '#1b5e20');
+              if (i === 16) drawPixel(baseCenterX + 2 + Math.round(swayX * 0.5) + tX, currY, '#1b5e20');
+              if (i === 24) drawPixel(baseCenterX - 3 + Math.round(swayX * 0.5) + tX, currY, '#1b5e20');
             }
           }
 
@@ -1172,14 +1174,29 @@ export const PixelCrop = ({
               break;
             }
             case 4: {
-              // 벚꽃 🌸 - 8단계 만개 (5개 꽃잎 구조 입체 구현)
-              const w = isSmall ? 7 : (isLarge ? 11 : 9);
+              // 벚꽃 🌸 - 8단계 만개 (미니 블로섬화: 5x5 ~ 7x7 크기 단순화)
+              const w = isSmall ? 5 : (isLarge ? 7 : 6);
               const outline = '#c2185b'; // 짙은 분홍 테두리
               const petal = '#f8bbd0'; // 연분홍 꽃잎
-              const shadow = '#e91e63'; // 꽃잎 내측 분홍 음영
               const yellowPistil = '#fff176'; // 노란 수술
 
-              if (w === 7) {
+              if (w === 5) {
+                drawPixelRect(fx - 1, fy - 1, 3, 3, outline);
+                drawPixel(fx - 2, fy, outline);
+                drawPixel(fx + 2, fy, outline);
+                drawPixel(fx, fy - 2, outline);
+                drawPixel(fx, fy + 2, outline);
+                drawPixel(fx - 1, fy, petal);
+                drawPixel(fx + 1, fy, petal);
+                drawPixel(fx, fy - 1, petal);
+                drawPixel(fx, fy + 1, petal);
+                drawPixel(fx, fy, yellowPistil);
+              } else if (w === 6) {
+                drawPixelRect(fx - 2, fy - 2, 5, 5, outline);
+                drawPixelRect(fx - 1, fy - 1, 3, 3, petal);
+                drawPixel(fx, fy, yellowPistil);
+              } else {
+                // w === 7
                 drawPixelRect(fx - 2, fy - 2, 5, 5, outline);
                 drawPixelRect(fx - 1, fy - 1, 3, 3, petal);
                 drawPixel(fx - 2, fy, petal);
@@ -1187,62 +1204,6 @@ export const PixelCrop = ({
                 drawPixel(fx, fy - 2, petal);
                 drawPixel(fx, fy + 2, petal);
                 drawPixel(fx, fy, yellowPistil);
-              } else if (w === 9) {
-                // 5개 꽃잎 & V자 홈
-                drawPixelRect(fx - 1, fy - 1, 3, 3, shadow);
-                drawPixel(fx, fy, yellowPistil);
-                
-                // Top Petal
-                drawPixelRect(fx - 1, fy - 4, 3, 2, outline);
-                drawPixelRect(fx - 1, fy - 3, 3, 1, petal);
-                drawPixel(fx, fy - 4, petal);
-                
-                // Top-Left Petal
-                drawPixelRect(fx - 4, fy - 2, 2, 3, outline);
-                drawPixelRect(fx - 3, fy - 2, 1, 3, petal);
-                drawPixel(fx - 4, fy - 1, petal);
-                
-                // Top-Right Petal
-                drawPixelRect(fx + 3, fy - 2, 2, 3, outline);
-                drawPixelRect(fx + 3, fy - 2, 1, 3, petal);
-                drawPixel(fx + 4, fy - 1, petal);
-                
-                // Bottom-Left Petal
-                drawPixelRect(fx - 3, fy + 1, 2, 3, outline);
-                drawPixelRect(fx - 2, fy + 1, 1, 3, petal);
-                drawPixel(fx - 3, fy + 2, petal);
-                
-                // Bottom-Right Petal
-                drawPixelRect(fx + 2, fy + 1, 2, 3, outline);
-                drawPixelRect(fx + 2, fy + 1, 1, 3, petal);
-                drawPixel(fx + 3, fy + 2, petal);
-
-                // 연결 외곽 픽셀
-                drawPixel(fx - 2, fy - 3, outline);
-                drawPixel(fx + 2, fy - 3, outline);
-                drawPixel(fx - 3, fy + 3, outline);
-                drawPixel(fx + 3, fy + 3, outline);
-                drawPixel(fx, fy + 4, outline);
-              } else {
-                // 11x11 대형 벚꽃
-                drawPixelRect(fx - 2, fy - 2, 5, 5, shadow);
-                drawPixelRect(fx - 1, fy - 1, 3, 3, yellowPistil);
-                
-                drawPixelRect(fx - 1, fy - 5, 3, 3, outline);
-                drawPixelRect(fx - 1, fy - 4, 3, 2, petal);
-                drawPixel(fx, fy - 5, petal);
-                
-                drawPixelRect(fx - 5, fy - 3, 3, 3, outline);
-                drawPixelRect(fx - 4, fy - 2, 2, 2, petal);
-                
-                drawPixelRect(fx + 3, fy - 3, 3, 3, outline);
-                drawPixelRect(fx + 3, fy - 2, 2, 2, petal);
-                
-                drawPixelRect(fx - 4, fy + 1, 3, 4, outline);
-                drawPixelRect(fx - 3, fy + 2, 2, 2, petal);
-                
-                drawPixelRect(fx + 2, fy + 1, 3, 4, outline);
-                drawPixelRect(fx + 1, fy + 2, 2, 2, petal);
               }
               break;
             }
@@ -1372,12 +1333,9 @@ export const PixelCrop = ({
               drawPixelRect(fx - 4 - offset, fy - 3 - offset, 9 + 2 * offset, 7 + 2 * offset, petalColor);
               
               drawPixelRect(fx - 3, fy - 2, 7, 5, coreOutline);
-              for (let sy = -1; sy <= 1; sy++) {
-                for (let sx = -2; sx <= 2; sx++) {
-                  const isGrid = (sx + sy) % 2 === 0;
-                  drawPixel(fx + sx, fy + sy, isGrid ? coreColor : '#5d4037');
-                }
-              }
+              drawPixelRect(fx - 2, fy - 1, 5, 3, '#3e2723');
+              drawPixelRect(fx - 1, fy - 1, 3, 3, '#271c19');
+              drawPixel(fx - 1, fy - 1, '#5d4037'); // Single soft highlight dot
               break;
             }
             case 10: {
@@ -1433,12 +1391,12 @@ export const PixelCrop = ({
               break;
             }
             case 12: {
-              // 동백꽃 🌺 - 8단계 만개 (둥근 겹꽃 & 잎사귀 배치 스케일링 대응)
+              // 동백꽃 🌺 - 8단계 만개 (미니 블로섬화: 5x5 ~ 7x7 크기 단순화)
               const petalRed = '#c2185b';
               const petalBright = '#d81b60';
               const goldPistil = '#ffca28';
-              const w = isSmall ? 7 : (isLarge ? 11 : 9);
-              const h = isSmall ? 7 : (isLarge ? 11 : 9);
+              const w = isSmall ? 5 : (isLarge ? 7 : 6);
+              const h = isSmall ? 5 : (isLarge ? 7 : 6);
               
               // 잎사귀 동백나무 암록색 잎
               drawPixelRect(fx - Math.floor(w / 2) - 1, fy - 1, 2, 2, '#0d533a');
@@ -1560,13 +1518,9 @@ export const PixelCrop = ({
         } else if (isTall) {
           if (month === 9) { // Sunflower
             const list = [
-              { dx: -9, dy: -34, scale: 0.85 },
-              { dx: 9, dy: -30, scale: 0.85 },
-              { dx: -12, dy: -25, scale: 0.7 },
-              { dx: 12, dy: -21, scale: 0.7 },
-              { dx: -6, dy: -46, scale: 0.75 },
-              { dx: 6, dy: -46, scale: 0.75 },
-              { dx: 0, dy: -42, scale: 1.25 }
+              { dx: 0, dy: -42, scale: 1.1 },
+              { dx: -7, dy: -30, scale: 0.8 },
+              { dx: 7, dy: -28, scale: 0.8 }
             ];
             coords = list.slice(0, Math.min(yieldCount, list.length));
           } else { // Corn
@@ -1582,12 +1536,9 @@ export const PixelCrop = ({
           }
         } else { // Standard (Rose)
           const list = [
-            { dx: -7, dy: -32, scale: 0.9 },
-            { dx: 7, dy: -36, scale: 0.9 },
-            { dx: -8, dy: -29, scale: 0.85 },
-            { dx: 8, dy: -31, scale: 0.85 },
-            { dx: 0, dy: -41, scale: 1.0 },
-            { dx: 0, dy: -34, scale: 1.15 }
+            { dx: 0, dy: -38, scale: 1.1 },
+            { dx: -6, dy: -29, scale: 0.85 },
+            { dx: 6, dy: -27, scale: 0.85 }
           ];
           coords = list.slice(0, Math.min(yieldCount, list.length));
         }
