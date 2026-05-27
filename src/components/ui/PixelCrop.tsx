@@ -14,6 +14,11 @@ export const PixelCrop = ({
 }: PixelCropProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationIdRef = useRef<number | null>(null);
+  const cropStateRef = useRef(cropState);
+
+  useEffect(() => {
+    cropStateRef.current = cropState;
+  }, [cropState]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -42,7 +47,7 @@ export const PixelCrop = ({
       localFrame++;
       ctx.clearRect(0, 0, 60, 60);
 
-      const { evolutionStage, month, health, yieldCount, quality, stats } = cropState;
+      const { evolutionStage, month, health, yieldCount, quality, stats } = cropStateRef.current;
 
       // Base Y coordinates
       const baseCenterX = 30;
@@ -1820,7 +1825,7 @@ export const PixelCrop = ({
         cancelAnimationFrame(animationIdRef.current);
       }
     };
-  }, [cropState]);
+  }, []);
 
   const getCenterOffsetPercent = (stage: number) => {
     if (stage === 1) return -30;
