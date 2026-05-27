@@ -87,19 +87,19 @@ export const PixelAction = ({
 
           // Can tilts to pour water, then returns
           const canAngle = 0.2 + Math.sin(frame * 0.06) * 0.28 + 0.28;
-          const canCenterX = 35; // Moved slightly left
-          const canCenterY = 22;
+          const canCenterX = 34;
+          const canCenterY = 24;
 
           const rad = canAngle;
-          const roseX = canCenterX - Math.round(20 * Math.cos(rad)) + Math.round(2 * Math.sin(rad));
-          const roseY = canCenterY + Math.round(20 * Math.sin(rad)) + Math.round(2 * Math.cos(rad));
+          const roseX = canCenterX - Math.round(19 * Math.cos(rad)) + Math.round(2 * Math.sin(rad));
+          const roseY = canCenterY + Math.round(19 * Math.sin(rad)) + Math.round(2 * Math.cos(rad));
 
           const isPouring = canAngle > 0.4;
           if (isPouring && frame % 2 === 0) {
             particles.push({
               x: roseX - 1 + Math.random() * 3,
               y: roseY + 1,
-              vx: -0.9 - Math.random() * 0.9,
+              vx: -0.8 - Math.random() * 0.8,
               vy: 2.0 + Math.random() * 0.8,
               color: Math.random() < 0.4 ? '#e0f7fa' : '#29b6f6',
               life: 1,
@@ -113,7 +113,7 @@ export const PixelAction = ({
             p.y += p.vy;
 
             if (p.y >= 50) {
-              p.life = 0; // kill particle on ground
+              p.life = 0;
               drawPixel(p.x - 1, 50, '#e0f7fa');
               drawPixel(p.x, 50, '#80deea');
               drawPixel(p.x + 1, 50, '#e0f7fa');
@@ -123,35 +123,53 @@ export const PixelAction = ({
           });
           particles = particles.filter((p) => p.life > 0);
 
-          // Render Stardew-Style Copper Watering Can (UPSCALED)
+          // === Gray Steel Watering Can (matching reference image) ===
           ctx.save();
           ctx.translate(canCenterX, canCenterY);
           ctx.rotate(-canAngle);
 
-          // Main Copper Body (Larger 18x12 instead of 14x10)
-          drawPixelRect(-9, -6, 18, 12, '#b55d28');
-          drawPixelRect(-9, -7, 18, 1, '#df8747');  // top rim
-          drawPixelRect(-7, -5, 14, 10, '#df8747'); // body highlight
-          drawPixelRect(-8, 4, 16, 2, '#7b3815');   // bottom shadow
-          
-          // Handle (top loop)
-          drawPixelRect(-7, -11, 14, 1, '#7b3815');
-          drawPixelRect(-8, -10, 1, 4, '#7b3815');
-          drawPixelRect(7, -10, 1, 4, '#7b3815');
+          // --- Main Body ---
+          // Dark outline / shadow bottom
+          drawPixelRect(-9, -5, 18, 11, '#4a4a4a');
+          // Main body fill (mid gray)
+          drawPixelRect(-8, -4, 16, 9, '#7a7a7a');
+          // Body highlight (lighter gray on upper-left)
+          drawPixelRect(-7, -3, 8, 4, '#9e9e9e');
+          drawPixelRect(-7, -4, 14, 1, '#9e9e9e'); // top highlight row
+          // Dark shadow on lower body
+          drawPixelRect(-8, 3, 16, 2, '#3a3a3a');
+          // Rivets / detailing
+          drawPixelRect(-5, -1, 2, 2, '#5a5a5a');
+          drawPixelRect(3, -1, 2, 2, '#5a5a5a');
 
-          // Back Handle (pouring handle)
-          drawPixelRect(-14, -4, 5, 1, '#7b3815');
-          drawPixelRect(-14, -3, 1, 8, '#7b3815');
-          drawPixelRect(-14, 5, 5, 1, '#7b3815');
+          // --- Top Handle (arch) ---
+          drawPixelRect(-5, -9, 10, 2, '#3a3a3a');   // top bar
+          drawPixelRect(-6, -8, 1, 4, '#3a3a3a');    // left side
+          drawPixelRect(5, -8, 1, 4, '#3a3a3a');     // right side
+          drawPixelRect(-5, -9, 10, 1, '#6a6a6a');   // top highlight
 
-          // Long Spout (extends leftward)
-          drawPixelRect(-16, 0, 7, 2, '#b55d28');
-          drawPixelRect(-20, -1, 4, 2, '#df8747'); // tip highlight
-          drawPixelRect(-16, 1, 7, 1, '#7b3815'); // bottom shadow
+          // --- Right Handle (pour grip) ---
+          drawPixelRect(9, -3, 1, 7, '#3a3a3a');  // vertical bar
+          drawPixelRect(9, -4, 4, 1, '#3a3a3a');  // top hook
+          drawPixelRect(9, 4, 4, 1, '#3a3a3a');   // bottom hook
+          drawPixelRect(12, -3, 1, 7, '#3a3a3a'); // right edge
 
-          // Sprinkler Rose (head)
-          drawPixelRect(-23, -4, 3, 8, '#ffd54f'); // gold/brass rose head
-          drawPixelRect(-22, -3, 1, 6, '#ffb300');
+          // --- Spout (extends left-downward) ---
+          drawPixelRect(-18, 0, 10, 2, '#6a6a6a');  // spout shaft
+          drawPixelRect(-18, 1, 10, 1, '#3a3a3a');  // spout shadow bottom
+          drawPixelRect(-17, -1, 8, 1, '#8a8a8a'); // spout top highlight
+          // Spout connection to body
+          drawPixelRect(-9, -1, 2, 4, '#5a5a5a');
+
+          // --- Nozzle / Rose Head ---
+          drawPixelRect(-22, -3, 5, 6, '#4a4a4a');  // rose outer
+          drawPixelRect(-21, -2, 3, 4, '#7a7a7a');  // rose inner
+          // Hole dots on rose
+          drawPixel(-21, -1, '#2a2a2a');
+          drawPixel(-19, -1, '#2a2a2a');
+          drawPixel(-20, 0, '#2a2a2a');
+          drawPixel(-21, 1, '#2a2a2a');
+          drawPixel(-19, 1, '#2a2a2a');
 
           ctx.restore();
 
@@ -442,28 +460,56 @@ export const PixelAction = ({
           });
           particles = particles.filter((p) => p.life < p.maxLife && p.y < 52);
 
-          // Render Stardew-Style Iron Hoe (UPSCALED)
-          const pivotX = moundX + 16;
-          const pivotY = 22;
+          // === Korean Homi (호미) pixel art ===
+          const pivotX = moundX + 18;
+          const pivotY = 20;
 
           ctx.save();
           ctx.translate(pivotX, pivotY);
           ctx.rotate(hoeAngle);
 
-          // Wooden Shaft (Longer shaft)
-          ctx.strokeStyle = '#a1887f';
-          ctx.lineWidth = 2.0; // Thicker line
+          // --- Wooden Handle (diagonal, going lower-left) ---
+          // Handle shadow
+          ctx.strokeStyle = '#6d3b1e';
+          ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.lineTo(30, -15);
+          ctx.moveTo(2, 2);
+          ctx.lineTo(26, 22);
+          ctx.stroke();
+          // Handle main color
+          ctx.strokeStyle = '#a0522d';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(1, 1);
+          ctx.lineTo(25, 21);
+          ctx.stroke();
+          // Handle highlight
+          ctx.strokeStyle = '#c8834a';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(0, 1);
+          ctx.lineTo(24, 21);
           ctx.stroke();
 
-          // Iron head connection fitting
-          drawPixelRect(-3, -4, 6, 8, '#37474f');
+          // --- Metal Neck (connects handle to head) ---
+          drawPixelRect(-4, -3, 7, 5, '#5a5a5a');
+          drawPixelRect(-3, -4, 5, 2, '#7a7a7a'); // top highlight
 
-          // Hoe Metal Head (Larger metal head)
-          drawPixelRect(-11, 2, 9, 3, '#546e7a');
-          drawPixelRect(-12, 3, 4, 3, '#cfd8dc');
+          // --- Round Metal Head (flat disc / homi blade) ---
+          // Outer dark ring
+          drawPixelRect(-11, -8, 12, 10, '#4a4a4a');
+          // Main body (mid gray)
+          drawPixelRect(-10, -7, 10, 8, '#7e7e7e');
+          // Inner highlight (top-left quadrant brighter)
+          drawPixelRect(-9, -6, 6, 4, '#ababab');
+          drawPixelRect(-9, -7, 9, 1, '#b0b0b0');
+          // Lower shadow
+          drawPixelRect(-10, 0, 10, 2, '#3a3a3a');
+          // Blade edge (bottom) - slightly lighter to show sharpness
+          drawPixelRect(-11, 1, 12, 1, '#cccccc');
+          // Rivet / center detail
+          drawPixelRect(-6, -3, 3, 3, '#5a5a5a');
+          drawPixelRect(-5, -2, 1, 1, '#2a2a2a');
 
           ctx.restore();
         }
