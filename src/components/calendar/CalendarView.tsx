@@ -4,6 +4,7 @@ import { Settings, ChevronLeft, ChevronRight } from 'lucide-react';
 import { calculateCropState } from '../../utils/crop';
 import { PixelCrop } from '../ui/PixelCrop';
 import { CropArchiveModal } from '../ui/CropArchiveModal';
+import { CropPokedexModal } from '../ui/CropPokedexModal';
 
 export const CalendarView = ({
   tasksByDate,
@@ -18,6 +19,7 @@ export const CalendarView = ({
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const [pokedexOpen, setPokedexOpen] = useState(false);
   
   const firstDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
   const totalDays = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
@@ -151,6 +153,11 @@ export const CalendarView = ({
         onClose={() => setArchiveOpen(false)}
         harvestedCrops={harvestedCrops}
       />
+      <CropPokedexModal
+        isOpen={pokedexOpen}
+        onClose={() => setPokedexOpen(false)}
+        currentMonth={cropState.month}
+      />
 
       {/* 작물 대시보드 카드 */}
       <div className="mb-4 flex flex-col rounded-3xl border border-stone-200 bg-white p-4 shadow-sm shrink-0">
@@ -167,12 +174,21 @@ export const CalendarView = ({
             <h2 className="font-hand text-xl text-stone-800 md:text-2xl truncate w-full">
               {getStageName(cropState.evolutionStage, cropState.cropName, cropState.month)}
             </h2>
-            <button
-              onClick={() => setArchiveOpen(true)}
-              className="text-xs font-bold text-amber-700 hover:text-amber-950 transition-colors shrink-0"
-            >
-              보관함 보기 &gt;
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setArchiveOpen(true)}
+                className="text-xs font-bold text-stone-500 hover:text-stone-800 transition-colors shrink-0"
+              >
+                보관함 보기 &gt;
+              </button>
+              <span className="text-stone-300 text-xs">|</span>
+              <button
+                onClick={() => setPokedexOpen(true)}
+                className="text-xs font-bold text-stone-500 hover:text-stone-800 transition-colors shrink-0"
+              >
+                도감 보기 &gt;
+              </button>
+            </div>
           </div>
         </div>
 

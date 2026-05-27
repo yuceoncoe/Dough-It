@@ -1744,21 +1744,21 @@ export const PixelCrop = ({
   }, [cropState]);
 
   const getCenterOffsetPercent = (stage: number) => {
-    if (stage === 1) return -38;
-    if (stage === 2) return -34;
-    if (stage === 3) return -30;
-    if (stage === 4) return -26;
-    if (stage === 5) return -22;
-    if (stage === 6) return -18;
-    if (stage === 7) return -14;
+    if (stage === 1) return -30;
+    if (stage === 2) return -26;
+    if (stage === 3) return -22;
+    if (stage === 4) return -18;
+    if (stage === 5) return -14;
+    if (stage === 6) return -10;
+    if (stage === 7) return -6;
     
     // Stage 8: custom translation for low-growing plants to stay centered
     const { month } = cropState;
     const isVine = month === 7 || month === 11;
     const isStrawberry = month === 1;
-    if (isVine) return -14;
-    if (isStrawberry) return -12;
-    return -6;
+    if (isVine) return -6;
+    if (isStrawberry) return -4;
+    return 2;
   };
 
   return (
