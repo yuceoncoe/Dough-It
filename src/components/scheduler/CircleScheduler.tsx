@@ -410,25 +410,16 @@ export const CircleScheduler = ({
       )}
 
       {showCurrentTime ? (
-        <g pointerEvents="none">
-          <circle
-            cx={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
-            cy={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
-            r={10}
-            fill="#ffffff"
-            stroke="#d90429"
-            strokeWidth="3.5"
-            style={{
-              filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2))',
-            }}
-          />
-          <circle
-            cx={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
-            cy={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
-            r={3.5}
-            fill="#d90429"
-          />
-        </g>
+        <circle
+          cx={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
+          cy={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
+          r={20}
+          fill="#ffffff"
+          style={{
+            filter: 'drop-shadow(0px 3px 8px rgba(0, 0, 0, 0.25))',
+          }}
+          pointerEvents="none"
+        />
       ) : null}
     </>
   );
