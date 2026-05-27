@@ -1134,9 +1134,9 @@ export const PixelCrop = ({
               break;
             }
             case 2: {
-              // 귤 🍊 - 8단계 완숙 (납작한 감귤 형태 구현)
-              const w = isSmall ? 9 : (isLarge ? 13 : 11);
-              const h = isSmall ? 7 : (isLarge ? 11 : 9);
+              // 귤 🍊 - 8단계 완숙 (납작한 감귤 형태 구현 - 크기 최적화)
+              const w = isSmall ? 6 : (isLarge ? 8 : 7);
+              const h = isSmall ? 5 : (isLarge ? 7 : 6);
               
               // 꼭지 & 잎
               drawPixel(fx, fy - Math.floor(h / 2) - 2, '#4e342e');
@@ -1145,8 +1145,7 @@ export const PixelCrop = ({
               // 주황색 납작 동글 형태 몸체
               for (let y = -Math.floor(h / 2); y <= Math.floor(h / 2); y++) {
                 let curW = w;
-                if (y === -Math.floor(h / 2) || y === Math.floor(h / 2)) curW = w - 4;
-                else if (y === -Math.floor(h / 2) + 1 || y === Math.floor(h / 2) - 1) curW = w - 2;
+                if (y === -Math.floor(h / 2) || y === Math.floor(h / 2)) curW = w - 2;
                 
                 const leftX = fx - Math.floor(curW / 2);
                 drawPixelRect(leftX, fy + y, curW, 1, '#e65100'); // 짙은 주황 테두리
@@ -1320,9 +1319,9 @@ export const PixelCrop = ({
               drawPixelRect(fx - 1, fy + 6 + offset, 3, 1, petalOutline);
               drawPixel(fx, fy + 7 + offset, petalColor); // 하
               drawPixelRect(fx - 6 - offset, fy - 1, 1, 3, petalOutline);
-              drawPixel(fx - 7 - offset, petalColor); // 좌
+              drawPixel(fx - 7 - offset, fy, petalColor); // 좌
               drawPixelRect(fx + 6 + offset, fy - 1, 1, 3, petalOutline);
-              drawPixel(fx + 7 + offset, petalColor); // 우
+              drawPixel(fx + 7 + offset, fy, petalColor); // 우
               
               drawPixel(fx - 5 - offset, fy - 5 - offset, petalColor);
               drawPixel(fx + 5 + offset, fy - 5 - offset, petalColor);
