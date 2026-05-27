@@ -295,14 +295,7 @@ export const CircleScheduler = ({
           onPointerDown={beginRingSelection}
         />
       ) : null}
-      <line
-        x1={CENTER}
-        y1={CENTER - (OUTER_BACKGROUND_RADIUS - 30)}
-        x2={CENTER}
-        y2={CENTER + (OUTER_BACKGROUND_RADIUS - 30)}
-        stroke="rgba(20, 20, 20, 0.06)"
-        strokeWidth="0.9"
-      />
+
       {!centerAction ? (
         <g className="center-progress-surface pointer-events-none">
           <circle className="center-progress-surface__track" cx={CENTER} cy={CENTER} r={TRACK_INNER_RADIUS} filter="url(#center-lens-shadow)" />
@@ -434,16 +427,7 @@ export const CircleScheduler = ({
 
       {showCurrentTime ? (
         <>
-          <line
-            x1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).x}
-            y1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).y}
-            x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
-            y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
-            stroke="#1c1917"
-            strokeWidth="1.5"
-            strokeOpacity="0.12"
-            pointerEvents="none"
-          />
+
           <circle
             cx={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
             cy={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
