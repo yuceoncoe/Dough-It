@@ -279,6 +279,9 @@ export const CircleScheduler = ({
         <filter id="current-time-dot-shadow" x="-50%" y="-50%" width="200%" height="200%">
           <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#000000" floodOpacity="0.32" />
         </filter>
+        <filter id="center-lens-shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="12" stdDeviation="24" floodColor="#000000" floodOpacity="0.12" />
+        </filter>
       </defs>
       {interactive ? (
         <circle
@@ -302,7 +305,7 @@ export const CircleScheduler = ({
       />
       {!centerAction ? (
         <g className="center-progress-surface pointer-events-none">
-          <circle className="center-progress-surface__track" cx={CENTER} cy={CENTER} r={TRACK_INNER_RADIUS} />
+          <circle className="center-progress-surface__track" cx={CENTER} cy={CENTER} r={TRACK_INNER_RADIUS} filter="url(#center-lens-shadow)" />
           {displayTask && clampedActiveTaskProgress > 0 ? (
             <path
               className="center-progress-surface__value"

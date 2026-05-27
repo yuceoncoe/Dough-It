@@ -446,7 +446,6 @@ canvas {
 
 .center-progress-surface__track {
   fill: #ffffff;
-  filter: drop-shadow(0px 8px 32px rgba(0, 0, 0, 0.08)) drop-shadow(0px 2px 8px rgba(0, 0, 0, 0.04));
 }
 
 .center-progress-surface__value {
