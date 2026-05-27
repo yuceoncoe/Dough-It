@@ -435,7 +435,7 @@ export const CircleScheduler = ({
         <circle
           cx={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
           cy={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
-          r={25}
+          r={16}
           fill="#d90429"
           filter="url(#current-time-dot-shadow)"
           pointerEvents="none"
@@ -658,12 +658,8 @@ export const CircleScheduler = ({
                       <PixelAction actionType={getActionTypeForTask(displayTask)} size={52} />
                     </div>
                     <div
-                      className="center-lens__title"
+                      className="pointer-events-none block w-fit max-w-[120px] truncate whitespace-nowrap rounded-full bg-white/70 px-[0.82rem] pb-[0.46rem] pt-[0.5rem] text-center text-[14px] font-bold leading-none shadow-[0_1px_0_rgba(255,255,255,0.85)_inset,0_6px_14px_rgba(0,0,0,0.08)]"
                       style={{
-                        position: 'relative',
-                        left: 'auto',
-                        top: 'auto',
-                        transform: 'none',
                         color: activeTaskColor,
                         marginTop: '4px'
                       }}

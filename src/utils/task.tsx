@@ -491,6 +491,23 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
   ctx.fill();
   ctx.restore();
 
+  if (minuteAngle !== null) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(CENTER, CENTER);
+    ctx.arc(
+      CENTER,
+      CENTER,
+      OUTER_BACKGROUND_RADIUS,
+      -Math.PI / 2,
+      (minuteAngle - 90) * (Math.PI / 180),
+      false
+    );
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.035)';
+    ctx.fill();
+    ctx.restore();
+  }
+
   OUTER_RING_SEGMENTS.forEach(({ start, end, isCardinal }) => {
     const progress = minuteAngle === null ? 0 : getBlurProgress(end, minuteAngle);
 
