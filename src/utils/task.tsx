@@ -542,10 +542,10 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
       gradient.addColorStop(0, 'rgba(59, 130, 246, 0)');
       const fraction = Math.max(0.001, Math.min(1, minuteAngle / 360));
       gradient.addColorStop(fraction * 0.2, 'rgba(59, 130, 246, 0)');
-      gradient.addColorStop(fraction, 'rgba(59, 130, 246, 0.08)');
+      gradient.addColorStop(fraction, 'rgba(59, 130, 246, 0.15)');
       ctx.fillStyle = gradient;
     } else {
-      ctx.fillStyle = 'rgba(59, 130, 246, 0.08)';
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.15)';
     }
     ctx.globalCompositeOperation = 'multiply';
     ctx.fill();
@@ -601,7 +601,7 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
         outerRadius
       );
       gradient.addColorStop(0, hexToRgba(baseColor, 0.15));
-      gradient.addColorStop(1, hexToRgba(baseColor, 1.0));
+      gradient.addColorStop(1, hexToRgba(baseColor, 0.8));
       ctx.strokeStyle = gradient;
 
       ctx.lineWidth = laneStrokeWidth;
