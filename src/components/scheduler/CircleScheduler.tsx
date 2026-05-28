@@ -538,7 +538,7 @@ export const CircleScheduler = ({
         }}
       />
 
-      <div ref={squareRef} className="relative aspect-square w-full max-w-[760px]">
+      <div ref={squareRef} className="relative aspect-square w-full max-w-[790px]">
         <div className="relative h-full w-full">
         <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} />
 

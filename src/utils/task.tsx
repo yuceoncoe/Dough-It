@@ -71,8 +71,8 @@ export const TRACK_LANE_GAP = 10;
 export const getTrackLaneWidth = (laneCount: number) => (
   (TRACK_OUTER_RADIUS - TRACK_INNER_RADIUS - TRACK_LANE_GAP * (laneCount - 1)) / laneCount
 );
-export const OUTER_BACKGROUND_RADIUS = 380;
-export const CURRENT_HAND_RADIUS = 362;
+export const OUTER_BACKGROUND_RADIUS = 382;
+export const CURRENT_HAND_RADIUS = 364;
 
 export const OUTER_HOUR_LABEL_RADIUS = 364;
 
@@ -82,8 +82,8 @@ export const OUTER_RING_SEGMENTS = Array.from({ length: 144 }, (_, index) => {
   const hourValue = isHour ? (index / 6) : -1;
   const isEvenHour = isHour && (hourValue % 2 === 0);
   
-  const end = polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS - 6, angle);
-  const start = polarToCartesian(CENTER, CENTER, isHour ? OUTER_BACKGROUND_RADIUS - 26 : OUTER_BACKGROUND_RADIUS - 16, angle);
+  const end = polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS - 8, angle);
+  const start = polarToCartesian(CENTER, CENTER, isHour ? OUTER_BACKGROUND_RADIUS - 28 : OUTER_BACKGROUND_RADIUS - 18, angle);
   
   return { angle, isHour, isEvenHour, skipTick: isEvenHour, start, end };
 });
