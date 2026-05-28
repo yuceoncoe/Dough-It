@@ -547,7 +547,6 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
     } else {
       ctx.fillStyle = 'rgba(59, 130, 246, 0.15)';
     }
-    ctx.globalCompositeOperation = 'multiply';
     ctx.fill();
     ctx.restore();
   }
