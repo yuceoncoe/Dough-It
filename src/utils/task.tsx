@@ -539,13 +539,13 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
     ctx.closePath();
     if (typeof ctx.createConicGradient === 'function') {
       const gradient = ctx.createConicGradient(-Math.PI / 2, CENTER, CENTER);
-      gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      gradient.addColorStop(0, 'rgba(59, 130, 246, 0)');
       const fraction = Math.max(0.001, Math.min(1, minuteAngle / 360));
-      gradient.addColorStop(fraction * 0.5, 'rgba(0, 0, 0, 0)');
-      gradient.addColorStop(fraction, 'rgba(30, 58, 138, 0.12)');
+      gradient.addColorStop(fraction * 0.2, 'rgba(59, 130, 246, 0)');
+      gradient.addColorStop(fraction, 'rgba(59, 130, 246, 0.12)');
       ctx.fillStyle = gradient;
     } else {
-      ctx.fillStyle = 'rgba(30, 58, 138, 0.12)';
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.12)';
     }
     ctx.fill();
     ctx.restore();
