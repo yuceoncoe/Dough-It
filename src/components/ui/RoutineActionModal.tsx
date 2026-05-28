@@ -34,16 +34,16 @@ export const RoutineActionModal = ({
         <div className="mt-5 space-y-3">
           <button 
             onClick={() => onSelectScope('single')} 
-            className={`w-full rounded-xl px-4 py-3.5 font-medium transition-colors ${
-              isDelete ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-stone-800 text-white hover:bg-stone-900'
+            className={`w-full rounded-xl border px-4 py-3.5 font-medium transition-colors ${
+              isDelete ? 'border-rose-200 bg-white text-rose-600 hover:bg-rose-50' : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'
             }`}
           >
             {isDelete ? '이번 일정만 삭제하기' : '이번 일정만 수정하기'}
           </button>
           <button 
             onClick={() => onSelectScope('future')} 
-            className={`w-full rounded-xl px-4 py-3.5 font-medium transition-colors ${
-              isDelete ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-stone-800 text-white hover:bg-stone-900'
+            className={`w-full rounded-xl border px-4 py-3.5 font-medium transition-colors ${
+              isDelete ? 'border-rose-200 bg-white text-rose-600 hover:bg-rose-50' : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'
             }`}
           >
             {isDelete ? '앞으로 모든 일정 삭제하기' : '앞으로 모든 일정 수정하기'}
@@ -51,7 +51,7 @@ export const RoutineActionModal = ({
         </div>
         <button 
           onClick={onClose} 
-          className="mt-4 w-full rounded-xl border border-stone-200 bg-white px-4 py-3.5 font-medium text-stone-700 transition-colors hover:bg-stone-50"
+          className="mt-4 w-full rounded-xl bg-stone-900 px-4 py-3.5 font-medium text-white transition-colors hover:bg-stone-800"
         >
           취소
         </button>
