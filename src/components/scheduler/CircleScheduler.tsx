@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Task, Tag } from '../../types';
 import { minutesToAngle, angleToMinutes, minutesToTime } from '../../utils/time';
-import { isCurrentMinuteInsideTask, getCenterTaskProgress, getClockTaskColor, getRequiredTrackLaneCount, assignTasksToTrackLanes, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, CENTER, RADIUS, OUTER_BACKGROUND_RADIUS, TRACK_INNER_RADIUS, getTrackLaneCenterRadius, getDirectionalTextVisuals, INNER_HOUR_LABELS, CURRENT_HAND_RADIUS, clampArcEnd, hexToRgba } from '../../utils/task';
+import { isCurrentMinuteInsideTask, getCenterTaskProgress, getClockTaskColor, getRequiredTrackLaneCount, assignTasksToTrackLanes, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, CENTER, RADIUS, OUTER_BACKGROUND_RADIUS, TRACK_INNER_RADIUS, getTrackLaneCenterRadius, getDirectionalTextVisuals, OUTER_HOUR_LABELS, CURRENT_HAND_RADIUS, clampArcEnd, hexToRgba } from '../../utils/task';
 import { polarToCartesian, describeArc } from '../../utils/geometry';
 import TaskCreationModal from '../ui/TaskCreationModal';
 import CanvasClockSurface from './CanvasClockSurface';
@@ -358,7 +358,7 @@ export const CircleScheduler = ({
         })}
       </g>
       <g className="pointer-events-none">
-        {INNER_HOUR_LABELS.map(({ value, angle, point }) => {
+        {OUTER_HOUR_LABELS.map(({ value, angle, point }) => {
           const { blur, opacity } = showCurrentTime
             ? getDirectionalTextVisuals(angle, minuteAngle)
             : { blur: 0, opacity: 0.88 };

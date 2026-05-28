@@ -65,34 +65,34 @@ export const QuadrantBadge = ({ task, sizeClassName = 'h-[14px] w-[14px]' }: { t
 
 
 export const DEFAULT_TRACK_LANE_COUNT = 2;
-export const TRACK_INNER_RADIUS = 230;
-export const TRACK_OUTER_RADIUS = 370;
+export const TRACK_INNER_RADIUS = 200;
+export const TRACK_OUTER_RADIUS = 340;
 export const TRACK_LANE_GAP = 10;
 export const getTrackLaneWidth = (laneCount: number) => (
   (TRACK_OUTER_RADIUS - TRACK_INNER_RADIUS - TRACK_LANE_GAP * (laneCount - 1)) / laneCount
 );
-export const OUTER_BACKGROUND_RADIUS = 370;
+export const OUTER_BACKGROUND_RADIUS = 380;
 export const CURRENT_HAND_RADIUS = 370;
 
-export const INNER_HOUR_LABEL_RADIUS = TRACK_INNER_RADIUS - 20;
+export const OUTER_HOUR_LABEL_RADIUS = 364;
 
-export const INNER_RING_SEGMENTS = Array.from({ length: 144 }, (_, index) => {
+export const OUTER_RING_SEGMENTS = Array.from({ length: 144 }, (_, index) => {
   const angle = index * 2.5;
   const isHour = index % 6 === 0;
   const hourValue = isHour ? (index / 6) : -1;
   const isEvenHour = isHour && (hourValue % 2 === 0);
   
-  const end = polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS - 10, angle);
-  const start = polarToCartesian(CENTER, CENTER, isHour ? TRACK_INNER_RADIUS - 30 : TRACK_INNER_RADIUS - 20, angle);
+  const end = polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS - 6, angle);
+  const start = polarToCartesian(CENTER, CENTER, isHour ? OUTER_BACKGROUND_RADIUS - 26 : OUTER_BACKGROUND_RADIUS - 16, angle);
   
   return { angle, isHour, isEvenHour, skipTick: isEvenHour, start, end };
 });
 
-export const INNER_HOUR_LABELS = Array.from({ length: 12 }, (_, index) => {
+export const OUTER_HOUR_LABELS = Array.from({ length: 12 }, (_, index) => {
   const hour = index * 2;
   const value = String(hour);
   const angle = hour * 15;
-  const point = polarToCartesian(CENTER, CENTER, INNER_HOUR_LABEL_RADIUS, angle);
+  const point = polarToCartesian(CENTER, CENTER, OUTER_HOUR_LABEL_RADIUS, angle);
   return { value, angle, point };
 });
 export const SVG_VIEWBOX_PADDING = 80;
@@ -551,7 +551,7 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
     ctx.restore();
   }
 
-  INNER_RING_SEGMENTS.forEach(({ start, end, isHour, skipTick }) => {
+  OUTER_RING_SEGMENTS.forEach(({ start, end, isHour, skipTick }) => {
     if (skipTick) return;
     const progress = minuteAngle === null ? 0 : getBlurProgress(end, minuteAngle);
 
