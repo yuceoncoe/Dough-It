@@ -35,6 +35,7 @@ const normalizeTask = (task: Partial<Task> | null | undefined, fallbackId: strin
   duration: typeof task?.duration === 'number' ? task.duration : null,
   completed: Boolean(task?.completed),
   isRoutine: Boolean(task?.isRoutine) || undefined,
+  activeFromDate: typeof task?.activeFromDate === 'string' ? task.activeFromDate : undefined,
   rating: typeof task?.rating === 'number' ? task.rating : undefined,
   note: typeof task?.note === 'string' ? task.note : undefined,
 });

@@ -377,7 +377,12 @@ const AppShell = ({
         if (entryDate < date || getRoutineBucketForDate(entryDate) !== bucket) {
           return;
         }
-        next[entryDate] = getTaskList(entryTasks).filter((item) => getRoutineBaseId(item.id, entryDate) !== baseId);
+        next[entryDate] = getTaskList(entryTasks).filter((item) => {
+          if (getRoutineBaseId(item.id, entryDate) !== baseId) {
+            return true;
+          }
+          return item.completed || item.rating !== undefined || (item.note !== undefined && item.note.trim() !== '');
+        });
       });
       return next;
     });

@@ -613,12 +613,14 @@ export function generateRoutinesForDate(dateStr: string, routines: RoutineState)
   const source = isWeekend ? routines.weekend : routines.weekday;
   const base = Array.isArray(source) ? source : [];
 
-  return base.map((task) => ({
-    ...task,
-    id: `routine-${dateStr}-${task.id}`,
-    completed: false,
-    isRoutine: true,
-  }));
+  return base
+    .filter((task) => !task.activeFromDate || dateStr >= task.activeFromDate)
+    .map((task) => ({
+      ...task,
+      id: `routine-${dateStr}-${task.id}`,
+      completed: false,
+      isRoutine: true,
+    }));
 }
 
 export const seedTasksForToday = (todayStr: string, routines: RoutineState): Record<string, Task[]> => ({
@@ -629,12 +631,22 @@ export const addOrReplaceDateTasks = (tasksByDate: Record<string, Task[]>, date:
   const existingTasks = Array.isArray(tasksByDate[date]) ? tasksByDate[date] : [];
   const existingRoutineById = new Map(existingTasks.filter((task) => task.isRoutine).map((task) => [task.id, task]));
   const manualTasks = existingTasks.filter((task) => !task.isRoutine);
-  const routineTasks = generateRoutinesForDate(date, routines).map((task) => {
+  
+  const activeRoutineTasks = generateRoutinesForDate(date, routines);
+  const activeRoutineIds = new Set(activeRoutineTasks.map((t) => t.id));
+
+  const routineTasks = activeRoutineTasks.map((task) => {
     const existing = existingRoutineById.get(task.id);
     return existing ? { ...task, completed: existing.completed, rating: existing.rating, note: existing.note } : task;
   });
 
-  return { ...tasksByDate, [date]: [...manualTasks, ...routineTasks] };
+  const preservedRoutineTasks = existingTasks.filter((task) => {
+    if (!task.isRoutine) return false;
+    if (activeRoutineIds.has(task.id)) return false;
+    return task.completed || task.rating !== undefined || (task.note !== undefined && task.note.trim() !== '');
+  });
+
+  return { ...tasksByDate, [date]: [...manualTasks, ...routineTasks, ...preservedRoutineTasks] };
 };
 
 export const getRoutineBucketForDate = (dateStr: string): keyof RoutineState => {

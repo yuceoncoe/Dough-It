@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RoutineState, Tag, Task } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
-import { getTaskTonePillClass, getTaskToneLabel, QuadrantBadge, getToneSelectionKey, getToneTags, getMaxOverlap } from '../../utils/task';
+import { getTaskTonePillClass, getTaskToneLabel, QuadrantBadge, getToneSelectionKey, getToneTags, getMaxOverlap, getTodayString } from '../../utils/task';
 import { Icon } from '../../components/ui/Icon';
 import { QuadrantPicker } from './QuadrantPicker';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
@@ -93,6 +93,7 @@ export const RoutineSettingsModal = ({
       duration,
       completed: false,
       isRoutine: true,
+      activeFromDate: getTodayString(),
     };
     const currentTab = activeTab === 'main' ? 'weekday' : activeTab;
     const currentTasks = Array.isArray(draft[currentTab]) ? draft[currentTab] : [];
@@ -252,6 +253,11 @@ export const RoutineSettingsModal = ({
                       <div className="mt-1.5 flex items-center gap-2 text-[12px] text-stone-400">
                         <Icon name="schedule" size={12} className="shrink-0" />
                         {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
+                        {task.activeFromDate && (
+                          <span className="ml-2 text-amber-600 font-medium">
+                            ({task.activeFromDate}부터 적용)
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="flex shrink-0 items-center gap-2.5">

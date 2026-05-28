@@ -7,6 +7,7 @@ export interface Task {
   duration: number | null;
   completed: boolean;
   isRoutine?: boolean;
+  activeFromDate?: string;
   rating?: number; // 1 to 5 scale
   note?: string;
 }
