@@ -193,7 +193,7 @@ export const RoutineSettingsModal = ({
 
             <section>
               <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">루틴 설정 리스트</h3>
-              <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
+              <div className="overflow-hidden rounded-2xl bg-white shadow-sm border border-stone-100 divide-y divide-stone-100">
                 <button 
                   onClick={() => setActiveTab('weekday')}
                   className="flex w-full items-center justify-between p-4 transition-colors hover:bg-stone-50"

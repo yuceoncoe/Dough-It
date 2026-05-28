@@ -72,7 +72,7 @@ export const TaskActionSheet = ({
                   className={`rounded-full p-1.5 transition-transform hover:scale-105 active:scale-95 ${isActive ? 'text-amber-400' : 'text-stone-200 hover:text-amber-300'}`}
                   aria-label={`${score}점 평가`}
                 >
-                  <Icon name="star" size={22} className="fill-current" />
+                  <Icon name="star" size={22} className={isActive ? "[font-variation-settings:'FILL'_1]" : "[font-variation-settings:'FILL'_0]"} />
                 </button>
               );
             })}
