@@ -600,7 +600,7 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
         CENTER,
         outerRadius
       );
-      gradient.addColorStop(0, hexToRgba(baseColor, 0.25));
+      gradient.addColorStop(0, hexToRgba(baseColor, 0.15));
       gradient.addColorStop(1, hexToRgba(baseColor, 1.0));
       ctx.strokeStyle = gradient;
 
