@@ -511,7 +511,7 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
     ctx.save();
     ctx.beginPath();
     ctx.arc(CENTER, CENTER, laneCenterRadius, 0, Math.PI * 2);
-    ctx.strokeStyle = laneIndex === 0 ? '#f6f7f9' : '#ffffff';
+    ctx.strokeStyle = laneIndex === 0 ? '#f9fafc' : '#ffffff';
     ctx.lineWidth = laneWidth;
     ctx.stroke();
     ctx.restore();
