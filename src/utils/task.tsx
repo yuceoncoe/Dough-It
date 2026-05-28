@@ -95,7 +95,7 @@ export const OUTER_HOUR_LABELS = Array.from({ length: 12 }, (_, index) => {
   const point = polarToCartesian(CENTER, CENTER, OUTER_HOUR_LABEL_RADIUS, angle);
   return { value, angle, point };
 });
-export const SVG_VIEWBOX_PADDING = 130;
+export const SVG_VIEWBOX_PADDING = 90;
 export const SVG_VIEWBOX_MIN = -SVG_VIEWBOX_PADDING;
 export const SVG_VIEWBOX_SIZE = 600 + SVG_VIEWBOX_PADDING * 2;
 

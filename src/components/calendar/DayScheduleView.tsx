@@ -346,7 +346,7 @@ export const DayScheduleView = ({
       </div>
 
       <div className="grid flex-1 grid-cols-1 gap-4 overflow-visible px-4 pb-4 md:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
-        <div className="min-h-[45vh] overflow-hidden">
+        <div className="min-h-[50vh] overflow-hidden">
           <CircleScheduler
             tasks={tasks}
             tasksByDate={tasksByDate}
