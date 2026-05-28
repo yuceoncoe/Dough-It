@@ -285,8 +285,9 @@ export const CircleScheduler = ({
   const renderClockSvgLayers = (interactive: boolean) => (
     <>
       <defs>
-        <filter id="current-time-dot-shadow" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#000000" floodOpacity="0.32" />
+        <filter id="current-time-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#1e3a8a" floodOpacity="0.6" />
+          <feDropShadow dx="0" dy="0" stdDeviation="2" floodColor="#1e3a8a" floodOpacity="0.8" />
         </filter>
         <filter id="center-lens-shadow" x="-50%" y="-50%" width="200%" height="200%">
           <feDropShadow dx="0" dy="12" stdDeviation="24" floodColor="#000000" floodOpacity="0.12" />
@@ -437,12 +438,15 @@ export const CircleScheduler = ({
       {showCurrentTime ? (
         <>
 
-          <circle
-            cx={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
-            cy={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
-            r={14}
-            fill="#1e3a8a"
-            filter="url(#current-time-dot-shadow)"
+          <line
+            x1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).x}
+            y1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).y}
+            x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).x}
+            y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, minuteAngle).y}
+            stroke="#1e3a8a"
+            strokeWidth={4}
+            strokeLinecap="round"
+            filter="url(#current-time-glow)"
             pointerEvents="none"
           />
         </>
