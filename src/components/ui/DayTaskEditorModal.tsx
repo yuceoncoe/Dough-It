@@ -74,17 +74,17 @@ export const DayTaskEditorModal = ({
               <input type="time" className="time-field" value={endTime} onChange={(event) => onEndTimeChange(event.target.value)} />
             </label>
           </div>
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <button type="button" onClick={() => onSetTags(getToneTags('urgent-important'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'urgent-important' ? 'bg-rose-100 text-rose-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
+          <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-stone-200 bg-stone-200">
+            <button type="button" onClick={() => onSetTags(getToneTags('urgent-important'))} className={`px-4 py-2.5 text-center text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'urgent-important' ? 'bg-rose-100 text-rose-900' : 'bg-white text-stone-600 hover:bg-stone-50'}`}>
               긴급+중요
             </button>
-            <button type="button" onClick={() => onSetTags(getToneTags('urgent'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'urgent' ? 'bg-yellow-100 text-yellow-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
+            <button type="button" onClick={() => onSetTags(getToneTags('urgent'))} className={`px-4 py-2.5 text-center text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'urgent' ? 'bg-yellow-100 text-yellow-900' : 'bg-white text-stone-600 hover:bg-stone-50'}`}>
               긴급
             </button>
-            <button type="button" onClick={() => onSetTags(getToneTags('important'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'important' ? 'bg-sky-100 text-sky-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
+            <button type="button" onClick={() => onSetTags(getToneTags('important'))} className={`px-4 py-2.5 text-center text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'important' ? 'bg-sky-100 text-sky-900' : 'bg-white text-stone-600 hover:bg-stone-50'}`}>
               중요
             </button>
-            <button type="button" onClick={() => onSetTags(getToneTags('normal'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'normal' ? 'bg-emerald-100 text-emerald-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
+            <button type="button" onClick={() => onSetTags(getToneTags('normal'))} className={`px-4 py-2.5 text-center text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'normal' ? 'bg-emerald-100 text-emerald-900' : 'bg-white text-stone-600 hover:bg-stone-50'}`}>
               일반
             </button>
           </div>
