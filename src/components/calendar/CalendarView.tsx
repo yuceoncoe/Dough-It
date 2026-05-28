@@ -29,8 +29,8 @@ export const CalendarView = ({
         <div>
           <h1 className="font-hand text-3xl text-stone-800 md:text-5xl">달력 보기</h1>
         </div>
-        <button onClick={onOpenSettings} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
-          <Icon name="settings" size={22} />
+        <button onClick={onOpenSettings} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
+          <Icon name="settings" size={18} />
         </button>
       </div>
 
