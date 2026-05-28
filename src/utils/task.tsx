@@ -72,7 +72,7 @@ export const getTrackLaneWidth = (laneCount: number) => (
   (TRACK_OUTER_RADIUS - TRACK_INNER_RADIUS - TRACK_LANE_GAP * (laneCount - 1)) / laneCount
 );
 export const OUTER_BACKGROUND_RADIUS = 380;
-export const CURRENT_HAND_RADIUS = 370;
+export const CURRENT_HAND_RADIUS = 362;
 
 export const OUTER_HOUR_LABEL_RADIUS = 364;
 
@@ -502,7 +502,7 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
   ctx.fill();
   ctx.restore();
 
-  const trackBgColors = ['#f6f7f9', '#f9fafc', '#fcfdff']; // Subtle blue-gray with small differences
+  // Only outermost track has color now
   Array.from({ length: laneCount }, (_, laneIndex) => laneIndex).forEach((laneIndex) => {
     const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex, laneCount);
     const laneCenterRadius = (innerRadius + outerRadius) / 2;
@@ -511,7 +511,7 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
     ctx.save();
     ctx.beginPath();
     ctx.arc(CENTER, CENTER, laneCenterRadius, 0, Math.PI * 2);
-    ctx.strokeStyle = trackBgColors[laneIndex % trackBgColors.length];
+    ctx.strokeStyle = laneIndex === 0 ? '#f6f7f9' : '#ffffff';
     ctx.lineWidth = laneWidth;
     ctx.stroke();
     ctx.restore();
@@ -542,10 +542,10 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
       gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
       const fraction = Math.max(0.001, Math.min(1, minuteAngle / 360));
       gradient.addColorStop(fraction * 0.5, 'rgba(0, 0, 0, 0)');
-      gradient.addColorStop(fraction, 'rgba(0, 0, 0, 0.07)');
+      gradient.addColorStop(fraction, 'rgba(30, 58, 138, 0.08)');
       ctx.fillStyle = gradient;
     } else {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.07)';
+      ctx.fillStyle = 'rgba(30, 58, 138, 0.08)';
     }
     ctx.fill();
     ctx.restore();
