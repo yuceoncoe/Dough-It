@@ -32,14 +32,27 @@ export const RoutineActionModal = ({
           {isDelete ? ' 루틴을 어디까지 반영할지 선택해 주세요.' : ' 루틴 변경을 어디까지 반영할지 선택해 주세요.'}
         </p>
         <div className="mt-5 space-y-3">
-          <button onClick={() => onSelectScope('single')} className="sheet-button">
+          <button 
+            onClick={() => onSelectScope('single')} 
+            className={`w-full rounded-xl px-4 py-3.5 font-medium transition-colors ${
+              isDelete ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-stone-800 text-white hover:bg-stone-900'
+            }`}
+          >
             {isDelete ? '이번 일정만 삭제하기' : '이번 일정만 수정하기'}
           </button>
-          <button onClick={() => onSelectScope('future')} className="sheet-button">
+          <button 
+            onClick={() => onSelectScope('future')} 
+            className={`w-full rounded-xl px-4 py-3.5 font-medium transition-colors ${
+              isDelete ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-stone-800 text-white hover:bg-stone-900'
+            }`}
+          >
             {isDelete ? '앞으로 모든 일정 삭제하기' : '앞으로 모든 일정 수정하기'}
           </button>
         </div>
-        <button onClick={onClose} className="mt-4 w-full rounded-xl bg-stone-100 px-4 py-3 font-medium text-stone-700 transition-colors hover:bg-stone-200">
+        <button 
+          onClick={onClose} 
+          className="mt-4 w-full rounded-xl bg-stone-100 px-4 py-3.5 font-medium text-stone-700 transition-colors hover:bg-stone-200"
+        >
           취소
         </button>
       </div>
