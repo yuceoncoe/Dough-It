@@ -82,7 +82,7 @@ export const TaskRatingCarousel = ({
                   rows={3}
                   maxLength={240}
                   placeholder="오늘 이 일정에 대해 짧게 남겨보세요"
-                  className="mt-2 w-full resize-none rounded-2xl bg-stone-50 px-4 py-3 text-sm leading-5 text-stone-700 outline-none transition-colors placeholder:text-stone-400 focus:border-stone-400 focus:bg-white"
+                  className="mt-2 w-full resize-none rounded-2xl bg-stone-50 px-4 py-3 text-sm leading-5 text-stone-700 outline-none transition-colors placeholder:text-stone-400 focus:border-stone-400"
                 />
               </label>
               <button

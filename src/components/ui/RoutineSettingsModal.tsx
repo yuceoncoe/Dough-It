@@ -287,17 +287,17 @@ export const RoutineSettingsModal = ({
                   autoComplete="off"
                   autoCorrect="off"
                   spellCheck="false"
-                  className="w-full rounded-2xl bg-white px-5 py-4 text-lg font-medium text-stone-800 placeholder:text-stone-300 outline-none border border-stone-200 focus:border-stone-400 focus:ring-1 focus:ring-stone-400 transition-all"
+                  className="w-full rounded-2xl bg-white px-5 py-4 text-lg font-medium text-stone-800 placeholder:text-stone-300 outline-none border border-stone-200 focus:border-stone-400 transition-all"
                   placeholder="루틴 이름"
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                 />
                 <div className="grid grid-cols-2 gap-3">
-                  <label className="block rounded-xl bg-white px-4 py-2.5 text-sm text-stone-600 border border-stone-200 focus-within:border-stone-400 focus-within:ring-1 focus-within:ring-stone-400 transition-all">
+                  <label className="block rounded-xl bg-white px-4 py-2.5 text-sm text-stone-600 border border-stone-200 focus-within:border-stone-400 transition-all">
                     <div className="mb-1">시작</div>
                     <input type="time" className="time-field" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
                   </label>
-                  <label className="block rounded-xl bg-white px-4 py-2.5 text-sm text-stone-600 border border-stone-200 focus-within:border-stone-400 focus-within:ring-1 focus-within:ring-stone-400 transition-all">
+                  <label className="block rounded-xl bg-white px-4 py-2.5 text-sm text-stone-600 border border-stone-200 focus-within:border-stone-400 transition-all">
                     <div className="mb-1">종료</div>
                     <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
                   </label>
