@@ -55,7 +55,7 @@ export const TaskActionSheet = ({
               <button
                 type="button"
                 onClick={() => onSetRating(task, undefined)}
-                className="text-xs font-medium text-stone-400 transition-colors hover:text-stone-600"
+                className="rounded-lg bg-stone-100 px-2 py-1 text-xs font-medium text-stone-500 transition-colors hover:bg-stone-200 hover:text-stone-700"
               >
                 평가 취소
               </button>

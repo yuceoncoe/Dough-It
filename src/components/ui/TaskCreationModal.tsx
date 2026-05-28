@@ -67,31 +67,31 @@ export const TaskCreationModal = ({
         <div className="mt-6 grid grid-cols-2 gap-3">
           <button
             onClick={() => setTags(getToneTags('urgent-important'))}
-            className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
+            className={`rounded-2xl px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'urgent-important' ? 'bg-rose-100 text-rose-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
           >
             <div className="font-medium">긴급+중요</div>
           </button>
           <button
             onClick={() => setTags(getToneTags('urgent'))}
-            className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'urgent' ? 'border-yellow-400 bg-yellow-100 text-yellow-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
+            className={`rounded-2xl px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'urgent' ? 'bg-yellow-100 text-yellow-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
           >
             <div className="font-medium">긴급</div>
           </button>
           <button
             onClick={() => setTags(getToneTags('important'))}
-            className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
+            className={`rounded-2xl px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'important' ? 'bg-sky-100 text-sky-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
           >
             <div className="font-medium">중요</div>
           </button>
           <button
             onClick={() => setTags(getToneTags('normal'))}
-            className={`rounded-2xl border px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white/70 text-stone-600 hover:bg-white'}`}
+            className={`rounded-2xl px-4 py-3 text-left transition-all ${getToneSelectionKey(tags) === 'normal' ? 'bg-emerald-100 text-emerald-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
           >
             <div className="font-medium">일반</div>
           </button>
         </div>
         <div className="mt-6 flex gap-3">
-          <button onClick={onClose} className="flex-1 rounded-2xl bg-white px-4 py-3 text-stone-700 transition-colors hover:bg-stone-50">
+          <button onClick={onClose} className="flex-1 rounded-2xl bg-stone-100 px-4 py-3 font-medium text-stone-700 transition-colors hover:bg-stone-200">
             취소
           </button>
           <button

@@ -160,7 +160,7 @@ export const RoutineSettingsModal = ({
                   <button
                     type="button"
                     onClick={() => void onSignOut()}
-                    className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-800"
+                    className="flex items-center gap-1.5 rounded-lg bg-stone-100 px-2 py-1 text-xs font-medium text-stone-600 transition-colors hover:bg-stone-200 hover:text-stone-900"
                   >
                     <Icon name="logout" size={14} />
                     로그아웃
@@ -180,7 +180,7 @@ export const RoutineSettingsModal = ({
                     type="button"
                     onClick={() => void handleEnableNotifications()}
                     disabled={notificationStatus === 'unsupported' || notificationStatus === 'enabled' || isEnabling}
-                    className={`inline-flex items-center justify-center rounded-full border px-3 py-1.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${notificationStatus === 'enabled' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-stone-300 bg-white text-stone-600 hover:bg-stone-50'}`}
+                    className={`inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${notificationStatus === 'enabled' ? 'bg-emerald-100 text-emerald-700' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
                   >
                     {isEnabling ? '설정 중...' : notificationLabel}
                   </button>
@@ -301,16 +301,16 @@ export const RoutineSettingsModal = ({
                   </label>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <button type="button" onClick={() => handleTagSelect(getToneTags('urgent-important'))} className={`rounded-xl border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                  <button type="button" onClick={() => handleTagSelect(getToneTags('urgent-important'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'urgent-important' ? 'bg-rose-100 text-rose-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
                     긴급+중요
                   </button>
-                  <button type="button" onClick={() => handleTagSelect(getToneTags('urgent'))} className={`rounded-xl border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-yellow-400 bg-yellow-100 text-yellow-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                  <button type="button" onClick={() => handleTagSelect(getToneTags('urgent'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'urgent' ? 'bg-yellow-100 text-yellow-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
                     긴급
                   </button>
-                  <button type="button" onClick={() => handleTagSelect(getToneTags('important'))} className={`rounded-xl border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                  <button type="button" onClick={() => handleTagSelect(getToneTags('important'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'important' ? 'bg-sky-100 text-sky-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
                     중요
                   </button>
-                  <button type="button" onClick={() => handleTagSelect(getToneTags('normal'))} className={`rounded-xl border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                  <button type="button" onClick={() => handleTagSelect(getToneTags('normal'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'normal' ? 'bg-emerald-100 text-emerald-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
                     일반
                   </button>
                 </div>
@@ -350,7 +350,7 @@ export const RoutineSettingsModal = ({
               <button
                 type="button"
                 onClick={() => setPendingDeleteTask(null)}
-                className="rounded-xl bg-white px-4 py-3 text-sm text-stone-700"
+                className="rounded-xl bg-stone-100 px-4 py-3 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-200"
               >
                 취소
               </button>

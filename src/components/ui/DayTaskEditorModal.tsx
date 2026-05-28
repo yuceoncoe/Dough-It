@@ -75,24 +75,24 @@ export const DayTaskEditorModal = ({
             </label>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <button type="button" onClick={() => onSetTags(getToneTags('urgent-important'))} className={`rounded-xl border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+            <button type="button" onClick={() => onSetTags(getToneTags('urgent-important'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'urgent-important' ? 'bg-rose-100 text-rose-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
               긴급+중요
             </button>
-            <button type="button" onClick={() => onSetTags(getToneTags('urgent'))} className={`rounded-xl border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-yellow-400 bg-yellow-100 text-yellow-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+            <button type="button" onClick={() => onSetTags(getToneTags('urgent'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'urgent' ? 'bg-yellow-100 text-yellow-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
               긴급
             </button>
-            <button type="button" onClick={() => onSetTags(getToneTags('important'))} className={`rounded-xl border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+            <button type="button" onClick={() => onSetTags(getToneTags('important'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'important' ? 'bg-sky-100 text-sky-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
               중요
             </button>
-            <button type="button" onClick={() => onSetTags(getToneTags('normal'))} className={`rounded-xl border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+            <button type="button" onClick={() => onSetTags(getToneTags('normal'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'normal' ? 'bg-emerald-100 text-emerald-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
               일반
             </button>
           </div>
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <button type="button" onClick={onClose} className="rounded-xl bg-white px-4 py-3 text-sm text-stone-700 transition-colors hover:bg-stone-50">
+          <div className="flex gap-3">
+            <button type="button" onClick={onClose} className="rounded-xl bg-stone-100 px-4 py-3 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-200">
               취소
             </button>
-            <button type="submit" disabled={!title.trim() || !startTime || !endTime} className="rounded-xl bg-stone-900 px-4 py-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50">
+            <button type="submit" disabled={!title.trim() || !startTime || !endTime} className="flex-1 rounded-xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
               {isEditing ? '업데이트' : '일정 추가'}
             </button>
           </div>

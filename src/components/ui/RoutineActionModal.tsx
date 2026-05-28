@@ -39,7 +39,7 @@ export const RoutineActionModal = ({
             {isDelete ? '앞으로 모든 일정 삭제하기' : '앞으로 모든 일정 수정하기'}
           </button>
         </div>
-        <button onClick={onClose} className="mt-4 w-full rounded-xl bg-white px-4 py-3 text-stone-700 transition-colors hover:bg-stone-50">
+        <button onClick={onClose} className="mt-4 w-full rounded-xl bg-stone-100 px-4 py-3 font-medium text-stone-700 transition-colors hover:bg-stone-200">
           취소
         </button>
       </div>
