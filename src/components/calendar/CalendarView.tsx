@@ -66,7 +66,7 @@ export const CalendarView = ({
             <button
               key={dateKey}
               onClick={() => onSelectDate(dateKey)}
-              className={`flex min-h-[54px] flex-col justify-between rounded-xl p-1.5 shadow-sm text-left transition-colors md:min-h-[76px] md:p-2 ${isToday ? 'bg-amber-50 ring-2 ring-amber-400' : 'bg-white'}`}
+              className={`flex min-h-[54px] flex-col justify-between rounded-lg p-1.5 shadow-sm text-left transition-colors md:min-h-[76px] md:p-2 ${isToday ? 'bg-amber-50 ring-2 ring-amber-400' : 'bg-white'}`}
             >
               <span className={`text-xs font-semibold md:text-sm ${isToday ? 'text-amber-700' : 'text-stone-700'}`}>{day}</span>
               <div className="grid h-5 w-5 grid-cols-2 grid-rows-2 gap-[2px] self-end md:h-7 md:w-7">
