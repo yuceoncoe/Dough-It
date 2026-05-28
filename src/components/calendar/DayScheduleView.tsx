@@ -45,7 +45,6 @@ export const DayScheduleView = ({
   const [sheetTask, setSheetTask] = useState<Task | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [pendingRoutineAction, setPendingRoutineAction] = useState<{ action: RoutineAction; task: Task } | null>(null);
-  const [pendingDeleteTask, setPendingDeleteTask] = useState<Task | null>(null);
   const [routineEditScope, setRoutineEditScope] = useState<RoutineScope>('single');
   const [swipedTaskId, setSwipedTaskId] = useState<string | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
@@ -58,7 +57,7 @@ export const DayScheduleView = ({
   const isToday = date === getTodayString();
   const isPastDate = date < getTodayString();
   const report = getTaskReport(tasks);
-  const hasOpenOverlay = Boolean(sheetTask || editorOpen || pendingRoutineAction || pendingDeleteTask || reportOpen);
+  const hasOpenOverlay = Boolean(sheetTask || editorOpen || pendingRoutineAction || reportOpen);
   useBodyScrollLock(hasOpenOverlay);
 
   const showToast = (message: string) => {
@@ -159,7 +158,9 @@ export const DayScheduleView = ({
       setPendingRoutineAction({ action: 'delete', task });
       return;
     }
-    setPendingDeleteTask(task);
+    if (window.confirm(`'${task.title}' 일정을 정말 삭제하시겠습니까?`)) {
+      deleteTask(task.id);
+    }
   };
 
   const setSwipeCardOffset = (taskId: string, offset: number, animated: boolean) => {
@@ -292,36 +293,6 @@ export const DayScheduleView = ({
           }
         }}
       />
-      {pendingDeleteTask ? (
-        <div className="modal-backdrop" onClick={() => setPendingDeleteTask(null)}>
-          <div className="action-sheet max-w-md" onClick={(event) => event.stopPropagation()}>
-            <h2 className="font-hand text-2xl text-stone-800">일정 삭제</h2>
-            <p className="mt-3 text-sm leading-6 text-stone-500">
-              <span className="font-semibold text-stone-700">{pendingDeleteTask.title}</span>
-              {' '}일정을 삭제할까요?
-            </p>
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setPendingDeleteTask(null)}
-                className="rounded-xl bg-white px-4 py-3 text-sm text-stone-700"
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  deleteTask(pendingDeleteTask.id);
-                  setPendingDeleteTask(null);
-                }}
-                className="rounded-xl bg-rose-500 px-4 py-3 text-sm font-semibold text-white"
-              >
-                삭제
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
       <DayTaskEditorModal
         isOpen={editorOpen}
         title={title}
@@ -415,7 +386,7 @@ export const DayScheduleView = ({
                         event.stopPropagation();
                         requestDeleteTask(task);
                       }}
-                      className="absolute inset-y-0 right-0 flex w-20 items-center justify-center rounded-xl bg-rose-500 text-white"
+                      className="absolute inset-y-0 right-0 flex w-20 items-center justify-center rounded-xl bg-transparent text-rose-500"
                       aria-label={`${task.title} 삭제`}
                     >
                       <Icon name="delete" size={20} />
