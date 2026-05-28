@@ -541,7 +541,11 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
       const gradient = ctx.createConicGradient(-Math.PI / 2, CENTER, CENTER);
       gradient.addColorStop(0, 'rgba(59, 130, 246, 0)');
       const fraction = Math.max(0.001, Math.min(1, minuteAngle / 360));
-      gradient.addColorStop(fraction * 0.2, 'rgba(59, 130, 246, 0)');
+      const maxSpan = 45; // 45 degrees (3 hours on a 24h clock) trail length
+      const startFraction = Math.max(0, (minuteAngle - maxSpan) / 360);
+      if (startFraction > 0) {
+        gradient.addColorStop(startFraction, 'rgba(59, 130, 246, 0)');
+      }
       gradient.addColorStop(fraction, 'rgba(59, 130, 246, 0.15)');
       ctx.fillStyle = gradient;
     } else {
