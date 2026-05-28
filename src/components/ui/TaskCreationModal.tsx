@@ -91,7 +91,7 @@ export const TaskCreationModal = ({
           </button>
         </div>
         <div className="mt-6 flex gap-3">
-          <button onClick={onClose} className="flex-1 rounded-2xl bg-stone-100 px-4 py-3 font-medium text-stone-700 transition-colors hover:bg-stone-200">
+          <button onClick={onClose} className="flex-1 rounded-2xl border border-stone-200 bg-white px-4 py-3 font-medium text-stone-700 transition-colors hover:bg-stone-50">
             취소
           </button>
           <button

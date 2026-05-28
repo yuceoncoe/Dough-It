@@ -89,7 +89,7 @@ export const DayTaskEditorModal = ({
             </button>
           </div>
           <div className="mt-8 flex gap-3">
-            <button type="button" onClick={onClose} className="rounded-xl bg-stone-100 px-4 py-3 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-200">
+            <button type="button" onClick={onClose} className="flex-1 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50">
               취소
             </button>
             <button type="submit" disabled={!title.trim() || !startTime || !endTime} className="flex-1 rounded-xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">

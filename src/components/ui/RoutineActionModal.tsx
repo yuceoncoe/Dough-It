@@ -51,7 +51,7 @@ export const RoutineActionModal = ({
         </div>
         <button 
           onClick={onClose} 
-          className="mt-4 w-full rounded-xl bg-stone-100 px-4 py-3.5 font-medium text-stone-700 transition-colors hover:bg-stone-200"
+          className="mt-4 w-full rounded-xl border border-stone-200 bg-white px-4 py-3.5 font-medium text-stone-700 transition-colors hover:bg-stone-50"
         >
           취소
         </button>
