@@ -563,7 +563,7 @@ export const CircleScheduler = ({
                 setHasPendingArcEnd(false);
                 setActiveArcHandle(null);
               }}
-              className="rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-stone-600 shadow-sm backdrop-blur"
+              className="flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-white/90 px-4 text-xs font-semibold text-stone-600 shadow-sm backdrop-blur"
             >
               취소
             </button>
@@ -571,14 +571,14 @@ export const CircleScheduler = ({
               <button
                 type="button"
                 onClick={() => setShowCreateModal(true)}
-                className="rounded-full bg-stone-900 px-5 py-2 text-xs font-semibold text-white shadow-sm"
+                className="flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-stone-900 px-5 text-xs font-semibold text-white shadow-sm"
               >
                 {activeArcHandle
                   ? `${activeArcHandle === 'start' ? '시작' : '종료'} ${minutesToTime(angleToMinutes(normalizeClockAngle(activeArcHandle === 'start' ? pendingArc.startAngle : pendingArc.endAngle)))}`
                   : `${pendingSelectionRange?.startTime} - ${pendingSelectionRange?.endTime} 추가`}
               </button>
             ) : (
-              <div className="rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-stone-500 shadow-sm backdrop-blur">
+              <div className="flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-white/90 px-4 text-xs font-semibold text-stone-500 shadow-sm backdrop-blur">
                 {activeArcHandle === 'start'
                   ? `시작 ${minutesToTime(angleToMinutes(normalizeClockAngle(pendingArc.startAngle)))}`
                   : '종료 시간을 터치하세요'}

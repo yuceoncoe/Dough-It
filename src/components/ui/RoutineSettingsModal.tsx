@@ -272,12 +272,12 @@ export const RoutineSettingsModal = ({
             <div className="min-h-0 flex-1 overflow-y-auto p-6">
               <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
               <form 
-              className="mt-4 space-y-3"
-              autoComplete="off"
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleAdd();
-              }}
+                className="mt-4 flex flex-col gap-3"
+                autoComplete="off"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleAdd();
+                }}
               >
                 <input
                   type="text"
@@ -290,7 +290,7 @@ export const RoutineSettingsModal = ({
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                 />
-                <div className="grid grid-cols-2 gap-3">
+                <div className="mt-3 flex flex-col gap-3">
                   <label className="block rounded-xl bg-white px-4 py-2.5 text-sm text-stone-600 border border-stone-200 focus-within:border-stone-400 transition-all">
                     <div className="mb-1">시작</div>
                     <input type="time" className="time-field" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
@@ -300,7 +300,7 @@ export const RoutineSettingsModal = ({
                     <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
                   </label>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="mt-6 grid grid-cols-2 gap-3">
                   <button type="button" onClick={() => handleTagSelect(getToneTags('urgent-important'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'urgent-important' ? 'bg-rose-100 text-rose-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
                     긴급+중요
                   </button>

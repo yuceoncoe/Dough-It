@@ -50,7 +50,7 @@ export const DayTaskEditorModal = ({
         </div>
         <p className="mb-4 mt-3 text-sm leading-relaxed text-stone-500">제목, 시간, 태그를 입력해서 하루 일정에 바로 반영합니다.</p>
 
-        <form onSubmit={onSubmit} autoComplete="off" className="space-y-3">
+        <form onSubmit={onSubmit} autoComplete="off" className="flex flex-col">
           <input
             autoFocus
             type="text"
@@ -64,7 +64,7 @@ export const DayTaskEditorModal = ({
             value={title}
             onChange={(event) => onTitleChange(event.target.value)}
           />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="mt-3 flex flex-col gap-3">
             <label className="block rounded-xl bg-white px-4 py-2.5 text-sm text-stone-600 border border-stone-200 focus-within:border-stone-400 transition-all">
               <div className="mb-1">시작</div>
               <input type="time" className="time-field" value={startTime} onChange={(event) => onStartTimeChange(event.target.value)} />
@@ -74,7 +74,7 @@ export const DayTaskEditorModal = ({
               <input type="time" className="time-field" value={endTime} onChange={(event) => onEndTimeChange(event.target.value)} />
             </label>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="mt-6 grid grid-cols-2 gap-3">
             <button type="button" onClick={() => onSetTags(getToneTags('urgent-important'))} className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'urgent-important' ? 'bg-rose-100 text-rose-900' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}>
               긴급+중요
             </button>
@@ -88,7 +88,7 @@ export const DayTaskEditorModal = ({
               일반
             </button>
           </div>
-          <div className="flex gap-3">
+          <div className="mt-8 flex gap-3">
             <button type="button" onClick={onClose} className="rounded-xl bg-stone-100 px-4 py-3 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-200">
               취소
             </button>
