@@ -142,7 +142,7 @@ export const RoutineSettingsModal = ({
   return (
     <div className="modal-backdrop" onClick={onClose}>
       {activeTab === 'main' ? (
-        <div className="action-sheet relative mx-auto h-auto w-full max-w-md" onClick={(event) => event.stopPropagation()}>
+        <div className="action-sheet relative max-w-md" onClick={(event) => event.stopPropagation()}>
           <div className="sheet-header">
             <h2 className="sheet-header__title font-hand text-2xl text-stone-800">설정</h2>
             <div className="sheet-header__actions">
@@ -212,7 +212,7 @@ export const RoutineSettingsModal = ({
         </div>
       ) : (
         <div className="action-sheet flex h-[min(92dvh,46rem)] !w-full !max-w-4xl flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
-          <div className="shrink-0 px-6 py-5">
+          <div className="shrink-0 p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <button onClick={() => setActiveTab('main')} className="sheet-icon-button shrink-0" aria-label="이전">
