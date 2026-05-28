@@ -7,6 +7,26 @@ import TaskCreationModal from '../ui/TaskCreationModal';
 import CanvasClockSurface from './CanvasClockSurface';
 
 
+const POMODORO_TICKS = Array.from({ length: 100 }, (_, i) => {
+  const angle = i * 3.6;
+  const isMajor = i % 10 === 0;
+  const isFive = i % 5 === 0;
+  const startRadius = isMajor ? TRACK_INNER_RADIUS - 10 : (isFive ? TRACK_INNER_RADIUS - 7 : TRACK_INNER_RADIUS - 4);
+  const endRadius = TRACK_INNER_RADIUS;
+  const start = polarToCartesian(CENTER, CENTER, startRadius, angle);
+  const end = polarToCartesian(CENTER, CENTER, endRadius, angle);
+  return {
+    id: i,
+    x1: start.x,
+    y1: start.y,
+    x2: end.x,
+    y2: end.y,
+    stroke: isMajor ? 'rgba(41, 37, 36, 0.28)' : 'rgba(41, 37, 36, 0.12)',
+    strokeWidth: isMajor ? 1.6 : 0.8,
+  };
+});
+
+
 export const CircleScheduler = ({
   tasks,
   tasksByDate,
@@ -446,6 +466,17 @@ export const CircleScheduler = ({
               fill={hexToRgba(activeTaskColor, 0.92)}
             />
           ) : null}
+          {POMODORO_TICKS.map((tick) => (
+            <line
+              key={tick.id}
+              x1={tick.x1}
+              y1={tick.y1}
+              x2={tick.x2}
+              y2={tick.y2}
+              stroke={tick.stroke}
+              strokeWidth={tick.strokeWidth}
+            />
+          ))}
         </g>
       ) : null}
     </>
