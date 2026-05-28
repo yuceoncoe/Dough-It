@@ -151,10 +151,10 @@ export const RoutineSettingsModal = ({
               </button>
             </div>
           </div>
-          <div className="mt-4 space-y-6">
+          <div className="mt-6 space-y-5">
             <section>
               <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">프로필 정보</h3>
-              <div className="rounded-2xl bg-white p-4 shadow-sm">
+              <div className="flex flex-col gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3">
                 <div className="flex items-center justify-between">
                   <div className="truncate text-sm font-medium text-stone-700">{userEmail ?? '로그인됨'}</div>
                   <button
@@ -166,14 +166,14 @@ export const RoutineSettingsModal = ({
                     로그아웃
                   </button>
                 </div>
-                {saveError && <div className="mt-2 text-xs text-rose-600">{saveError}</div>}
-                {isSaving && <div className="mt-2 text-xs text-stone-400">저장 중...</div>}
+                {saveError && <div className="text-xs text-rose-600">{saveError}</div>}
+                {isSaving && <div className="text-xs text-stone-400">저장 중...</div>}
               </div>
             </section>
 
             <section>
               <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">푸시 알림</h3>
-              <div className="rounded-2xl bg-white p-4 shadow-sm">
+              <div className="flex flex-col gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-medium text-stone-700">앱 푸시 알림</div>
                   <button
@@ -185,25 +185,25 @@ export const RoutineSettingsModal = ({
                     {isEnabling ? '설정 중...' : notificationLabel}
                   </button>
                 </div>
-                {notificationMessage && <div className="mt-2 text-xs text-stone-500">{notificationMessage}</div>}
+                {notificationMessage && <div className="text-xs text-stone-500">{notificationMessage}</div>}
               </div>
             </section>
 
             <section>
               <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">루틴 설정 리스트</h3>
-              <div className="overflow-hidden rounded-2xl bg-white shadow-sm border border-stone-100 divide-y divide-stone-100">
+              <div className="overflow-hidden rounded-xl border border-stone-200 bg-white divide-y divide-stone-200">
                 <button 
                   onClick={() => setActiveTab('weekday')}
-                  className="flex w-full items-center justify-between p-4 transition-colors hover:bg-stone-50"
+                  className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-stone-50"
                 >
                   <span className="text-sm font-medium text-stone-700">평일 루틴 설정</span>
                   <Icon name="chevron_right" size={18} className="text-stone-400" />
                 </button>
                 <button 
                   onClick={() => setActiveTab('weekend')}
-                  className="flex w-full items-center justify-between p-4 transition-colors hover:bg-stone-50"
+                  className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-stone-50"
                 >
-                  <span className="text-sm font-medium text-stone-700">주말 루틴 설정</span>
+                  <span className="text-sm font-medium text-stone-700">주말/휴일 루틴 설정</span>
                   <Icon name="chevron_right" size={18} className="text-stone-400" />
                 </button>
               </div>
@@ -212,7 +212,7 @@ export const RoutineSettingsModal = ({
         </div>
       ) : (
         <div className="action-sheet flex h-[min(92dvh,46rem)] !w-full !max-w-4xl flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
-          <div className="shrink-0 p-6">
+          <div className="shrink-0 px-6 pt-6 pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <button onClick={() => setActiveTab('main')} className="sheet-icon-button shrink-0" aria-label="이전">
@@ -233,7 +233,7 @@ export const RoutineSettingsModal = ({
             </div>
           </div>
         <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
-          <div className="min-h-0 overflow-y-auto p-6 md:border-b-0 md:border-r md:border-stone-100">
+          <div className="min-h-0 overflow-y-auto px-6 pb-6 md:border-b-0 md:border-r md:border-stone-100">
             <div className="space-y-2.5">
               {draft[activeTab].map((task) => (
                 <div
@@ -269,7 +269,7 @@ export const RoutineSettingsModal = ({
             </div>
           </div>
           <div className="flex min-h-0 flex-col bg-white">
-            <div className="min-h-0 flex-1 overflow-y-auto p-6">
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-4">
               <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
               <form 
                 className="mt-4 flex flex-col gap-3"
@@ -316,7 +316,7 @@ export const RoutineSettingsModal = ({
                 </div>
               </form>
             </div>
-            <div className="shrink-0 bg-white p-6">
+            <div className="shrink-0 bg-white px-6 pb-6">
               <button
                 type="button"
                 onClick={handleAdd}
