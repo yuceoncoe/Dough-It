@@ -156,7 +156,7 @@ export const RoutineSettingsModal = ({
           <div className="overflow-y-auto bg-white p-5 space-y-6">
             <section>
               <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">프로필 정보</h3>
-              <div className="rounded-[16px] border border-stone-200 bg-white p-4 shadow-sm">
+              <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="truncate text-sm font-medium text-stone-700">{userEmail ?? '로그인됨'}</div>
                   <button
@@ -175,7 +175,7 @@ export const RoutineSettingsModal = ({
 
             <section>
               <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">푸시 알림</h3>
-              <div className="rounded-[16px] border border-stone-200 bg-white p-4 shadow-sm">
+              <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-medium text-stone-700">앱 푸시 알림</div>
                   <button
@@ -193,7 +193,7 @@ export const RoutineSettingsModal = ({
 
             <section>
               <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">루틴 설정 리스트</h3>
-              <div className="overflow-hidden rounded-[16px] border border-stone-200 bg-white shadow-sm">
+              <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
                 <button 
                   onClick={() => setActiveTab('weekday')}
                   className="flex w-full items-center justify-between border-b border-stone-100 p-4 transition-colors hover:bg-stone-50"
@@ -240,7 +240,7 @@ export const RoutineSettingsModal = ({
               {draft[activeTab].map((task) => (
                 <div
                   key={task.id}
-                  className="task-card block w-full rounded-[0.75rem] bg-white px-4 py-3.5 text-left"
+                  className="task-card block w-full rounded-xl bg-white px-4 py-3.5 text-left"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
@@ -288,32 +288,32 @@ export const RoutineSettingsModal = ({
                   autoCorrect="off"
                   autoCapitalize="none"
                   spellCheck={false}
-                  className="w-full rounded-[12px] border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
+                  className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
                   placeholder="일정 이름"
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                 />
                 <div className="space-y-3">
-                  <label className="block rounded-[12px] border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
+                  <label className="block rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
                     <div className="mb-1">시작</div>
                     <input type="time" className="time-field" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
                   </label>
-                  <label className="block rounded-[12px] border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
+                  <label className="block rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
                     <div className="mb-1">종료</div>
                     <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
                   </label>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <button type="button" onClick={() => handleTagSelect(getToneTags('urgent-important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                  <button type="button" onClick={() => handleTagSelect(getToneTags('urgent-important'))} className={`rounded-xl border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent-important' ? 'border-rose-400 bg-rose-100 text-rose-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                     긴급+중요
                   </button>
-                  <button type="button" onClick={() => handleTagSelect(getToneTags('urgent'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-yellow-400 bg-yellow-100 text-yellow-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                  <button type="button" onClick={() => handleTagSelect(getToneTags('urgent'))} className={`rounded-xl border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'urgent' ? 'border-yellow-400 bg-yellow-100 text-yellow-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                     긴급
                   </button>
-                  <button type="button" onClick={() => handleTagSelect(getToneTags('important'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                  <button type="button" onClick={() => handleTagSelect(getToneTags('important'))} className={`rounded-xl border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'important' ? 'border-sky-400 bg-sky-100 text-sky-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                     중요
                   </button>
-                  <button type="button" onClick={() => handleTagSelect(getToneTags('normal'))} className={`rounded-[12px] border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
+                  <button type="button" onClick={() => handleTagSelect(getToneTags('normal'))} className={`rounded-xl border px-4 py-2.5 text-left text-sm ${getToneSelectionKey(tags) === 'normal' ? 'border-emerald-400 bg-emerald-100 text-emerald-900' : 'border-stone-300 bg-white text-stone-600'}`}>
                     일반
                   </button>
                 </div>
@@ -324,7 +324,7 @@ export const RoutineSettingsModal = ({
                 type="button"
                 onClick={handleAdd}
                 disabled={!title.trim() || !startTime || !endTime}
-                className="w-full rounded-[12px] bg-stone-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 블록 추가
               </button>
@@ -334,7 +334,7 @@ export const RoutineSettingsModal = ({
       </div>
       )}
       {toastMessage && (
-        <div className="fixed bottom-8 left-1/2 z-[100] -translate-x-1/2 whitespace-nowrap animate-[fade-in_200ms_ease-out] rounded-full bg-stone-800 px-4 py-2.5 text-sm font-medium text-white shadow-lg">
+        <div className="fixed bottom-8 left-1/2 z-[100] -translate-x-1/2 whitespace-nowrap animate-[fade-in_200ms_ease-out] rounded-full bg-stone-800 px-4 py-2.5 text-sm font-medium text-white shadow-xl">
           {toastMessage}
         </div>
       )}
@@ -353,14 +353,14 @@ export const RoutineSettingsModal = ({
               <button
                 type="button"
                 onClick={() => setPendingDeleteTask(null)}
-                className="rounded-[12px] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700"
+                className="rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700"
               >
                 취소
               </button>
               <button
                 type="button"
                 onClick={() => handleDelete(pendingDeleteTask.id)}
-                className="rounded-[12px] bg-rose-500 px-4 py-3 text-sm font-semibold text-white"
+                className="rounded-xl bg-rose-500 px-4 py-3 text-sm font-semibold text-white"
               >
                 삭제
               </button>

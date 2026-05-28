@@ -93,7 +93,7 @@ export const TaskActionSheet = ({
             className="mt-2 w-full resize-none rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm leading-5 text-stone-700 outline-none transition-colors placeholder:text-stone-400 focus:border-stone-400 focus:bg-white"
           />
         </label>
-        <button onClick={onClose} className="mt-4 w-full rounded-[8px] bg-stone-900 px-4 py-3 text-white transition-colors hover:bg-stone-800">
+        <button onClick={onClose} className="mt-4 w-full rounded-xl bg-stone-900 px-4 py-3 text-white transition-colors hover:bg-stone-800">
           닫기
         </button>
       </div>

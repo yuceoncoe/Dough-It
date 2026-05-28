@@ -116,7 +116,7 @@ canvas {
 
 .task-card {
   border: 1px solid rgba(17, 24, 39, 0.07);
-  box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.02);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .modal-backdrop {
@@ -135,19 +135,19 @@ canvas {
   position: relative;
   width: min(100%, 42rem);
   border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 2rem;
+  border-radius: 1.5rem;
   background: #ffffff;
-  box-shadow: 0 24px 80px rgba(73, 54, 31, 0.18);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
 }
 
 .action-sheet {
   width: min(100%, 42rem);
   max-height: min(82dvh, 46rem);
-  border-radius: 24px;
+  border-radius: 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.85);
   background: #ffffff;
-  box-shadow: 0 18px 60px rgba(54, 40, 27, 0.2);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
   padding: 1.25rem;
   overflow-y: auto;
 }

@@ -304,7 +304,7 @@ export const DayScheduleView = ({
               <button
                 type="button"
                 onClick={() => setPendingDeleteTask(null)}
-                className="rounded-[12px] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700"
+                className="rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700"
               >
                 취소
               </button>
@@ -314,7 +314,7 @@ export const DayScheduleView = ({
                   deleteTask(pendingDeleteTask.id);
                   setPendingDeleteTask(null);
                 }}
-                className="rounded-[12px] bg-rose-500 px-4 py-3 text-sm font-semibold text-white"
+                className="rounded-xl bg-rose-500 px-4 py-3 text-sm font-semibold text-white"
               >
                 삭제
               </button>
@@ -410,14 +410,14 @@ export const DayScheduleView = ({
                   </div>
                 )}
                 {sortedTasks.map((task) => (
-                  <div key={task.id} className="relative overflow-hidden rounded-[0.75rem]">
+                  <div key={task.id} className="relative overflow-hidden rounded-xl">
                     <button
                       type="button"
                       onClick={(event) => {
                         event.stopPropagation();
                         requestDeleteTask(task);
                       }}
-                      className="absolute inset-y-0 right-0 flex w-20 items-center justify-center rounded-[0.75rem] bg-rose-500 text-white"
+                      className="absolute inset-y-0 right-0 flex w-20 items-center justify-center rounded-xl bg-rose-500 text-white"
                       aria-label={`${task.title} 삭제`}
                     >
                       <Trash2 size={20} />
@@ -482,7 +482,7 @@ export const DayScheduleView = ({
                       ref={(node) => {
                         swipeCardRefs.current[task.id] = node;
                       }}
-                      className="task-card relative block w-full rounded-[0.75rem] bg-white px-4 py-3.5 text-left"
+                      className="task-card relative block w-full rounded-xl bg-white px-4 py-3.5 text-left"
                       style={{
                         transform: `translateX(${swipedTaskId === task.id ? -80 : 0}px)`,
                         touchAction: 'pan-y',
@@ -524,7 +524,7 @@ export const DayScheduleView = ({
         </div>
       </div>
       {toastMessage && (
-        <div className="fixed bottom-24 left-1/2 z-[100] -translate-x-1/2 whitespace-nowrap animate-[fade-in_200ms_ease-out] rounded-full bg-stone-800 px-4 py-2.5 text-sm font-medium text-white shadow-lg sm:bottom-8">
+        <div className="fixed bottom-24 left-1/2 z-[100] -translate-x-1/2 whitespace-nowrap animate-[fade-in_200ms_ease-out] rounded-full bg-stone-800 px-4 py-2.5 text-sm font-medium text-white shadow-xl sm:bottom-8">
           {toastMessage}
         </div>
       )}

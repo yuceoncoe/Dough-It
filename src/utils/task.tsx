@@ -542,10 +542,10 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
       gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
       const fraction = Math.max(0.001, Math.min(1, minuteAngle / 360));
       gradient.addColorStop(fraction * 0.5, 'rgba(0, 0, 0, 0)');
-      gradient.addColorStop(fraction, 'rgba(30, 58, 138, 0.08)');
+      gradient.addColorStop(fraction, 'rgba(30, 58, 138, 0.12)');
       ctx.fillStyle = gradient;
     } else {
-      ctx.fillStyle = 'rgba(30, 58, 138, 0.08)';
+      ctx.fillStyle = 'rgba(30, 58, 138, 0.12)';
     }
     ctx.fill();
     ctx.restore();
