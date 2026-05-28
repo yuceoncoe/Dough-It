@@ -5,7 +5,7 @@ import { AlertCircle, Calendar as CalendarIcon, Check, ChevronLeft, ChevronRight
 import React from 'react';
 
 export const CENTER = 300;
-export const RADIUS = 278;
+export const RADIUS = 300;
 
 export const INITIAL_ROUTINES: RoutineState = {
   weekday: [],
@@ -65,29 +65,36 @@ export const QuadrantBadge = ({ task, sizeClassName = 'h-[14px] w-[14px]' }: { t
 
 
 export const DEFAULT_TRACK_LANE_COUNT = 2;
-export const TRACK_INNER_RADIUS = 160;
-export const TRACK_OUTER_RADIUS = RADIUS + 10;
+export const TRACK_INNER_RADIUS = 230;
+export const TRACK_OUTER_RADIUS = 370;
 export const TRACK_LANE_GAP = 10;
 export const getTrackLaneWidth = (laneCount: number) => (
   (TRACK_OUTER_RADIUS - TRACK_INNER_RADIUS - TRACK_LANE_GAP * (laneCount - 1)) / laneCount
 );
-export const OUTER_BOUNDARY_RADIUS = RADIUS + 45;
-export const OUTER_HOUR_LABEL_RADIUS = OUTER_BOUNDARY_RADIUS + 34;
-export const OUTER_BACKGROUND_RADIUS = OUTER_BOUNDARY_RADIUS + 4;
-export const CURRENT_HAND_RADIUS = OUTER_BOUNDARY_RADIUS - 8;
-export const OUTER_RING_SEGMENTS = Array.from({ length: 144 }, (_, index) => {
+export const OUTER_BACKGROUND_RADIUS = 370;
+export const CURRENT_HAND_RADIUS = 370;
+
+export const INNER_HOUR_LABEL_RADIUS = TRACK_INNER_RADIUS - 20;
+
+export const INNER_RING_SEGMENTS = Array.from({ length: 144 }, (_, index) => {
   const angle = index * 2.5;
-  const isCardinal = index % 6 === 0;
-  const end = polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS - 6, angle);
-  const start = polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS - (isCardinal ? 26 : 16), angle);
-  return { angle, isCardinal, start, end };
+  const isHour = index % 6 === 0;
+  const hourValue = isHour ? (index / 6) : -1;
+  const isEvenHour = isHour && (hourValue % 2 === 0);
+  
+  const end = polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS - 10, angle);
+  const start = polarToCartesian(CENTER, CENTER, isHour ? TRACK_INNER_RADIUS - 30 : TRACK_INNER_RADIUS - 20, angle);
+  
+  return { angle, isHour, isEvenHour, skipTick: isEvenHour, start, end };
 });
-export const OUTER_HOUR_LABELS = Array.from({ length: 24 }, (_, index) => {
-  const value = String(index);
-  const angle = index * 15;
-  const point = polarToCartesian(CENTER, CENTER, OUTER_HOUR_LABEL_RADIUS, angle);
+
+export const INNER_HOUR_LABELS = Array.from({ length: 12 }, (_, index) => {
+  const hour = index * 2;
+  const value = String(hour);
+  const angle = hour * 15;
+  const point = polarToCartesian(CENTER, CENTER, INNER_HOUR_LABEL_RADIUS, angle);
   return { value, angle, point };
-}).filter(({ value }) => Number(value) % 2 === 0);
+});
 export const SVG_VIEWBOX_PADDING = 80;
 export const SVG_VIEWBOX_MIN = -SVG_VIEWBOX_PADDING;
 export const SVG_VIEWBOX_SIZE = 600 + SVG_VIEWBOX_PADDING * 2;
@@ -544,14 +551,15 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
     ctx.restore();
   }
 
-  OUTER_RING_SEGMENTS.forEach(({ start, end, isCardinal }) => {
+  INNER_RING_SEGMENTS.forEach(({ start, end, isHour, skipTick }) => {
+    if (skipTick) return;
     const progress = minuteAngle === null ? 0 : getBlurProgress(end, minuteAngle);
 
     ctx.save();
     ctx.filter = minuteAngle === null ? 'none' : `blur(${0.4 + progress * 1.6}px)`;
     ctx.globalAlpha = 1;
     ctx.strokeStyle = '#aaa';
-    ctx.lineWidth = isCardinal ? 1 : 0.8;
+    ctx.lineWidth = isHour ? 1 : 0.8;
     ctx.beginPath();
     ctx.moveTo(start.x, start.y);
     ctx.lineTo(end.x, end.y);
