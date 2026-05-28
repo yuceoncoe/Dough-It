@@ -95,7 +95,7 @@ export const OUTER_HOUR_LABELS = Array.from({ length: 12 }, (_, index) => {
   const point = polarToCartesian(CENTER, CENTER, OUTER_HOUR_LABEL_RADIUS, angle);
   return { value, angle, point };
 });
-export const SVG_VIEWBOX_PADDING = 90;
+export const SVG_VIEWBOX_PADDING = 115;
 export const SVG_VIEWBOX_MIN = -SVG_VIEWBOX_PADDING;
 export const SVG_VIEWBOX_SIZE = 600 + SVG_VIEWBOX_PADDING * 2;
 
@@ -495,9 +495,9 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
   ctx.beginPath();
   ctx.arc(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, 0, Math.PI * 2);
   ctx.shadowColor = 'rgba(0, 0, 0, 0.06)';
-  ctx.shadowBlur = 36;
+  ctx.shadowBlur = 28;
   ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 12;
+  ctx.shadowOffsetY = 8;
   ctx.fillStyle = '#ffffff';
   ctx.fill();
   ctx.restore();
