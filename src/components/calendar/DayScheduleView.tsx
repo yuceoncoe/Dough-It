@@ -339,38 +339,36 @@ export const DayScheduleView = ({
 
       <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-stone-200/0 bg-[#f0f0f4]/95 px-4 pb-3 pt-4 backdrop-blur md:px-6">
         <div className="flex items-center gap-3">
-          <div className="flex min-w-0 items-center gap-2">
-            <button
-              type="button"
-              onClick={onPreviousDate}
-              className="rounded-full bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
-              aria-label="전일로 이동"
-            >
-              <Icon name="chevron_left" size={18} />
-            </button>
-            <h1 className="font-hand min-w-0 whitespace-nowrap text-2xl text-stone-800 md:text-3xl">{formatDateLabel(date)}</h1>
-            <button
-              type="button"
-              onClick={onNextDate}
-              className="rounded-full bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
-              aria-label="후일로 이동"
-            >
-              <Icon name="chevron_right" size={18} />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onPreviousDate}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
+            aria-label="전일로 이동"
+          >
+            <Icon name="chevron_left" size={18} />
+          </button>
+          <h1 className="font-hand min-w-0 whitespace-nowrap text-2xl text-stone-800 md:text-3xl">{formatDateLabel(date)}</h1>
+          <button
+            type="button"
+            onClick={onNextDate}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
+            aria-label="후일로 이동"
+          >
+            <Icon name="chevron_right" size={18} />
+          </button>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={() => {
               resetForm();
               setEditorOpen(true);
             }}
-            className="rounded-full bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
             aria-label="빠른 일정 추가"
           >
             <Icon name="add" size={18} />
           </button>
-          <button onClick={onOpenSettings} className="rounded-full bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
+          <button onClick={onOpenSettings} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
             <Icon name="settings" size={18} />
           </button>
         </div>
@@ -397,7 +395,7 @@ export const DayScheduleView = ({
               <div>
                 <h2 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-stone-900">일정 목록</h2>
               </div>
-              <button onClick={() => setShowRoutines((current) => !current)} className="inline-flex h-9 min-w-[100px] items-center justify-center rounded-full bg-white px-4 py-2 text-[10px] font-medium text-stone-500 shadow-[0_1px_8px_rgba(15,23,42,0.06)] ring-1 ring-black/5">
+              <button onClick={() => setShowRoutines((current) => !current)} className="inline-flex h-9 min-w-[100px] items-center justify-center rounded-full bg-white px-4 py-2 text-[10px] font-medium text-stone-500 shadow-sm">
                 {showRoutines ? '루틴숨기기' : '루틴보기'}
               </button>
             </div>

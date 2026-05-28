@@ -29,20 +29,20 @@ export const CalendarView = ({
         <div>
           <h1 className="font-hand text-3xl text-stone-800 md:text-5xl">달력 보기</h1>
         </div>
-        <button onClick={onOpenSettings} className="rounded-full bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
+        <button onClick={onOpenSettings} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
           <Icon name="settings" size={22} />
         </button>
       </div>
 
 
       <div className="mb-3 flex items-center justify-between rounded-xl bg-white px-2 py-2 shadow-sm shrink-0">
-        <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))} className="rounded-full p-2 text-stone-600 transition-colors hover:bg-stone-100">
+        <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-stone-600 transition-colors hover:bg-stone-100">
           <Icon name="chevron_left" size={18} />
         </button>
         <div className="text-center text-lg font-medium text-stone-800 md:text-2xl">
           {`${currentMonth.getFullYear()} ${currentMonth.getMonth() + 1}월`}
         </div>
-        <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))} className="rounded-full p-2 text-stone-600 transition-colors hover:bg-stone-100">
+        <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-stone-600 transition-colors hover:bg-stone-100">
           <Icon name="chevron_right" size={18} />
         </button>
       </div>
