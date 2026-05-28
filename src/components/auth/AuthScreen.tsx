@@ -22,10 +22,10 @@ export const AuthScreen = ({
   return (
     <div className="min-h-screen bg-[#f0f0f4] px-6 py-10 text-stone-900">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-md items-center">
-        <div className="w-full rounded-[28px] bg-white px-6 py-7 shadow-[0_24px_80px_rgba(73,54,31,0.12)]">
+        <div className="w-full rounded-[28px] bg-white px-6 py-7 shadow-[0_24px_80px_rgba(73,54,31,0.06)]">
           <div className="mb-6">
             <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-stone-900 text-white">
-              <Icon name="lock"Keyhole size={20} />
+              <Icon name="lock" size={20} />
             </div>
             <h1 className="font-hand text-3xl text-stone-900">Circle Day 로그인</h1>
             <p className="mt-2 text-sm text-stone-500">Supabase 계정으로 로그인하면 일정과 루틴이 계정별로 저장됩니다.</p>

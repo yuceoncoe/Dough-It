@@ -485,7 +485,7 @@ const AppShell = ({
         ) : null}
       </main>
 
-      <nav className="bottom-nav fixed inset-x-0 bottom-0 z-40 flex items-center justify-around bg-white/90 px-2 shadow-[0_-12px_25px_rgba(85,72,56,0.08)] backdrop-blur">
+      <nav className="bottom-nav fixed inset-x-0 bottom-0 z-40 flex items-center justify-around bg-white/90 px-2 shadow-[0_-12px_25px_rgba(85,72,56,0.04)] backdrop-blur">
         <button
           onClick={() => {
             setActiveTab('home');
