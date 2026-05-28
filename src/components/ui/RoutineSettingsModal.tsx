@@ -142,18 +142,16 @@ export const RoutineSettingsModal = ({
   return (
     <div className="modal-backdrop" onClick={onClose}>
       {activeTab === 'main' ? (
-        <div className="action-sheet mx-auto flex h-auto w-full max-w-md flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
-          <div className="shrink-0 px-5 py-4">
-            <div className="flex items-center justify-between">
-              <div className="min-w-0 pr-3">
-                <h2 className="font-hand truncate text-2xl text-stone-800">설정</h2>
-              </div>
-              <button onClick={onClose} className="sheet-icon-button shrink-0" aria-label="닫기">
-                <Icon name="close" size={20} />
+        <div className="action-sheet relative mx-auto h-auto w-full max-w-md" onClick={(event) => event.stopPropagation()}>
+          <div className="sheet-header">
+            <h2 className="sheet-header__title font-hand text-2xl text-stone-800">설정</h2>
+            <div className="sheet-header__actions">
+              <button type="button" onClick={onClose} className="sheet-icon-button" aria-label="닫기">
+                <Icon name="close" size={18} />
               </button>
             </div>
           </div>
-          <div className="overflow-y-auto bg-white p-5 space-y-6">
+          <div className="mt-4 space-y-6">
             <section>
               <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">프로필 정보</h3>
               <div className="rounded-2xl bg-white p-4 shadow-sm">
@@ -214,7 +212,7 @@ export const RoutineSettingsModal = ({
         </div>
       ) : (
         <div className="action-sheet flex h-[min(92dvh,46rem)] !w-full !max-w-4xl flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
-          <div className="shrink-0 px-5 py-4">
+          <div className="shrink-0 px-6 py-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <button onClick={() => setActiveTab('main')} className="sheet-icon-button shrink-0" aria-label="이전">
@@ -235,7 +233,7 @@ export const RoutineSettingsModal = ({
             </div>
           </div>
         <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
-          <div className="min-h-0 overflow-y-auto p-5 md:border-b-0 md:border-r">
+          <div className="min-h-0 overflow-y-auto p-6 md:border-b-0 md:border-r md:border-stone-100">
             <div className="space-y-2.5">
               {draft[activeTab].map((task) => (
                 <div
@@ -271,7 +269,7 @@ export const RoutineSettingsModal = ({
             </div>
           </div>
           <div className="flex min-h-0 flex-col bg-white">
-            <div className="min-h-0 flex-1 overflow-y-auto p-5">
+            <div className="min-h-0 flex-1 overflow-y-auto p-6">
               <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
               <form 
               className="mt-4 space-y-3"
@@ -318,7 +316,7 @@ export const RoutineSettingsModal = ({
                 </div>
               </form>
             </div>
-            <div className="shrink-0 bg-white p-5">
+            <div className="shrink-0 bg-white p-6">
               <button
                 type="button"
                 onClick={handleAdd}
