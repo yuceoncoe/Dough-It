@@ -346,8 +346,8 @@ export const CircleScheduler = ({
                 height={labelHeight}
                 rx="15"
                 fill="rgba(255,255,255,0.82)"
-                stroke="rgba(214,211,209,0.72)"
-                strokeWidth="1"
+                stroke={getClockTaskColor(task)}
+                strokeWidth="1.2"
               />
               <text
                 x={labelX}
