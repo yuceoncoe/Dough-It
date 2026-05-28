@@ -66,7 +66,7 @@ export const AuthScreen = ({
               <input
                 type="email"
                 autoComplete="email"
-                className="w-full rounded-2xl bg-white px-4 py-3 outline-none focus:border-stone-500"
+                className="w-full rounded-2xl bg-white px-5 py-4 text-lg outline-none border border-stone-200 focus:border-stone-400 focus:ring-1 focus:ring-stone-400 transition-all"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@example.com"
@@ -78,7 +78,7 @@ export const AuthScreen = ({
               <input
                 type="password"
                 autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'}
-                className="w-full rounded-2xl bg-white px-4 py-3 outline-none focus:border-stone-500"
+                className="w-full rounded-2xl bg-white px-5 py-4 text-lg outline-none border border-stone-200 focus:border-stone-400 focus:ring-1 focus:ring-stone-400 transition-all"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="8자 이상"
