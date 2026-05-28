@@ -233,8 +233,8 @@ export const RoutineSettingsModal = ({
               </button>
             </div>
           </div>
-        <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
-          <div className="min-h-0 overflow-y-auto px-6 pb-6 md:border-b-0 md:border-r md:border-stone-100">
+        <div className="flex flex-col md:grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
+          <div className="flex-none md:flex-1 md:min-h-0 md:overflow-y-auto px-6 pb-6 md:border-b-0 md:border-r md:border-stone-100">
             <div className="space-y-2.5">
               {draft[activeTab].map((task) => (
                 <div

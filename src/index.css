@@ -271,7 +271,7 @@ canvas {
 .input-field {
   width: 100%;
   border-radius: 1rem;
-  border: 1px solid #f5f5f4;
+  border: 1px solid rgba(17, 24, 39, 0.07);
   background: #ffffff;
   padding: 1rem 1.25rem;
   font-size: 1.125rem;
@@ -292,7 +292,7 @@ canvas {
 .time-label {
   display: block;
   border-radius: 0.75rem;
-  border: 1px solid #f5f5f4;
+  border: 1px solid rgba(17, 24, 39, 0.07);
   background: #ffffff;
   padding: 0.625rem 1rem;
   font-size: 0.875rem;
@@ -308,18 +308,22 @@ canvas {
   width: 100%;
   resize: none;
   border-radius: 1rem;
-  border: 0;
-  background: #fafaf9;
+  border: 1px solid rgba(17, 24, 39, 0.07);
+  background: #ffffff;
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
   color: #44403c;
   outline: none;
-  transition: background-color 160ms ease;
+  transition: border-color 160ms ease, background-color 160ms ease;
 }
 
 .textarea-field::placeholder {
   color: #a8a29e;
+}
+
+.textarea-field:focus {
+  border-color: #d6d3d1;
 }
 
 /* ── Design Token: Quadrant Grid ── */
