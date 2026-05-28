@@ -54,7 +54,7 @@ export const TaskCreationModal = ({
           autoCorrect="off"
           autoCapitalize="none"
           spellCheck="false"
-          className="w-full rounded-2xl bg-white px-5 py-4 text-xl font-medium text-stone-800 placeholder:text-stone-300 outline-none border border-stone-200 focus:border-stone-400 transition-all"
+          className="w-full rounded-2xl bg-white px-5 py-4 text-xl font-medium text-stone-800 placeholder:text-stone-300 outline-none border border-stone-100 focus:border-stone-300 transition-all"
           placeholder="일정 이름"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
