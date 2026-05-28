@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Loader2, LockKeyhole, LogIn, UserPlus } from 'lucide-react';
+import { Icon } from '../../components/ui/Icon';
 
 export const AuthScreen = ({
   onSubmit,
@@ -25,7 +25,7 @@ export const AuthScreen = ({
         <div className="w-full rounded-[28px] bg-white px-6 py-7 shadow-[0_24px_80px_rgba(73,54,31,0.12)]">
           <div className="mb-6">
             <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-stone-900 text-white">
-              <LockKeyhole size={20} />
+              <Icon name="lock"Keyhole size={20} />
             </div>
             <h1 className="font-hand text-3xl text-stone-900">Circle Day 로그인</h1>
             <p className="mt-2 text-sm text-stone-500">Supabase 계정으로 로그인하면 일정과 루틴이 계정별로 저장됩니다.</p>
@@ -113,7 +113,7 @@ export const AuthScreen = ({
               disabled={isSubmitting || !email.trim() || password.length < 8}
               className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 py-3 text-white transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : mode === 'sign-in' ? <LogIn size={18} /> : <UserPlus size={18} />}
+              {isSubmitting ? <Icon name="progress_activity" size={18} className="animate-spin" /> : mode === 'sign-in' ? <Icon name="login" size={18} /> : <Icon name="person_add" size={18} />}
               {mode === 'sign-in' ? '로그인' : '계정 만들기'}
             </button>
           </form>

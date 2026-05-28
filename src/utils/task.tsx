@@ -1,7 +1,7 @@
 import { Task, Tag, RoutineState } from '../types';
 import { timeToMinutes, minutesToTime, minutesToAngle, angleToMinutes } from './time';
 import { polarToCartesian } from './geometry';
-import { AlertCircle, Calendar as CalendarIcon, Check, ChevronLeft, ChevronRight, Clock, Eye, EyeOff, Home, Lock, Moon, Paintbrush, Pencil, Plus, RefreshCw, Settings, Sparkles, Star, SunMedium, Trash2, X, Zap } from 'lucide-react';
+import { Icon } from '../components/ui/Icon';
 import React from 'react';
 
 export const CENTER = 300;
@@ -435,24 +435,24 @@ export const getTaskIcon = (task: Task) => {
   const title = task.title.toLowerCase();
   const tags = getSafeTags(task.tags);
   if (task.isRoutine) {
-    return <RefreshCw size={30} className="text-stone-600" />;
+    return <Icon name="sync" size={30} className="text-stone-600" />;
   }
   if (tags.includes('urgent') && tags.includes('important')) {
-    return <Sparkles size={30} className="text-rose-500" />;
+    return <Icon name="auto_awesome" size={30} className="text-rose-500" />;
   }
   if (tags.includes('urgent')) {
-    return <AlertCircle size={30} className="text-yellow-400" />;
+    return <Icon name="error_outline" size={30} className="text-yellow-400" />;
   }
   if (tags.includes('important')) {
-    return <Star size={30} className="text-sky-500" />;
+    return <Icon name="star" size={30} className="text-sky-500" />;
   }
   if (title.includes('sleep') || title.includes('rest')) {
-    return <Moon size={30} className="text-indigo-400" />;
+    return <Icon name="dark_mode" size={30} className="text-indigo-400" />;
   }
   if (title.includes('studio') || title.includes('art')) {
-    return <Paintbrush size={30} className="text-amber-600" />;
+    return <Icon name="brush" size={30} className="text-amber-600" />;
   }
-  return <SunMedium size={30} className="text-emerald-400" />;
+  return <Icon name="light_mode" size={30} className="text-emerald-400" />;
 };
 
 export const getTodayString = () => {

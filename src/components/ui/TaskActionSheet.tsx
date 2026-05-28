@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Task } from '../../types';
 import { minutesToTime } from '../../utils/time';
 import { timeToMinutes } from '../../utils/time';
-import { Pencil, Star, Trash2 } from 'lucide-react';
+import { Icon } from '../../components/ui/Icon';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 export const TaskActionSheet = ({
@@ -38,10 +38,10 @@ export const TaskActionSheet = ({
           <h3 className="sheet-header__title font-hand text-2xl text-stone-800">{task.title}</h3>
           <div className="sheet-header__actions">
             <button type="button" onClick={() => onEdit(task)} className="sheet-icon-button" aria-label="일정 수정">
-              <Pencil size={18} />
+              <Icon name="edit" size={18} />
             </button>
             <button type="button" onClick={() => onDelete(task)} className="sheet-icon-button sheet-icon-button--danger" aria-label="일정 삭제">
-              <Trash2 size={18} />
+              <Icon name="delete" size={18} />
             </button>
           </div>
         </div>
@@ -72,7 +72,7 @@ export const TaskActionSheet = ({
                   className={`rounded-full p-1.5 transition-transform hover:scale-105 active:scale-95 ${isActive ? 'text-amber-400' : 'text-stone-200 hover:text-amber-300'}`}
                   aria-label={`${score}점 평가`}
                 >
-                  <Star size={22} className="fill-current" />
+                  <Icon name="star" size={22} className="fill-current" />
                 </button>
               );
             })}

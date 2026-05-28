@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { RoutineState, Tag, Task } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
 import { getTaskTonePillClass, getTaskToneLabel, QuadrantBadge, getToneSelectionKey, getToneTags, getMaxOverlap } from '../../utils/task';
-import { Clock, LogOut, Trash2, X, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Icon } from '../../components/ui/Icon';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 export const RoutineSettingsModal = ({
@@ -149,7 +149,7 @@ export const RoutineSettingsModal = ({
                 <h2 className="font-hand truncate text-2xl text-stone-800">설정</h2>
               </div>
               <button onClick={onClose} className="sheet-icon-button shrink-0" aria-label="닫기">
-                <X size={20} />
+                <Icon name="close" size={20} />
               </button>
             </div>
           </div>
@@ -164,7 +164,7 @@ export const RoutineSettingsModal = ({
                     onClick={() => void onSignOut()}
                     className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-800"
                   >
-                    <LogOut size={14} />
+                    <Icon name="logout" size={14} />
                     로그아웃
                   </button>
                 </div>
@@ -199,14 +199,14 @@ export const RoutineSettingsModal = ({
                   className="flex w-full items-center justify-between p-4 transition-colors hover:bg-stone-50"
                 >
                   <span className="text-sm font-medium text-stone-700">평일 루틴 설정</span>
-                  <ChevronRight size={18} className="text-stone-400" />
+                  <Icon name="chevron_right" size={18} className="text-stone-400" />
                 </button>
                 <button 
                   onClick={() => setActiveTab('weekend')}
                   className="flex w-full items-center justify-between p-4 transition-colors hover:bg-stone-50"
                 >
                   <span className="text-sm font-medium text-stone-700">주말 루틴 설정</span>
-                  <ChevronRight size={18} className="text-stone-400" />
+                  <Icon name="chevron_right" size={18} className="text-stone-400" />
                 </button>
               </div>
             </section>
@@ -218,7 +218,7 @@ export const RoutineSettingsModal = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <button onClick={() => setActiveTab('main')} className="sheet-icon-button shrink-0" aria-label="이전">
-                  <ChevronLeft size={20} />
+                  <Icon name="chevron_left" size={20} />
                 </button>
                 <div className="min-w-0 pr-3">
                   <h2 className="font-hand truncate text-2xl text-stone-800 sm:text-3xl">
@@ -230,7 +230,7 @@ export const RoutineSettingsModal = ({
                 </div>
               </div>
               <button onClick={onClose} className="sheet-icon-button shrink-0" aria-label="닫기">
-                <X size={20} />
+                <Icon name="close" size={20} />
               </button>
             </div>
           </div>
@@ -251,7 +251,7 @@ export const RoutineSettingsModal = ({
                         </span>
                       </div>
                       <div className="mt-1.5 flex items-center gap-2 text-[12px] text-stone-400">
-                        <Clock size={12} className="shrink-0" />
+                        <Icon name="schedule" size={12} className="shrink-0" />
                         {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
                       </div>
                     </div>
@@ -262,7 +262,7 @@ export const RoutineSettingsModal = ({
                         </span>
                       </div>
                       <button onClick={() => setPendingDeleteTask(task)} className="rounded-full p-1 text-stone-300 transition-colors hover:bg-rose-50 hover:text-rose-500">
-                        <Trash2 size={15} />
+                        <Icon name="delete" size={15} />
                       </button>
                     </div>
                   </div>

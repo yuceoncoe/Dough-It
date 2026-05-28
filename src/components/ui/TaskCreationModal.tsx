@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Tag } from '../../types';
 import { getToneTags, getToneSelectionKey } from '../../utils/task';
-import { X } from 'lucide-react';
+import { Icon } from '../../components/ui/Icon';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 export const TaskCreationModal = ({
@@ -38,7 +38,7 @@ export const TaskCreationModal = ({
           <h2 className="sheet-header__title font-hand text-2xl text-stone-800">일정 추가</h2>
           <div className="sheet-header__actions">
             <button type="button" onClick={onClose} className="sheet-icon-button" aria-label="닫기">
-              <X size={18} />
+              <Icon name="close" size={18} />
             </button>
           </div>
         </div>

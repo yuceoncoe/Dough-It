@@ -8,7 +8,7 @@ import RoutineActionModal from '../ui/RoutineActionModal';
 import DayTaskEditorModal from '../ui/DayTaskEditorModal';
 import CircleScheduler from '../scheduler/CircleScheduler';
 import TaskReportModal from '../ui/TaskReportModal';
-import { ChevronLeft, ChevronRight, Plus, Settings, Clock, Trash2 } from 'lucide-react';
+import { Icon } from '../../components/ui/Icon';
 import { QuadrantBadge, getMaxOverlap } from '../../utils/task';
 import { getTaskReport } from '../../utils/report';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
@@ -346,7 +346,7 @@ export const DayScheduleView = ({
               className="rounded-full bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
               aria-label="전일로 이동"
             >
-              <ChevronLeft size={18} />
+              <Icon name="chevron_left" size={18} />
             </button>
             <h1 className="font-hand min-w-0 whitespace-nowrap text-2xl text-stone-800 md:text-3xl">{formatDateLabel(date)}</h1>
             <button
@@ -355,7 +355,7 @@ export const DayScheduleView = ({
               className="rounded-full bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
               aria-label="후일로 이동"
             >
-              <ChevronRight size={18} />
+              <Icon name="chevron_right" size={18} />
             </button>
           </div>
         </div>
@@ -368,10 +368,10 @@ export const DayScheduleView = ({
             className="rounded-full bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
             aria-label="빠른 일정 추가"
           >
-            <Plus size={18} />
+            <Icon name="add" size={18} />
           </button>
           <button onClick={onOpenSettings} className="rounded-full bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
-            <Settings size={18} />
+            <Icon name="settings" size={18} />
           </button>
         </div>
       </div>
@@ -420,7 +420,7 @@ export const DayScheduleView = ({
                       className="absolute inset-y-0 right-0 flex w-20 items-center justify-center rounded-xl bg-rose-500 text-white"
                       aria-label={`${task.title} 삭제`}
                     >
-                      <Trash2 size={20} />
+                      <Icon name="delete" size={20} />
                     </button>
                     <button
                       onClick={() => {
@@ -497,7 +497,7 @@ export const DayScheduleView = ({
                             {task.title}
                           </span>
                           <div className="mt-1 flex items-center gap-2 text-[12px] text-stone-400">
-                            <Clock size={12} className="shrink-0" />
+                            <Icon name="schedule" size={12} className="shrink-0" />
                             {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
                           </div>
                           {task.note ? (

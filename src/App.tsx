@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
-import { Home, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
+import { Icon } from './components/ui/Icon';
 import { RoutineState, Task, RoutineScope } from './types';
 import { addOrReplaceDateTasks, getRoutineBaseId, getRoutineBucketForDate, getTodayString } from './utils/task';
 import RoutineSettingsModal from './components/ui/RoutineSettingsModal';
@@ -400,7 +400,7 @@ const AppShell = ({
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f0f0f4] text-stone-500">
         <div className="inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 shadow-sm ring-1 ring-black/5">
-          <Loader2 size={18} className="animate-spin" />
+          <Icon name="progress_activity" size={18} className="animate-spin" />
           데이터를 불러오는 중...
         </div>
       </div>
@@ -493,7 +493,7 @@ const AppShell = ({
           }}
           className={`flex w-full flex-col items-center gap-1 py-3 ${activeTab === 'home' ? 'text-amber-600' : 'text-stone-400'}`}
         >
-          <Home size={22} />
+          <Icon name="home" size={22} />
           <span className="text-xs tracking-[0.2em]">오늘</span>
         </button>
         <button
@@ -505,7 +505,7 @@ const AppShell = ({
           }}
           className={`flex w-full flex-col items-center gap-1 py-3 ${activeTab === 'calendar' ? 'text-amber-600' : 'text-stone-400'}`}
         >
-          <CalendarIcon size={22} />
+          <Icon name="calendar_today"Icon size={22} />
           <span className="text-xs tracking-[0.2em]">달력</span>
         </button>
       </nav>
@@ -682,7 +682,7 @@ const App = () => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f0f0f4] text-stone-500">
         <div className="inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 shadow-sm ring-1 ring-black/5">
-          <Loader2 size={18} className="animate-spin" />
+          <Icon name="progress_activity" size={18} className="animate-spin" />
           인증 상태를 확인하는 중...
         </div>
       </div>

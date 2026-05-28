@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Task } from '../../types';
-import { Star } from 'lucide-react';
+import { Icon } from '../../components/ui/Icon';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 import { playHarpChime } from '../../utils/audio';
 
@@ -67,7 +67,7 @@ export const TaskRatingCarousel = ({
                     className={`p-2 transition-transform hover:scale-110 active:scale-95 ${(ratingsByTaskId[task.id] ?? 0) >= score ? 'text-amber-400' : 'text-stone-200 hover:text-amber-300'}`}
                     aria-label={`${score}점 선택`}
                   >
-                    <Star size={36} className="fill-current" />
+                    <Icon name="star" size={36} className="fill-current" />
                   </button>
                 ))}
               </div>
