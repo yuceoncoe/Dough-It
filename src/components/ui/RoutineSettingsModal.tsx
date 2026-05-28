@@ -211,7 +211,7 @@ export const RoutineSettingsModal = ({
           </div>
         </div>
       ) : (
-        <div className="action-sheet flex h-[min(92dvh,46rem)] !w-full !max-w-4xl flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
+        <div className="action-sheet flex h-[min(92dvh,46rem)] !w-full !max-w-4xl flex-col overflow-hidden !p-0" onClick={(event) => event.stopPropagation()}>
           <div className="shrink-0 px-6 pt-6 pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
