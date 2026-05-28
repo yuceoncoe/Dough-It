@@ -3,6 +3,7 @@ import { RoutineState, Tag, Task } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
 import { getTaskTonePillClass, getTaskToneLabel, QuadrantBadge, getToneSelectionKey, getToneTags, getMaxOverlap } from '../../utils/task';
 import { Icon } from '../../components/ui/Icon';
+import { QuadrantPicker } from './QuadrantPicker';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 export const RoutineSettingsModal = ({
@@ -153,8 +154,8 @@ export const RoutineSettingsModal = ({
           </div>
           <div className="mt-6 space-y-5">
             <section>
-              <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">프로필 정보</h3>
-              <div className="flex flex-col gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3">
+              <h3 className="section-title">프로필 정보</h3>
+              <div className="settings-card flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="truncate text-sm font-medium text-stone-700">{userEmail ?? '로그인됨'}</div>
                   <button
@@ -172,8 +173,8 @@ export const RoutineSettingsModal = ({
             </section>
 
             <section>
-              <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">푸시 알림</h3>
-              <div className="flex flex-col gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3">
+              <h3 className="section-title">푸시 알림</h3>
+              <div className="settings-card flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-medium text-stone-700">앱 푸시 알림</div>
                   <button
@@ -190,8 +191,8 @@ export const RoutineSettingsModal = ({
             </section>
 
             <section>
-              <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">루틴 설정 리스트</h3>
-              <div className="overflow-hidden rounded-xl border border-stone-200 bg-white divide-y divide-stone-200">
+              <h3 className="section-title">루틴 설정 리스트</h3>
+              <div className="settings-card overflow-hidden divide-y divide-stone-200 !p-0">
                 <button 
                   onClick={() => setActiveTab('weekday')}
                   className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-stone-50"
@@ -285,34 +286,23 @@ export const RoutineSettingsModal = ({
                   autoComplete="off"
                   autoCorrect="off"
                   spellCheck="false"
-                  className="w-full rounded-2xl bg-white px-5 py-4 text-lg font-medium text-stone-800 placeholder:text-stone-300 outline-none border border-stone-100 focus:border-stone-300 transition-all"
+                  className="input-field"
                   placeholder="루틴 이름"
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                 />
                 <div className="mt-3 flex flex-col gap-3">
-                  <label className="block rounded-xl bg-white px-4 py-2.5 text-sm text-stone-600 border border-stone-100 focus-within:border-stone-300 transition-all">
+                  <label className="time-label">
                     <div className="mb-1">시작</div>
                     <input type="time" className="time-field" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
                   </label>
-                  <label className="block rounded-xl bg-white px-4 py-2.5 text-sm text-stone-600 border border-stone-100 focus-within:border-stone-300 transition-all">
+                  <label className="time-label">
                     <div className="mb-1">종료</div>
                     <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
                   </label>
                 </div>
-                <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-stone-200 bg-stone-200">
-                  <button type="button" onClick={() => handleTagSelect(getToneTags('urgent-important'))} className={`px-4 py-2.5 text-center text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'urgent-important' ? 'bg-rose-100 text-rose-900' : 'bg-white text-stone-600 hover:bg-stone-50'}`}>
-                    긴급+중요
-                  </button>
-                  <button type="button" onClick={() => handleTagSelect(getToneTags('urgent'))} className={`px-4 py-2.5 text-center text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'urgent' ? 'bg-yellow-100 text-yellow-900' : 'bg-white text-stone-600 hover:bg-stone-50'}`}>
-                    긴급
-                  </button>
-                  <button type="button" onClick={() => handleTagSelect(getToneTags('important'))} className={`px-4 py-2.5 text-center text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'important' ? 'bg-sky-100 text-sky-900' : 'bg-white text-stone-600 hover:bg-stone-50'}`}>
-                    중요
-                  </button>
-                  <button type="button" onClick={() => handleTagSelect(getToneTags('normal'))} className={`px-4 py-2.5 text-center text-sm font-medium transition-colors ${getToneSelectionKey(tags) === 'normal' ? 'bg-emerald-100 text-emerald-900' : 'bg-white text-stone-600 hover:bg-stone-50'}`}>
-                    일반
-                  </button>
+                <div className="mt-6">
+                  <QuadrantPicker tags={tags} onSelect={handleTagSelect} buttonType="button" />
                 </div>
               </form>
             </div>
@@ -321,7 +311,7 @@ export const RoutineSettingsModal = ({
                 type="button"
                 onClick={handleAdd}
                 disabled={!title.trim() || !startTime || !endTime}
-                className="w-full rounded-xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-primary w-full"
               >
                 블록 추가
               </button>
@@ -350,14 +340,14 @@ export const RoutineSettingsModal = ({
               <button
                 type="button"
                 onClick={() => setPendingDeleteTask(null)}
-                className="rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
+                className="btn-outline"
               >
                 취소
               </button>
               <button
                 type="button"
                 onClick={() => handleDelete(pendingDeleteTask.id)}
-                className="rounded-xl bg-rose-500 px-4 py-3 text-sm font-semibold text-white"
+                className="btn-primary"
               >
                 삭제
               </button>

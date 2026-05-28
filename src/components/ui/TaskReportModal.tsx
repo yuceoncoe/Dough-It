@@ -80,7 +80,7 @@ export const TaskReportModal = ({
           </div>
         </div>
 
-        <button type="button" onClick={onClose} className="mt-5 w-full rounded-xl bg-stone-900 px-4 py-3 text-white">
+        <button type="button" onClick={onClose} className="btn-primary mt-5 w-full">
           닫기
         </button>
       </div>

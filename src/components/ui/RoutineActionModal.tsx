@@ -34,24 +34,20 @@ export const RoutineActionModal = ({
         <div className="mt-5 space-y-3">
           <button 
             onClick={() => onSelectScope('single')} 
-            className={`w-full rounded-xl border px-4 py-3.5 font-medium transition-colors ${
-              isDelete ? 'border-rose-200 bg-white text-rose-600 hover:bg-rose-50' : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'
-            }`}
+            className="btn-outline w-full"
           >
             {isDelete ? '이번 일정만 삭제하기' : '이번 일정만 수정하기'}
           </button>
           <button 
             onClick={() => onSelectScope('future')} 
-            className={`w-full rounded-xl border px-4 py-3.5 font-medium transition-colors ${
-              isDelete ? 'border-rose-200 bg-white text-rose-600 hover:bg-rose-50' : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'
-            }`}
+            className="btn-outline w-full"
           >
             {isDelete ? '앞으로 모든 일정 삭제하기' : '앞으로 모든 일정 수정하기'}
           </button>
         </div>
         <button 
           onClick={onClose} 
-          className="mt-4 w-full rounded-xl bg-stone-900 px-4 py-3.5 font-medium text-white transition-colors hover:bg-stone-800"
+          className="btn-primary mt-4 w-full"
         >
           취소
         </button>
