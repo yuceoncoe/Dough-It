@@ -590,7 +590,20 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
       ctx.save();
       ctx.filter = minuteAngle === null ? 'none' : `blur(${0.8 + progress * 5.2}px)`;
       ctx.globalAlpha = task.completed ? 0.42 : 0.92;
-      ctx.strokeStyle = getClockTaskColor(task);
+      
+      const baseColor = getClockTaskColor(task);
+      const gradient = ctx.createRadialGradient(
+        CENTER,
+        CENTER,
+        innerRadius,
+        CENTER,
+        CENTER,
+        outerRadius
+      );
+      gradient.addColorStop(0, hexToRgba(baseColor, 0.25));
+      gradient.addColorStop(1, hexToRgba(baseColor, 1.0));
+      ctx.strokeStyle = gradient;
+
       ctx.lineWidth = laneStrokeWidth;
       ctx.lineCap = 'butt';
       ctx.beginPath();
