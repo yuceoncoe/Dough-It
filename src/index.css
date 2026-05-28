@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
 @font-face {
   font-family: "Pretendard";
   src: url("/fonts/Pretendard-Regular.woff2") format("woff2");
