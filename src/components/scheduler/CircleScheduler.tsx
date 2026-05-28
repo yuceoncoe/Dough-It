@@ -11,7 +11,7 @@ const POMODORO_TICKS = Array.from({ length: 100 }, (_, i) => {
   const angle = i * 3.6;
   const isMajor = i % 10 === 0;
   const isFive = i % 5 === 0;
-  const startRadius = isMajor ? TRACK_INNER_RADIUS - 10 : (isFive ? TRACK_INNER_RADIUS - 7 : TRACK_INNER_RADIUS - 4);
+  const startRadius = isMajor ? TRACK_INNER_RADIUS - 18 : (isFive ? TRACK_INNER_RADIUS - 12 : TRACK_INNER_RADIUS - 8);
   const endRadius = TRACK_INNER_RADIUS;
   const start = polarToCartesian(CENTER, CENTER, startRadius, angle);
   const end = polarToCartesian(CENTER, CENTER, endRadius, angle);
