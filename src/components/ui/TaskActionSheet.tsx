@@ -61,7 +61,7 @@ export const TaskActionSheet = ({
               </button>
             ) : null}
           </div>
-          <div className="mt-3 flex items-center gap-1.5">
+          <div className="mt-3 flex w-full items-center justify-between">
             {[1, 2, 3, 4, 5].map((score) => {
               const isActive = (task.rating ?? 0) >= score;
               return (
@@ -69,10 +69,10 @@ export const TaskActionSheet = ({
                   key={score}
                   type="button"
                   onClick={() => onSetRating(task, score)}
-                  className={`rounded-full p-1.5 transition-transform hover:scale-105 active:scale-95 ${isActive ? 'text-amber-400' : 'text-stone-200 hover:text-amber-300'}`}
+                  className={`flex-1 flex justify-center py-2 transition-transform hover:scale-110 active:scale-95 ${isActive ? 'text-amber-400' : 'text-stone-200 hover:text-amber-300'}`}
                   aria-label={`${score}점 평가`}
                 >
-                  <Icon name="star" size={22} className={isActive ? "[font-variation-settings:'FILL'_1]" : "[font-variation-settings:'FILL'_0]"} />
+                  <Icon name="star" size={36} className={isActive ? "[font-variation-settings:'FILL'_1]" : "[font-variation-settings:'FILL'_0]"} />
                 </button>
               );
             })}

@@ -59,15 +59,15 @@ export const TaskRatingCarousel = ({
               <h3 className="mb-2 font-hand text-2xl text-stone-800">{task.title}</h3>
               <p className="mb-6 text-sm text-stone-500">얼마나 만족스럽게 달성하셨나요?</p>
               
-              <div className="mb-4 flex gap-2">
+              <div className="mb-4 flex w-full items-center justify-between">
                 {[1, 2, 3, 4, 5].map((score) => (
                   <button
                     key={score}
                     onClick={() => setRatingsByTaskId((current) => ({ ...current, [task.id]: score }))}
-                    className={`p-2 transition-transform hover:scale-110 active:scale-95 ${(ratingsByTaskId[task.id] ?? 0) >= score ? 'text-amber-400' : 'text-stone-200 hover:text-amber-300'}`}
+                    className={`flex-1 flex justify-center py-2 transition-transform hover:scale-110 active:scale-95 ${(ratingsByTaskId[task.id] ?? 0) >= score ? 'text-amber-400' : 'text-stone-200 hover:text-amber-300'}`}
                     aria-label={`${score}점 선택`}
                   >
-                    <Icon name="star" size={36} className={(ratingsByTaskId[task.id] ?? 0) >= score ? "[font-variation-settings:'FILL'_1]" : "[font-variation-settings:'FILL'_0]"} />
+                    <Icon name="star" size={48} className={(ratingsByTaskId[task.id] ?? 0) >= score ? "[font-variation-settings:'FILL'_1]" : "[font-variation-settings:'FILL'_0]"} />
                   </button>
                 ))}
               </div>
