@@ -239,9 +239,9 @@ export const RoutineSettingsModal = ({
               {draft[activeTab].map((task) => (
                 <div
                   key={task.id}
-                  className="task-card block w-full rounded-xl bg-white px-4 py-3.5 text-left"
+                  className="task-card block w-full rounded-xl bg-white px-4 py-3 text-left"
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center justify-between gap-4">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2.5">
                         <QuadrantBadge task={task} />
@@ -254,14 +254,12 @@ export const RoutineSettingsModal = ({
                         {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
                       </div>
                     </div>
-                    <div className="flex shrink-0 flex-col items-end justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
-                          {getTaskToneLabel(task)}
-                        </span>
-                      </div>
+                    <div className="flex shrink-0 items-center gap-2.5">
+                      <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
+                        {getTaskToneLabel(task)}
+                      </span>
                       <button onClick={() => setPendingDeleteTask(task)} className="rounded-full p-1 text-stone-300 transition-colors hover:bg-rose-50 hover:text-rose-500">
-                        <Icon name="delete" size={15} />
+                        <Icon name="delete" size={16} />
                       </button>
                     </div>
                   </div>
