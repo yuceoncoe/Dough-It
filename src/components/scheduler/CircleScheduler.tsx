@@ -302,18 +302,7 @@ export const CircleScheduler = ({
         />
       ) : null}
 
-      {!centerAction ? (
-        <g className="center-progress-surface pointer-events-none">
-          <circle className="center-progress-surface__track" cx={CENTER} cy={CENTER} r={TRACK_INNER_RADIUS} filter="url(#center-lens-shadow)" />
-          {displayTask && clampedActiveTaskProgress > 0 ? (
-            <path
-              className="center-progress-surface__value"
-              d={describeArc(CENTER, CENTER, TRACK_INNER_RADIUS, 0, clampedActiveTaskProgress * 360)}
-              fill={hexToRgba(activeTaskColor, 0.92)}
-            />
-          ) : null}
-        </g>
-      ) : null}
+
       <g className="pointer-events-none">
         {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
           const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
@@ -445,6 +434,19 @@ export const CircleScheduler = ({
             pointerEvents="none"
           />
         </>
+      ) : null}
+
+      {!centerAction ? (
+        <g className="center-progress-surface pointer-events-none">
+          <circle className="center-progress-surface__track" cx={CENTER} cy={CENTER} r={TRACK_INNER_RADIUS} filter="url(#center-lens-shadow)" />
+          {displayTask && clampedActiveTaskProgress > 0 ? (
+            <path
+              className="center-progress-surface__value"
+              d={describeArc(CENTER, CENTER, TRACK_INNER_RADIUS, 0, clampedActiveTaskProgress * 360)}
+              fill={hexToRgba(activeTaskColor, 0.92)}
+            />
+          ) : null}
+        </g>
       ) : null}
     </>
   );
