@@ -143,7 +143,7 @@ export const RoutineSettingsModal = ({
     <div className="modal-backdrop" onClick={onClose}>
       {activeTab === 'main' ? (
         <div className="action-sheet mx-auto flex h-auto w-full max-w-md flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
-          <div className="shrink-0 border-b border-stone-200 px-5 py-4">
+          <div className="shrink-0 px-5 py-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 pr-3">
                 <h2 className="font-hand truncate text-2xl text-stone-800">설정</h2>
@@ -156,7 +156,7 @@ export const RoutineSettingsModal = ({
           <div className="overflow-y-auto bg-white p-5 space-y-6">
             <section>
               <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">프로필 정보</h3>
-              <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="truncate text-sm font-medium text-stone-700">{userEmail ?? '로그인됨'}</div>
                   <button
@@ -175,7 +175,7 @@ export const RoutineSettingsModal = ({
 
             <section>
               <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">푸시 알림</h3>
-              <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-medium text-stone-700">앱 푸시 알림</div>
                   <button
@@ -193,10 +193,10 @@ export const RoutineSettingsModal = ({
 
             <section>
               <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.1em] text-stone-500">루틴 설정 리스트</h3>
-              <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+              <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
                 <button 
                   onClick={() => setActiveTab('weekday')}
-                  className="flex w-full items-center justify-between border-b border-stone-100 p-4 transition-colors hover:bg-stone-50"
+                  className="flex w-full items-center justify-between p-4 transition-colors hover:bg-stone-50"
                 >
                   <span className="text-sm font-medium text-stone-700">평일 루틴 설정</span>
                   <ChevronRight size={18} className="text-stone-400" />
@@ -214,7 +214,7 @@ export const RoutineSettingsModal = ({
         </div>
       ) : (
         <div className="action-sheet flex h-[min(92dvh,46rem)] !w-full !max-w-4xl flex-col overflow-hidden p-0" onClick={(event) => event.stopPropagation()}>
-          <div className="shrink-0 border-b border-stone-200 px-5 py-4">
+          <div className="shrink-0 px-5 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <button onClick={() => setActiveTab('main')} className="sheet-icon-button shrink-0" aria-label="이전">
@@ -235,7 +235,7 @@ export const RoutineSettingsModal = ({
             </div>
           </div>
         <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
-          <div className="min-h-0 overflow-y-auto border-b border-stone-200 p-5 md:border-b-0 md:border-r">
+          <div className="min-h-0 overflow-y-auto p-5 md:border-b-0 md:border-r">
             <div className="space-y-2.5">
               {draft[activeTab].map((task) => (
                 <div
@@ -288,17 +288,17 @@ export const RoutineSettingsModal = ({
                   autoCorrect="off"
                   autoCapitalize="none"
                   spellCheck={false}
-                  className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
+                  className="w-full rounded-xl bg-white px-4 py-3 outline-none focus:border-stone-500"
                   placeholder="일정 이름"
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                 />
                 <div className="space-y-3">
-                  <label className="block rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
+                  <label className="block rounded-xl bg-white px-4 py-2.5 text-sm text-stone-600">
                     <div className="mb-1">시작</div>
                     <input type="time" className="time-field" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
                   </label>
-                  <label className="block rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
+                  <label className="block rounded-xl bg-white px-4 py-2.5 text-sm text-stone-600">
                     <div className="mb-1">종료</div>
                     <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
                   </label>
@@ -319,7 +319,7 @@ export const RoutineSettingsModal = ({
                 </div>
               </form>
             </div>
-            <div className="shrink-0 border-t border-stone-200 bg-white p-5">
+            <div className="shrink-0 bg-white p-5">
               <button
                 type="button"
                 onClick={handleAdd}
@@ -353,7 +353,7 @@ export const RoutineSettingsModal = ({
               <button
                 type="button"
                 onClick={() => setPendingDeleteTask(null)}
-                className="rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700"
+                className="rounded-xl bg-white px-4 py-3 text-sm text-stone-700"
               >
                 취소
               </button>

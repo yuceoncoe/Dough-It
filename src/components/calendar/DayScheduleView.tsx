@@ -304,7 +304,7 @@ export const DayScheduleView = ({
               <button
                 type="button"
                 onClick={() => setPendingDeleteTask(null)}
-                className="rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700"
+                className="rounded-xl bg-white px-4 py-3 text-sm text-stone-700"
               >
                 취소
               </button>
@@ -343,7 +343,7 @@ export const DayScheduleView = ({
             <button
               type="button"
               onClick={onPreviousDate}
-              className="rounded-full border border-stone-300 bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
+              className="rounded-full bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
               aria-label="전일로 이동"
             >
               <ChevronLeft size={18} />
@@ -352,7 +352,7 @@ export const DayScheduleView = ({
             <button
               type="button"
               onClick={onNextDate}
-              className="rounded-full border border-stone-300 bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
+              className="rounded-full bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
               aria-label="후일로 이동"
             >
               <ChevronRight size={18} />
@@ -365,12 +365,12 @@ export const DayScheduleView = ({
               resetForm();
               setEditorOpen(true);
             }}
-            className="rounded-full border border-stone-300 bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
+            className="rounded-full bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
             aria-label="빠른 일정 추가"
           >
             <Plus size={18} />
           </button>
-          <button onClick={onOpenSettings} className="rounded-full border border-stone-300 bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
+          <button onClick={onOpenSettings} className="rounded-full bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
             <Settings size={18} />
           </button>
         </div>

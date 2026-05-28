@@ -61,7 +61,7 @@ export const TaskReportModal = ({
 
 
 
-        <div className="mt-4 rounded-2xl border border-stone-200 p-4">
+        <div className="mt-4 rounded-2xl p-4">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-stone-700">처리한 일정</span>
             <span className="text-sm font-bold text-stone-900">{report.completedCount}개</span>

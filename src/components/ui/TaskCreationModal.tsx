@@ -54,7 +54,7 @@ export const TaskCreationModal = ({
           autoCorrect="off"
           autoCapitalize="none"
           spellCheck={false}
-          className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-xl text-stone-800 outline-none placeholder:text-stone-400 focus:border-stone-500"
+          className="w-full rounded-xl bg-white px-4 py-3 text-xl text-stone-800 outline-none placeholder:text-stone-400 focus:border-stone-500"
           placeholder="일정 이름"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
@@ -91,7 +91,7 @@ export const TaskCreationModal = ({
           </button>
         </div>
         <div className="mt-6 flex gap-3">
-          <button onClick={onClose} className="flex-1 rounded-2xl border border-stone-300 bg-white px-4 py-3 text-stone-700 transition-colors hover:bg-stone-50">
+          <button onClick={onClose} className="flex-1 rounded-2xl bg-white px-4 py-3 text-stone-700 transition-colors hover:bg-stone-50">
             취소
           </button>
           <button

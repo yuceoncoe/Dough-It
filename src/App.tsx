@@ -485,7 +485,7 @@ const AppShell = ({
         ) : null}
       </main>
 
-      <nav className="bottom-nav fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-stone-200 bg-white/90 px-2 shadow-[0_-12px_25px_rgba(85,72,56,0.08)] backdrop-blur">
+      <nav className="bottom-nav fixed inset-x-0 bottom-0 z-40 flex items-center justify-around bg-white/90 px-2 shadow-[0_-12px_25px_rgba(85,72,56,0.08)] backdrop-blur">
         <button
           onClick={() => {
             setActiveTab('home');
@@ -516,7 +516,7 @@ const AppShell = ({
 const SupabaseConfigNotice = () => (
   <div className="min-h-screen bg-[#f0f0f4] px-6 py-10 text-stone-900">
     <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-xl items-center">
-      <div className="w-full rounded-[28px] border border-white/80 bg-white px-6 py-7 shadow-[0_24px_80px_rgba(73,54,31,0.12)]">
+      <div className="w-full rounded-[28px] bg-white px-6 py-7 shadow-[0_24px_80px_rgba(73,54,31,0.12)]">
         <h1 className="font-hand text-3xl text-stone-900">Supabase 설정이 필요합니다</h1>
         <p className="mt-3 text-sm leading-6 text-stone-500">
           배포 환경 또는 로컬 `.env` 파일에 `VITE_SUPABASE_URL` 과 `VITE_SUPABASE_ANON_KEY` 를 추가해 주세요.

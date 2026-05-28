@@ -59,17 +59,17 @@ export const DayTaskEditorModal = ({
             autoCorrect="off"
             autoCapitalize="none"
             spellCheck={false}
-            className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
+            className="w-full rounded-xl bg-white px-4 py-3 outline-none focus:border-stone-500"
             placeholder="일정 이름"
             value={title}
             onChange={(event) => onTitleChange(event.target.value)}
           />
           <div className="space-y-3">
-            <label className="block rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
+            <label className="block rounded-xl bg-white px-4 py-2.5 text-sm text-stone-600">
               <div className="mb-1">시작</div>
               <input type="time" className="time-field" value={startTime} onChange={(event) => onStartTimeChange(event.target.value)} />
             </label>
-            <label className="block rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-600">
+            <label className="block rounded-xl bg-white px-4 py-2.5 text-sm text-stone-600">
               <div className="mb-1">종료</div>
               <input type="time" className="time-field" value={endTime} onChange={(event) => onEndTimeChange(event.target.value)} />
             </label>
@@ -89,7 +89,7 @@ export const DayTaskEditorModal = ({
             </button>
           </div>
           <div className="mt-5 grid grid-cols-2 gap-3">
-            <button type="button" onClick={onClose} className="rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-700 transition-colors hover:bg-stone-50">
+            <button type="button" onClick={onClose} className="rounded-xl bg-white px-4 py-3 text-sm text-stone-700 transition-colors hover:bg-stone-50">
               취소
             </button>
             <button type="submit" disabled={!title.trim() || !startTime || !endTime} className="rounded-xl bg-stone-900 px-4 py-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50">

@@ -22,7 +22,7 @@ export const AuthScreen = ({
   return (
     <div className="min-h-screen bg-[#f0f0f4] px-6 py-10 text-stone-900">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-md items-center">
-        <div className="w-full rounded-[28px] border border-white/80 bg-white px-6 py-7 shadow-[0_24px_80px_rgba(73,54,31,0.12)]">
+        <div className="w-full rounded-[28px] bg-white px-6 py-7 shadow-[0_24px_80px_rgba(73,54,31,0.12)]">
           <div className="mb-6">
             <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-stone-900 text-white">
               <LockKeyhole size={20} />
@@ -66,7 +66,7 @@ export const AuthScreen = ({
               <input
                 type="email"
                 autoComplete="email"
-                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
+                className="w-full rounded-2xl bg-white px-4 py-3 outline-none focus:border-stone-500"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@example.com"
@@ -78,7 +78,7 @@ export const AuthScreen = ({
               <input
                 type="password"
                 autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'}
-                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-stone-500"
+                className="w-full rounded-2xl bg-white px-4 py-3 outline-none focus:border-stone-500"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="8자 이상"

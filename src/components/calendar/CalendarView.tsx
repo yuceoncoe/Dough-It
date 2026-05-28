@@ -29,13 +29,13 @@ export const CalendarView = ({
         <div>
           <h1 className="font-hand text-3xl text-stone-800 md:text-5xl">달력 보기</h1>
         </div>
-        <button onClick={onOpenSettings} className="rounded-full border border-stone-300 bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
+        <button onClick={onOpenSettings} className="rounded-full bg-white p-3 text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
           <Settings size={22} />
         </button>
       </div>
 
 
-      <div className="mb-3 flex items-center justify-between rounded-xl border border-stone-200 bg-white px-2 py-2 shadow-sm shrink-0">
+      <div className="mb-3 flex items-center justify-between rounded-xl bg-white px-2 py-2 shadow-sm shrink-0">
         <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))} className="rounded-full p-2 text-stone-600 transition-colors hover:bg-stone-100">
           <ChevronLeft size={18} />
         </button>
@@ -66,7 +66,7 @@ export const CalendarView = ({
             <button
               key={dateKey}
               onClick={() => onSelectDate(dateKey)}
-              className={`flex min-h-[54px] flex-col justify-between rounded-xl border p-1.5 text-left transition-colors md:min-h-[76px] md:p-2 ${isToday ? 'border-amber-400 bg-amber-50' : 'border-stone-200 bg-white'}`}
+              className={`flex min-h-[54px] flex-col justify-between rounded-xl p-1.5 shadow-sm text-left transition-colors md:min-h-[76px] md:p-2 ${isToday ? 'bg-amber-50 ring-2 ring-amber-400' : 'bg-white'}`}
             >
               <span className={`text-xs font-semibold md:text-sm ${isToday ? 'text-amber-700' : 'text-stone-700'}`}>{day}</span>
               <div className="grid h-5 w-5 grid-cols-2 grid-rows-2 gap-[2px] self-end md:h-7 md:w-7">

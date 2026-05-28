@@ -55,7 +55,7 @@ export const TaskRatingCarousel = ({
 
         <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden">
           {unratedTasks.map((task) => (
-            <div key={task.id} className="flex min-w-full snap-center flex-col items-center rounded-3xl border border-stone-100 bg-white p-6 text-center shadow-xl">
+            <div key={task.id} className="flex min-w-full snap-center flex-col items-center rounded-3xl bg-white p-6 text-center shadow-xl">
               <h3 className="mb-2 font-hand text-2xl text-stone-800">{task.title}</h3>
               <p className="mb-6 text-sm text-stone-500">얼마나 만족스럽게 달성하셨나요?</p>
               
@@ -82,7 +82,7 @@ export const TaskRatingCarousel = ({
                   rows={3}
                   maxLength={240}
                   placeholder="오늘 이 일정에 대해 짧게 남겨보세요"
-                  className="mt-2 w-full resize-none rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm leading-5 text-stone-700 outline-none transition-colors placeholder:text-stone-400 focus:border-stone-400 focus:bg-white"
+                  className="mt-2 w-full resize-none rounded-2xl bg-stone-50 px-4 py-3 text-sm leading-5 text-stone-700 outline-none transition-colors placeholder:text-stone-400 focus:border-stone-400 focus:bg-white"
                 />
               </label>
               <button

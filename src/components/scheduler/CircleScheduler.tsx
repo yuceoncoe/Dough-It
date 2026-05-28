@@ -563,7 +563,7 @@ export const CircleScheduler = ({
                 setHasPendingArcEnd(false);
                 setActiveArcHandle(null);
               }}
-              className="rounded-full border border-stone-300 bg-white/90 px-4 py-2 text-xs font-semibold text-stone-600 shadow-sm backdrop-blur"
+              className="rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-stone-600 shadow-sm backdrop-blur"
             >
               취소
             </button>
