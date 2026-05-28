@@ -270,7 +270,7 @@ export const RoutineSettingsModal = ({
             </div>
           </div>
           <div className="flex min-h-0 flex-col bg-white">
-            <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-4">
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
               <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
               <form 
                 className="mt-4 flex flex-col gap-3"
@@ -304,17 +304,15 @@ export const RoutineSettingsModal = ({
                 <div className="mt-6">
                   <QuadrantPicker tags={tags} onSelect={handleTagSelect} buttonType="button" />
                 </div>
+                <button
+                  type="button"
+                  onClick={handleAdd}
+                  disabled={!title.trim() || !startTime || !endTime}
+                  className="btn-primary mt-8 w-full"
+                >
+                  블록 추가
+                </button>
               </form>
-            </div>
-            <div className="shrink-0 bg-white px-6 pb-6">
-              <button
-                type="button"
-                onClick={handleAdd}
-                disabled={!title.trim() || !startTime || !endTime}
-                className="btn-primary w-full"
-              >
-                블록 추가
-              </button>
             </div>
           </div>
         </div>
