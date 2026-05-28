@@ -495,6 +495,21 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
   ctx.fill();
   ctx.restore();
 
+  const trackBgColors = ['#f5f5f4', '#fafaf9', '#ffffff']; // Outer to inner
+  Array.from({ length: laneCount }, (_, laneIndex) => laneIndex).forEach((laneIndex) => {
+    const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex, laneCount);
+    const laneCenterRadius = (innerRadius + outerRadius) / 2;
+    const laneWidth = outerRadius - innerRadius;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(CENTER, CENTER, laneCenterRadius, 0, Math.PI * 2);
+    ctx.strokeStyle = trackBgColors[laneIndex % trackBgColors.length];
+    ctx.lineWidth = laneWidth;
+    ctx.stroke();
+    ctx.restore();
+  });
+
   if (minuteAngle !== null) {
     ctx.save();
     ctx.beginPath();
