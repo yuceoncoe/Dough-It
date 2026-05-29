@@ -596,17 +596,17 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
       ctx.globalAlpha = task.completed ? 0.42 : 0.92;
       
       const baseColor = getClockTaskColor(task);
-      const gradient = ctx.createRadialGradient(
-        CENTER,
-        CENTER,
-        innerRadius,
-        CENTER,
-        CENTER,
-        outerRadius
-      );
-      gradient.addColorStop(0, hexToRgba(baseColor, 0.15));
-      gradient.addColorStop(1, hexToRgba(baseColor, 0.8));
-      ctx.strokeStyle = gradient;
+      if (typeof ctx.createConicGradient === 'function') {
+        const startAngleRad = (startAngle - 90) * Math.PI / 180;
+        const gradient = ctx.createConicGradient(startAngleRad, CENTER, CENTER);
+        const spanFraction = Math.max(0.001, Math.min(1, (endAngle - startAngle) / 360));
+        
+        gradient.addColorStop(0, hexToRgba(baseColor, 0.8));
+        gradient.addColorStop(spanFraction, hexToRgba(baseColor, 1.0));
+        ctx.strokeStyle = gradient;
+      } else {
+        ctx.strokeStyle = baseColor;
+      }
 
       ctx.lineWidth = laneStrokeWidth;
       ctx.lineCap = 'butt';
