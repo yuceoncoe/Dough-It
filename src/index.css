@@ -86,12 +86,13 @@ canvas {
 }
 
 .time-field {
-  width: 100%;
-  min-height: 2rem;
+  width: auto;
+  flex: 1;
+  text-align: right;
   background: transparent;
   border: 0;
   outline: none;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   line-height: 1.1;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -290,12 +291,15 @@ canvas {
 }
 
 .time-label {
-  display: block;
-  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-radius: 1rem;
   border: 1px solid rgba(17, 24, 39, 0.07);
   background: #ffffff;
-  padding: 0.625rem 1rem;
-  font-size: 0.875rem;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
   color: #57534e;
   transition: border-color 160ms ease;
 }

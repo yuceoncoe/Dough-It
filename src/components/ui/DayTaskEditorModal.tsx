@@ -49,7 +49,7 @@ export const DayTaskEditorModal = ({
             </button>
           </div>
         </div>
-        <form onSubmit={onSubmit} autoComplete="off" className="mt-2 flex flex-col">
+        <form onSubmit={onSubmit} autoComplete="off" className="mt-6 flex flex-col">
           <input
             autoFocus
             type="text"
@@ -65,11 +65,11 @@ export const DayTaskEditorModal = ({
           />
           <div className="mt-3 flex flex-col gap-3">
             <label className="time-label">
-              <div className="mb-1">시작</div>
+              <div className="font-medium shrink-0">시작</div>
               <input type="time" className="time-field" value={startTime} onChange={(event) => onStartTimeChange(event.target.value)} />
             </label>
             <label className="time-label">
-              <div className="mb-1">종료</div>
+              <div className="font-medium shrink-0">종료</div>
               <input type="time" className="time-field" value={endTime} onChange={(event) => onEndTimeChange(event.target.value)} />
             </label>
           </div>

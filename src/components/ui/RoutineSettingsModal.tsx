@@ -274,7 +274,7 @@ export const RoutineSettingsModal = ({
             <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
               <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
               <form 
-                className="mt-4 flex flex-col gap-3"
+                className="mt-6 flex flex-col gap-3"
                 autoComplete="off"
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -294,11 +294,11 @@ export const RoutineSettingsModal = ({
                 />
                 <div className="mt-3 flex flex-col gap-3">
                   <label className="time-label">
-                    <div className="mb-1">시작</div>
+                    <div className="font-medium shrink-0">시작</div>
                     <input type="time" className="time-field" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
                   </label>
                   <label className="time-label">
-                    <div className="mb-1">종료</div>
+                    <div className="font-medium shrink-0">종료</div>
                     <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
                   </label>
                 </div>
