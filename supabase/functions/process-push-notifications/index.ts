@@ -89,9 +89,14 @@ Deno.serve(async (request) => {
           .eq('id', notification.id);
       } else {
         failed += 1;
+        // Log all reasons for failure to Supabase logs
+        const errorDetails = results
+          .map((r, i) => `Sub ${i}: ${r.status === 'rejected' ? (r.reason?.message || JSON.stringify(r.reason)) : 'Success'}`)
+          .join(', ');
+        console.error(`Notification ${notification.id} failed. Details: ${errorDetails}`);
         await supabase
           .from('scheduled_notifications')
-          .update({ status: 'failed', error: 'Every push subscription failed.' })
+          .update({ status: 'failed', error: `Every push subscription failed. Details: ${errorDetails}` })
           .eq('id', notification.id);
       }
     }
