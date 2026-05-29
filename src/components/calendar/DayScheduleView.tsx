@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Task, Tag, RoutineScope, RoutineAction } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
 import { getTaskColor, getTaskTonePillClass, getTaskToneLabel } from '../../utils/task';
@@ -12,8 +12,7 @@ import { Icon } from '../../components/ui/Icon';
 import { QuadrantBadge, getMaxOverlap } from '../../utils/task';
 import { getTaskReport } from '../../utils/report';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
-
-
+import { useSwipeCard } from '../../hooks/useSwipeCard';
 
 export const DayScheduleView = ({
   date,
@@ -46,14 +45,19 @@ export const DayScheduleView = ({
   const [editorOpen, setEditorOpen] = useState(false);
   const [pendingRoutineAction, setPendingRoutineAction] = useState<{ action: RoutineAction; task: Task } | null>(null);
   const [routineEditScope, setRoutineEditScope] = useState<RoutineScope>('single');
-  const [swipedTaskId, setSwipedTaskId] = useState<string | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
   const [now, setNow] = useState(() => new Date());
-  const swipeStartRef = useRef<{ id: string; x: number; y: number; isHorizontal: boolean | null } | null>(null);
-  const swipeCardRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  const {
+    swipedTaskId,
+    registerCardRef,
+    getPointerHandlers,
+    getCardStyle,
+    resetSwipe,
+  } = useSwipeCard();
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const toastTimeoutRef = useRef<number | null>(null);
+  const toastTimeoutRef = React.useRef<number | null>(null);
   const isToday = date === getTodayString();
   const isPastDate = date < getTodayString();
   const report = getTaskReport(tasks);
@@ -122,10 +126,6 @@ export const DayScheduleView = ({
     resetForm();
   };
 
-  const toggleTag = (tag: Tag) => {
-    setTags((current) => current.includes(tag) ? current.filter((item) => item !== tag) : [...current, tag]);
-  };
-
   const addTask = (nextTitle: string, nextTags: Tag[], nextStartTime: string, duration: number): boolean => {
     const newTask: Task = {
       id: `task-${Date.now()}`,
@@ -153,7 +153,7 @@ export const DayScheduleView = ({
   };
 
   const requestDeleteTask = (task: Task) => {
-    setSwipedTaskId(null);
+    resetSwipe(task.id);
     if (task.isRoutine) {
       setPendingRoutineAction({ action: 'delete', task });
       return;
@@ -161,15 +161,6 @@ export const DayScheduleView = ({
     if (window.confirm(`'${task.title}' 일정을 정말 삭제하시겠습니까?`)) {
       deleteTask(task.id);
     }
-  };
-
-  const setSwipeCardOffset = (taskId: string, offset: number, animated: boolean) => {
-    const card = swipeCardRefs.current[taskId];
-    if (!card) {
-      return;
-    }
-    card.style.transition = animated ? 'transform 180ms ease' : 'none';
-    card.style.transform = `translateX(${offset}px)`;
   };
 
   const startEditing = (task: Task, scope: RoutineScope = 'single') => {
@@ -394,68 +385,15 @@ export const DayScheduleView = ({
                     <button
                       onClick={() => {
                         if (swipedTaskId === task.id) {
-                          setSwipedTaskId(null);
+                          resetSwipe(task.id);
                           return;
                         }
                         setSheetTask(task);
                       }}
-                      onPointerDown={(event) => {
-                        setSwipeCardOffset(task.id, swipedTaskId === task.id ? -80 : 0, false);
-                        swipeStartRef.current = { id: task.id, x: event.clientX, y: event.clientY, isHorizontal: null };
-                      }}
-                      onPointerMove={(event) => {
-                        const start = swipeStartRef.current;
-                        if (!start || start.id !== task.id) {
-                          return;
-                        }
-                        const deltaX = event.clientX - start.x;
-                        const deltaY = event.clientY - start.y;
-                        if (start.isHorizontal === null) {
-                          if (Math.abs(deltaX) < 8 && Math.abs(deltaY) < 8) {
-                            return;
-                          }
-                          start.isHorizontal = Math.abs(deltaX) > Math.abs(deltaY) * 1.15;
-                        }
-                        if (!start.isHorizontal) {
-                          return;
-                        }
-                        event.preventDefault();
-                        event.stopPropagation();
-                        const baseOffset = swipedTaskId === task.id ? -80 : 0;
-                        const nextOffset = Math.max(-96, Math.min(0, baseOffset + deltaX));
-                        setSwipeCardOffset(task.id, nextOffset, false);
-                      }}
-                      onPointerUp={(event) => {
-                        const start = swipeStartRef.current;
-                        swipeStartRef.current = null;
-                        if (!start || start.id !== task.id) {
-                          return;
-                        }
-                        const deltaX = event.clientX - start.x;
-                        const deltaY = event.clientY - start.y;
-                        if (!start.isHorizontal && Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
-                          return;
-                        }
-                        event.preventDefault();
-                        event.stopPropagation();
-                        const baseOffset = swipedTaskId === task.id ? -80 : 0;
-                        const currentOffset = Math.max(-96, Math.min(0, baseOffset + deltaX));
-                        const shouldOpen = currentOffset <= -42;
-                        setSwipedTaskId(shouldOpen ? task.id : null);
-                        setSwipeCardOffset(task.id, shouldOpen ? -80 : 0, true);
-                      }}
-                      onPointerCancel={() => {
-                        swipeStartRef.current = null;
-                        setSwipeCardOffset(task.id, swipedTaskId === task.id ? -80 : 0, true);
-                      }}
-                      ref={(node) => {
-                        swipeCardRefs.current[task.id] = node;
-                      }}
+                      {...getPointerHandlers(task.id)}
+                      ref={registerCardRef(task.id)}
                       className="task-card relative block w-full rounded-xl bg-white px-4 py-3.5 text-left"
-                      style={{
-                        transform: `translateX(${swipedTaskId === task.id ? -80 : 0}px)`,
-                        touchAction: 'pan-y',
-                      }}
+                      style={getCardStyle(task.id)}
                     >
                       <div className="flex items-center gap-3.5">
                         <div className="flex shrink-0 items-center">

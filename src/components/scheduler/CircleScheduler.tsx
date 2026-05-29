@@ -6,7 +6,6 @@ import { polarToCartesian, describeArc } from '../../utils/geometry';
 import TaskCreationModal from '../ui/TaskCreationModal';
 import CanvasClockSurface from './CanvasClockSurface';
 
-
 const POMODORO_TICKS = Array.from({ length: 100 }, (_, i) => {
   const angle = i * 3.6;
   const isMajor = i % 10 === 0;
@@ -26,6 +25,243 @@ const POMODORO_TICKS = Array.from({ length: 100 }, (_, i) => {
   };
 });
 
+const clampLabelCoordinate = (value: number, size: number) => (
+  Math.max(SVG_VIEWBOX_MIN + size / 2 + 6, Math.min(SVG_VIEWBOX_MIN + SVG_VIEWBOX_SIZE - size / 2 - 6, value))
+);
+
+const getTaskLabelText = (title: string) => {
+  const trimmed = title.trim();
+  return trimmed.length > 8 ? `${trimmed.slice(0, 8)}...` : trimmed;
+};
+
+interface ClockHourLabelsProps {
+  showCurrentTime: boolean;
+  minuteAngle: number | null;
+  interactive: boolean;
+}
+
+interface ClockTaskTracksProps {
+  trackTasks: Array<{ task: Task; startAngle: number; endAngle: number; laneIndex: number }>;
+  laneCount: number;
+  interactive: boolean;
+  getClockTaskColor: (task: Task) => string;
+}
+
+interface ClockPendingArcProps {
+  pendingArc: { startAngle: number; endAngle: number } | null;
+  hasPendingArcEnd: boolean;
+  interactive: boolean;
+  beginArcHandleDrag: (event: React.PointerEvent<SVGCircleElement>, handle: 'start' | 'end') => void;
+}
+
+interface ClockCurrentTimeHandProps {
+  showCurrentTime: boolean;
+  minuteAngle: number | null;
+}
+
+interface ClockCenterProgressProps {
+  centerAction?: { label: string; onClick: () => void };
+  displayTask: Task | null;
+  clampedActiveTaskProgress: number;
+  activeTaskColor: string;
+}
+
+const ClockTaskTracks = ({
+  trackTasks,
+  laneCount,
+  interactive,
+  getClockTaskColor,
+}: ClockTaskTracksProps) => {
+  return (
+    <g className="pointer-events-none">
+      {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
+        const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
+        const safeEndAngle = clampArcEnd(startAngle, endAngle);
+        const midAngle = startAngle + (safeEndAngle - startAngle) / 2;
+        const labelPoint = polarToCartesian(CENTER, CENTER, laneCenterRadius, midAngle);
+        const labelText = getTaskLabelText(task.title);
+        const labelWidth = Math.min(132, Math.max(52, labelText.length * 18 + 24));
+        const labelHeight = 30;
+        const labelX = clampLabelCoordinate(labelPoint.x, labelWidth);
+        const labelY = clampLabelCoordinate(labelPoint.y, labelHeight);
+        const isCompleted = task.completed;
+        const textColor = isCompleted ? 'rgba(120, 113, 108, 0.72)' : 'rgba(41, 37, 36, 0.88)';
+
+        return (
+          <g key={`${interactive ? 'main' : 'preview'}-${task.id}-label`} className="pointer-events-none">
+            <rect
+              x={labelX - labelWidth / 2}
+              y={labelY - labelHeight / 2}
+              width={labelWidth}
+              height={labelHeight}
+              rx="15"
+              fill="rgba(255,255,255,0.82)"
+              stroke={getClockTaskColor(task)}
+              strokeWidth="1.2"
+            />
+            <text
+              x={labelX}
+              y={labelY + 1}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="text-[18px] font-semibold"
+              fill={textColor}
+            >
+              {labelText}
+            </text>
+          </g>
+        );
+      })}
+    </g>
+  );
+};
+
+const ClockHourLabels = ({
+  showCurrentTime,
+  minuteAngle,
+  interactive,
+}: ClockHourLabelsProps) => {
+  return (
+    <g className="pointer-events-none">
+      {OUTER_HOUR_LABELS.map(({ value, angle, point }) => {
+        const { blur, opacity } = showCurrentTime && minuteAngle !== null
+          ? getDirectionalTextVisuals(angle, minuteAngle)
+          : { blur: 0, opacity: 0.88 };
+
+        return (
+          <text
+            key={`${interactive ? 'main' : 'preview'}-hour-label-${value}-${angle}`}
+            x={point.x}
+            y={point.y}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="fill-black text-[18px] font-semibold"
+            opacity={opacity}
+            style={{ filter: `blur(${blur}px)` }}
+          >
+            {value}
+          </text>
+        );
+      })}
+    </g>
+  );
+};
+
+const ClockPendingArc = ({
+  pendingArc,
+  hasPendingArcEnd,
+  interactive,
+  beginArcHandleDrag,
+}: ClockPendingArcProps) => {
+  if (pendingArc === null) return null;
+
+  return (
+    <>
+      {hasPendingArcEnd && (
+        <path
+          d={describeArc(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle, pendingArc.endAngle)}
+          fill="rgba(59, 130, 246, 0.15)"
+          stroke="#3b82f6"
+          strokeWidth="2"
+          strokeDasharray="5 5"
+          pointerEvents="none"
+        />
+      )}
+      <line
+        x1={CENTER}
+        y1={CENTER}
+        x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle).x}
+        y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle).y}
+        stroke="#3b82f6"
+        strokeWidth="2"
+        strokeDasharray="5 5"
+        pointerEvents="none"
+      />
+      {hasPendingArcEnd && (
+        <line
+          x1={CENTER}
+          y1={CENTER}
+          x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.endAngle).x}
+          y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.endAngle).y}
+          stroke="#3b82f6"
+          strokeWidth="2"
+          strokeDasharray="5 5"
+          pointerEvents="none"
+        />
+      )}
+      {(hasPendingArcEnd ? (['start', 'end'] as const) : (['start'] as const)).map((handle) => {
+        const angle = handle === 'start' ? pendingArc.startAngle : pendingArc.endAngle;
+        const point = polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, angle);
+        return interactive ? (
+          <circle
+            key={`${interactive ? 'main' : 'preview'}-pending-arc-${handle}`}
+            cx={point.x}
+            cy={point.y}
+            r={18}
+            fill="transparent"
+            stroke="none"
+            className="cursor-grab active:cursor-grabbing"
+            onPointerDown={(event) => beginArcHandleDrag(event, handle)}
+            pointerEvents="all"
+          />
+        ) : null;
+      })}
+    </>
+  );
+};
+
+const ClockCurrentTimeHand = ({
+  showCurrentTime,
+  minuteAngle,
+}: ClockCurrentTimeHandProps) => {
+  if (!showCurrentTime || minuteAngle === null) return null;
+
+  return (
+    <line
+      x1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).x}
+      y1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).y}
+      x2={polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, minuteAngle).x}
+      y2={polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, minuteAngle).y}
+      stroke="#3b82f6"
+      strokeWidth={4}
+      strokeLinecap="round"
+      pointerEvents="none"
+    />
+  );
+};
+
+const ClockCenterProgress = ({
+  centerAction,
+  displayTask,
+  clampedActiveTaskProgress,
+  activeTaskColor,
+}: ClockCenterProgressProps) => {
+  if (centerAction) return null;
+
+  return (
+    <g className="center-progress-surface pointer-events-none">
+      <circle className="center-progress-surface__track" cx={CENTER} cy={CENTER} r={TRACK_INNER_RADIUS} filter="url(#center-lens-shadow)" />
+      {displayTask && clampedActiveTaskProgress > 0 ? (
+        <path
+          className="center-progress-surface__value"
+          d={describeArc(CENTER, CENTER, TRACK_INNER_RADIUS, 0, clampedActiveTaskProgress * 360)}
+          fill={hexToRgba(activeTaskColor, 0.92)}
+        />
+      ) : null}
+      {POMODORO_TICKS.map((tick) => (
+        <line
+          key={tick.id}
+          x1={tick.x1}
+          y1={tick.y1}
+          x2={tick.x2}
+          y2={tick.y2}
+          stroke={tick.stroke}
+          strokeWidth={tick.strokeWidth}
+        />
+      ))}
+    </g>
+  );
+};
 
 export const CircleScheduler = ({
   tasks,
@@ -45,22 +281,6 @@ export const CircleScheduler = ({
     onClick: () => void;
   };
 }) => {
-  const getActionTypeForTask = (task: Task): 'pruning' | 'watering' | 'fertilizing' | 'tilling' => {
-    const tags = task.tags || [];
-    const hasUrgent = tags.includes('urgent');
-    const hasImportant = tags.includes('important');
-    if (hasUrgent && hasImportant) {
-      return 'fertilizing';
-    }
-    if (hasUrgent) {
-      return 'pruning';
-    }
-    if (hasImportant) {
-      return 'watering';
-    }
-    return 'tilling';
-  };
-
   const squareRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const sliderDragStartRef = useRef<number | null>(null);
@@ -277,13 +497,7 @@ export const CircleScheduler = ({
   const trackTasks = assignTasksToTrackLanes(tasks, laneCount);
   const interactionRingRadius = (TRACK_INNER_RADIUS + OUTER_BACKGROUND_RADIUS) / 2;
   const interactionRingWidth = OUTER_BACKGROUND_RADIUS - TRACK_INNER_RADIUS + 28;
-  const clampLabelCoordinate = (value: number, size: number) => (
-    Math.max(SVG_VIEWBOX_MIN + size / 2 + 6, Math.min(SVG_VIEWBOX_MIN + SVG_VIEWBOX_SIZE - size / 2 - 6, value))
-  );
-  const getTaskLabelText = (title: string) => {
-    const trimmed = title.trim();
-    return trimmed.length > 8 ? `${trimmed.slice(0, 8)}...` : trimmed;
-  };
+
   const dragPreviewSize = 176;
   const dragPreviewZoom = 1.9;
   const dragPreviewHalf = dragPreviewSize / 2;
@@ -322,163 +536,37 @@ export const CircleScheduler = ({
         />
       ) : null}
 
+      <ClockTaskTracks
+        trackTasks={trackTasks}
+        laneCount={laneCount}
+        interactive={interactive}
+        getClockTaskColor={getClockTaskColor}
+      />
 
-      <g className="pointer-events-none">
-        {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
-          const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
-          const safeEndAngle = clampArcEnd(startAngle, endAngle);
-          const midAngle = startAngle + (safeEndAngle - startAngle) / 2;
-          const labelPoint = polarToCartesian(CENTER, CENTER, laneCenterRadius, midAngle);
-          const labelText = getTaskLabelText(task.title);
-          const labelWidth = Math.min(132, Math.max(52, labelText.length * 18 + 24));
-          const labelHeight = 30;
-          const labelX = clampLabelCoordinate(labelPoint.x, labelWidth);
-          const labelY = clampLabelCoordinate(labelPoint.y, labelHeight);
-          const isCompleted = task.completed;
-          const textColor = isCompleted ? 'rgba(120, 113, 108, 0.72)' : 'rgba(41, 37, 36, 0.88)';
+      <ClockHourLabels
+        showCurrentTime={showCurrentTime}
+        minuteAngle={canvasMinuteAngle}
+        interactive={interactive}
+      />
 
-          return (
-            <g key={`${interactive ? 'main' : 'preview'}-${task.id}-label`} className="pointer-events-none">
-              <rect
-                x={labelX - labelWidth / 2}
-                y={labelY - labelHeight / 2}
-                width={labelWidth}
-                height={labelHeight}
-                rx="15"
-                fill="rgba(255,255,255,0.82)"
-                stroke={getClockTaskColor(task)}
-                strokeWidth="1.2"
-              />
-              <text
-                x={labelX}
-                y={labelY + 1}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="text-[18px] font-semibold"
-                fill={textColor}
-              >
-                {labelText}
-              </text>
-            </g>
-          );
-        })}
-      </g>
-      <g className="pointer-events-none">
-        {OUTER_HOUR_LABELS.map(({ value, angle, point }) => {
-          const { blur, opacity } = showCurrentTime
-            ? getDirectionalTextVisuals(angle, minuteAngle)
-            : { blur: 0, opacity: 0.88 };
+      <ClockPendingArc
+        pendingArc={pendingArc}
+        hasPendingArcEnd={hasPendingArcEnd}
+        interactive={interactive}
+        beginArcHandleDrag={beginArcHandleDrag}
+      />
 
-          return (
-            <text
-              key={`${interactive ? 'main' : 'preview'}-hour-label-${value}-${angle}`}
-              x={point.x}
-              y={point.y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              className="fill-black text-[18px] font-semibold"
-              opacity={opacity}
-              style={{ filter: `blur(${blur}px)` }}
-            >
-              {value}
-            </text>
-          );
-        })}
-      </g>
+      <ClockCurrentTimeHand
+        showCurrentTime={showCurrentTime}
+        minuteAngle={canvasMinuteAngle}
+      />
 
-      {pendingArc !== null && (
-        <>
-          {hasPendingArcEnd && (
-            <path
-              d={describeArc(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle, pendingArc.endAngle)}
-              fill="rgba(59, 130, 246, 0.15)"
-              stroke="#3b82f6"
-              strokeWidth="2"
-              strokeDasharray="5 5"
-              pointerEvents="none"
-            />
-          )}
-          <line
-            x1={CENTER}
-            y1={CENTER}
-            x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle).x}
-            y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.startAngle).y}
-            stroke="#3b82f6"
-            strokeWidth="2"
-            strokeDasharray="5 5"
-            pointerEvents="none"
-          />
-          {hasPendingArcEnd && (
-            <line
-              x1={CENTER}
-              y1={CENTER}
-              x2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.endAngle).x}
-              y2={polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, pendingArc.endAngle).y}
-              stroke="#3b82f6"
-              strokeWidth="2"
-              strokeDasharray="5 5"
-              pointerEvents="none"
-            />
-          )}
-          {(hasPendingArcEnd ? ['start', 'end'] as const : ['start'] as const).map((handle) => {
-            const angle = handle === 'start' ? pendingArc.startAngle : pendingArc.endAngle;
-            const point = polarToCartesian(CENTER, CENTER, CURRENT_HAND_RADIUS, angle);
-            return interactive ? (
-              <circle
-                key={`${interactive ? 'main' : 'preview'}-pending-arc-${handle}`}
-                cx={point.x}
-                cy={point.y}
-                r={18}
-                fill="transparent"
-                stroke="none"
-                className="cursor-grab active:cursor-grabbing"
-                onPointerDown={(event) => beginArcHandleDrag(event, handle)}
-                pointerEvents="all"
-              />
-            ) : null;
-          })}
-        </>
-      )}
-
-      {showCurrentTime ? (
-        <>
-
-          <line
-            x1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).x}
-            y1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).y}
-            x2={polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, minuteAngle).x}
-            y2={polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, minuteAngle).y}
-            stroke="#3b82f6"
-            strokeWidth={4}
-            strokeLinecap="round"
-            pointerEvents="none"
-          />
-        </>
-      ) : null}
-
-      {!centerAction ? (
-        <g className="center-progress-surface pointer-events-none">
-          <circle className="center-progress-surface__track" cx={CENTER} cy={CENTER} r={TRACK_INNER_RADIUS} filter="url(#center-lens-shadow)" />
-          {displayTask && clampedActiveTaskProgress > 0 ? (
-            <path
-              className="center-progress-surface__value"
-              d={describeArc(CENTER, CENTER, TRACK_INNER_RADIUS, 0, clampedActiveTaskProgress * 360)}
-              fill={hexToRgba(activeTaskColor, 0.92)}
-            />
-          ) : null}
-          {POMODORO_TICKS.map((tick) => (
-            <line
-              key={tick.id}
-              x1={tick.x1}
-              y1={tick.y1}
-              x2={tick.x2}
-              y2={tick.y2}
-              stroke={tick.stroke}
-              strokeWidth={tick.strokeWidth}
-            />
-          ))}
-        </g>
-      ) : null}
+      <ClockCenterProgress
+        centerAction={centerAction}
+        displayTask={displayTask}
+        clampedActiveTaskProgress={clampedActiveTaskProgress}
+        activeTaskColor={activeTaskColor}
+      />
     </>
   );
 
@@ -508,6 +596,7 @@ export const CircleScheduler = ({
       return (next + count) % count;
     });
   };
+
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[2rem] bg-[#f0f0f4]">
       <TaskCreationModal
@@ -540,19 +629,19 @@ export const CircleScheduler = ({
 
       <div ref={squareRef} className="relative aspect-square w-full max-w-[850px]">
         <div className="relative h-full w-full">
-        <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} />
+          <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} />
 
-        <svg
-          ref={svgRef}
-          viewBox={`${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_SIZE} ${SVG_VIEWBOX_SIZE}`}
-          className="absolute inset-0 h-full w-full select-none"
-          style={{ touchAction: 'none' }}
-          onPointerMove={moveArcHandle}
-          onPointerUp={endArcHandleDrag}
-          onPointerCancel={endArcHandleDrag}
-        >
-        {renderClockSvgLayers(true)}
-        </svg>
+          <svg
+            ref={svgRef}
+            viewBox={`${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_SIZE} ${SVG_VIEWBOX_SIZE}`}
+            className="absolute inset-0 h-full w-full select-none"
+            style={{ touchAction: 'none' }}
+            onPointerMove={moveArcHandle}
+            onPointerUp={endArcHandleDrag}
+            onPointerCancel={endArcHandleDrag}
+          >
+            {renderClockSvgLayers(true)}
+          </svg>
         </div>
         {dragPreviewPoint && schedulerSceneSize > 0 ? (
           <div
@@ -617,9 +706,7 @@ export const CircleScheduler = ({
             )}
           </div>
         )}
-        <div
-          className="center-stack"
-        >
+        <div className="center-stack">
           {centerAction ? (
             <button type="button" className="center-lens center-lens--button" onClick={centerAction.onClick}>
               <span className="center-lens__title center-lens__title--button">
@@ -689,7 +776,7 @@ export const CircleScheduler = ({
                   </div>
                 </div>
               )}
-               <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''} flex flex-col items-center justify-center`} aria-hidden="true">
+              <div className={`center-progress-shell ${sliderTransitionDirection ? `is-transitioning ${sliderTransitionDirection}` : ''} flex flex-col items-center justify-center`} aria-hidden="true">
                 {displayTask ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <div
@@ -711,7 +798,6 @@ export const CircleScheduler = ({
           )}
         </div>
       </div>
-
     </div>
   );
 };

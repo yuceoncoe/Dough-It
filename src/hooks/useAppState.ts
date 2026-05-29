@@ -95,12 +95,9 @@ export const useAppState = (user: User, todayStr: string) => {
       if (Notification.permission === 'granted') {
         try {
           const registration = await navigator.serviceWorker.getRegistration('/push-sw.js');
-          if (registration) {
-            const subscription = await registration.pushManager.getSubscription();
-            if (subscription) {
-              setNotificationStatus('enabled');
-              return;
-            }
+          const subscription = await registration?.pushManager.getSubscription();
+          if (subscription) {
+            setNotificationStatus('enabled');
           }
         } catch (error) {
           // ignore
