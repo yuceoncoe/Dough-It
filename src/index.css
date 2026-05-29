@@ -2,41 +2,6 @@
 
 @theme {
   --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.025), 0 1px 4px rgba(0, 0, 0, 0.015);
-
-  /* Q1: Urgent+Important - #FD8ED0 */
-  --color-rose-50: #FFF0FA;
-  --color-rose-100: #FFE3F5;
-  --color-rose-200: #FFC6EB;
-  --color-rose-500: #FD8ED0;
-  --color-rose-600: #DF6FA9;
-  --color-rose-700: #B84A83;
-  --color-rose-900: #6B1944;
-
-  /* Q2: Urgent - #FF9F42 */
-  --color-yellow-50: #FFF5EC;
-  --color-yellow-100: #FFEADB;
-  --color-yellow-200: #FFD4B3;
-  --color-yellow-400: #FF9F42;
-  --color-yellow-700: #B85F14;
-  --color-yellow-900: #6B3000;
-
-  /* Q3: Important - #00CBFF */
-  --color-sky-50: #EBFBFF;
-  --color-sky-100: #D1F7FF;
-  --color-sky-200: #A8EFFF;
-  --color-sky-500: #00CBFF;
-  --color-sky-600: #00A6D1;
-  --color-sky-700: #007D9E;
-  --color-sky-900: #004A5E;
-
-  /* Q4: Normal - #64D484 */
-  --color-emerald-50: #EEFBF2;
-  --color-emerald-100: #D8F7E1;
-  --color-emerald-200: #B3EFBF;
-  --color-emerald-400: #64D484;
-  --color-emerald-600: #46B567;
-  --color-emerald-700: #2C914A;
-  --color-emerald-900: #105926;
 }
 
 @font-face {
