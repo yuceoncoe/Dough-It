@@ -346,15 +346,15 @@ export const getTaskColor = (tags: Tag[]) => {
   const urgent = safeTags.includes('urgent');
   const important = safeTags.includes('important');
   if (urgent && important) {
-    return '#f43f5e';
+    return '#FD8ED0';
   }
   if (urgent) {
-    return '#facc15';
+    return '#FF9F42';
   }
   if (important) {
-    return '#0ea5e9';
+    return '#00CBFF';
   }
-  return '#34d399';
+  return '#64D484';
 };
 
 export const getClockTaskColor = (task: Task) => {
