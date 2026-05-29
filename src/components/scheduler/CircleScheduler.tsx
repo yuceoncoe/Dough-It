@@ -242,11 +242,30 @@ const ClockCenterProgress = ({
     <g className="center-progress-surface pointer-events-none">
       <circle className="center-progress-surface__track" cx={CENTER} cy={CENTER} r={TRACK_INNER_RADIUS} filter="url(#center-lens-shadow)" />
       {displayTask && clampedActiveTaskProgress > 0 ? (
-        <path
-          className="center-progress-surface__value"
-          d={describeArc(CENTER, CENTER, TRACK_INNER_RADIUS, 0, clampedActiveTaskProgress * 360)}
-          fill={hexToRgba(activeTaskColor, 0.92)}
-        />
+        <g>
+          <defs>
+            <clipPath id="pomodoro-progress-clip">
+              <path d={describeArc(CENTER, CENTER, TRACK_INNER_RADIUS, 0, clampedActiveTaskProgress * 360)} />
+            </clipPath>
+          </defs>
+          <foreignObject
+            x={CENTER - TRACK_INNER_RADIUS}
+            y={CENTER - TRACK_INNER_RADIUS}
+            width={TRACK_INNER_RADIUS * 2}
+            height={TRACK_INNER_RADIUS * 2}
+            clipPath="url(#pomodoro-progress-clip)"
+            className="pointer-events-none"
+          >
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                background: `conic-gradient(${hexToRgba(activeTaskColor, 0.8)} 0deg, ${hexToRgba(activeTaskColor, 1.0)} ${clampedActiveTaskProgress * 360}deg, transparent ${clampedActiveTaskProgress * 360}deg)`,
+              }}
+            />
+          </foreignObject>
+        </g>
       ) : null}
       {POMODORO_TICKS.map((tick) => (
         <line
