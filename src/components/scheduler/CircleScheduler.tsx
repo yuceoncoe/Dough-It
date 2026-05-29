@@ -261,7 +261,7 @@ const ClockCenterProgress = ({
                 width: '100%',
                 height: '100%',
                 borderRadius: '50%',
-                background: `conic-gradient(${hexToRgba(activeTaskColor, 0.8)} 0deg, ${hexToRgba(activeTaskColor, 1.0)} ${clampedActiveTaskProgress * 360}deg, transparent ${clampedActiveTaskProgress * 360}deg)`,
+                background: `conic-gradient(${hexToRgba(activeTaskColor, 0.5)} 0deg, ${hexToRgba(activeTaskColor, 1.0)} ${clampedActiveTaskProgress * 360}deg, transparent ${clampedActiveTaskProgress * 360}deg)`,
               }}
             />
           </foreignObject>
