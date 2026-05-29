@@ -221,12 +221,9 @@ export const RoutineSettingsModal = ({
                   <Icon name="chevron_left" size={20} />
                 </button>
                 <div className="min-w-0 pr-3">
-                  <h2 className="font-hand truncate text-2xl text-stone-800 sm:text-3xl">
+                  <h2 className="font-hand truncate text-2xl text-stone-800 sm:text-3xl pb-1">
                     {activeTab === 'weekday' ? '평일 루틴 보관함' : '주말 루틴 보관함'}
                   </h2>
-                  <p className="mt-1 text-xs leading-relaxed text-stone-500 sm:text-sm">
-                    {activeTab === 'weekday' ? '평일의 기본 루틴을 관리합니다.' : '주말의 기본 루틴을 관리합니다.'}
-                  </p>
                 </div>
               </div>
               <button onClick={onClose} className="sheet-icon-button shrink-0" aria-label="닫기">

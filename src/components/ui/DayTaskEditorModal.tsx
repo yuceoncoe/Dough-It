@@ -49,9 +49,7 @@ export const DayTaskEditorModal = ({
             </button>
           </div>
         </div>
-        <p className="mb-4 mt-3 text-sm leading-relaxed text-stone-500">제목, 시간, 태그를 입력해서 하루 일정에 바로 반영합니다.</p>
-
-        <form onSubmit={onSubmit} autoComplete="off" className="flex flex-col">
+        <form onSubmit={onSubmit} autoComplete="off" className="mt-2 flex flex-col">
           <input
             autoFocus
             type="text"

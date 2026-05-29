@@ -43,10 +43,9 @@ export const TaskCreationModal = ({
             </button>
           </div>
         </div>
-        <div className="mt-2 text-base font-semibold tracking-[-0.03em] text-stone-500">
+        <div className="mt-2 mb-6 text-base font-semibold tracking-[-0.03em] text-stone-500">
           <span>{initialTimeRange.start} - {initialTimeRange.end}</span>
         </div>
-        <p className="mb-6 mt-3 text-sm text-stone-500">이 시간 블록에 맞는 아이젠하워 태그를 선택하세요.</p>
         <input
           autoFocus
           type="text"

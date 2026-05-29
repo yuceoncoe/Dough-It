@@ -27,7 +27,7 @@ export const QuadrantPicker = ({
           key={q.key}
           type={buttonType}
           onClick={() => onSelect(getToneTags(q.key))}
-          className={`px-4 py-2.5 text-center text-sm font-medium transition-colors ${
+          className={`px-4 py-5 text-center text-sm font-medium transition-colors ${
             currentKey === q.key ? q.activeClass : 'bg-white text-stone-600 hover:bg-stone-50'
           }`}
         >
