@@ -70,10 +70,10 @@ export const CalendarView = ({
             >
               <span className={`text-xs font-semibold md:text-sm ${isToday ? 'text-amber-700' : 'text-stone-700'}`}>{day}</span>
               <div className="mt-1 grid flex-1 w-full grid-cols-2 grid-rows-2 gap-[1px] rounded-sm overflow-hidden" aria-hidden="true">
-                <div className={quadrants.urgentImportant ? 'bg-rose-100' : 'bg-transparent'} />
-                <div className={quadrants.urgent ? 'bg-yellow-100' : 'bg-transparent'} />
-                <div className={quadrants.important ? 'bg-sky-100' : 'bg-transparent'} />
-                <div className={quadrants.normal ? 'bg-emerald-100' : 'bg-transparent'} />
+                <div className={quadrants.urgentImportant ? 'bg-gradient-to-br from-rose-500/15 to-rose-500/80' : 'bg-transparent'} />
+                <div className={quadrants.urgent ? 'bg-gradient-to-br from-yellow-400/15 to-yellow-400/80' : 'bg-transparent'} />
+                <div className={quadrants.important ? 'bg-gradient-to-br from-sky-500/15 to-sky-500/80' : 'bg-transparent'} />
+                <div className={quadrants.normal ? 'bg-gradient-to-br from-emerald-400/15 to-emerald-400/80' : 'bg-transparent'} />
               </div>
             </button>
           );
