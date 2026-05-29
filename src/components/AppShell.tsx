@@ -120,7 +120,7 @@ export const AppShell = ({
             setActiveTab('home');
             setSelectedDate(null);
           }}
-          className={`flex w-full flex-col items-center gap-1 py-3 ${activeTab === 'home' ? 'text-amber-600' : 'text-stone-400'}`}
+          className={`flex w-full flex-col items-center gap-1 py-3 ${activeTab === 'home' ? 'text-blue-500' : 'text-stone-400'}`}
         >
           <Icon name="home" size={22} />
           <span className="text-xs tracking-[0.2em]">오늘</span>
@@ -132,7 +132,7 @@ export const AppShell = ({
               setSelectedDate(null);
             }
           }}
-          className={`flex w-full flex-col items-center gap-1 py-3 ${activeTab === 'calendar' ? 'text-amber-600' : 'text-stone-400'}`}
+          className={`flex w-full flex-col items-center gap-1 py-3 ${activeTab === 'calendar' ? 'text-blue-500' : 'text-stone-400'}`}
         >
           <Icon name="calendar_today" size={22} />
           <span className="text-xs tracking-[0.2em]">달력</span>
