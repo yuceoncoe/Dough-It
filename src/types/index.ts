@@ -7,15 +7,13 @@ export interface Task {
   duration: number | null;
   completed: boolean;
   isRoutine?: boolean;
+  routineDays?: number[]; // 0: Sunday, ..., 6: Saturday
   activeFromDate?: string;
   rating?: number; // 1 to 5 scale
   note?: string;
 }
 
-export interface RoutineState {
-  weekday: Task[];
-  weekend: Task[];
-}
+export type RoutineState = Task[];
 
 export type RoutineScope = 'single' | 'future';
 export type RoutineAction = 'edit' | 'delete';

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { RoutineState, Task, RoutineScope } from '../types';
-import { addOrReplaceDateTasks, getRoutineBaseId, getRoutineBucketForDate } from '../utils/task';
+import { addOrReplaceDateTasks, getRoutineBaseId } from '../utils/task';
 import { syncTaskAlarms, requestNotificationPermissions } from '../utils/notifications';
 import { timeToMinutes } from '../utils/time';
 import { AppStateSnapshot, createDefaultAppState, normalizeAppState } from '../utils/appState';
@@ -312,21 +312,16 @@ export const useAppState = (user: User, todayStr: string) => {
     if (!baseId) {
       return;
     }
-    const bucket = getRoutineBucketForDate(date);
 
     setRoutines((current) => {
-      const bucketRoutines = getTaskList(current[bucket]);
-
-      return {
-        ...current,
-        [bucket]: bucketRoutines.map((item) => item.id === baseId ? { ...item, ...safeUpdates } : item),
-      };
+      const routinesArray = getTaskList(current);
+      return routinesArray.map((item) => item.id === baseId ? { ...item, ...safeUpdates } : item);
     });
 
     setTasksByDate((current) => {
       const next = { ...current };
       Object.entries(current).forEach(([entryDate, entryTasks]) => {
-        if (entryDate < date || getRoutineBucketForDate(entryDate) !== bucket) {
+        if (entryDate < date) {
           return;
         }
         next[entryDate] = getTaskList(entryTasks).map((item) => {
@@ -351,21 +346,16 @@ export const useAppState = (user: User, todayStr: string) => {
     if (!baseId) {
       return;
     }
-    const bucket = getRoutineBucketForDate(date);
 
     setRoutines((current) => {
-      const bucketRoutines = getTaskList(current[bucket]);
-
-      return {
-        ...current,
-        [bucket]: bucketRoutines.filter((item) => item.id !== baseId),
-      };
+      const routinesArray = getTaskList(current);
+      return routinesArray.filter((item) => item.id !== baseId);
     });
 
     setTasksByDate((current) => {
       const next = { ...current };
       Object.entries(current).forEach(([entryDate, entryTasks]) => {
-        if (entryDate < date || getRoutineBucketForDate(entryDate) !== bucket) {
+        if (entryDate < date) {
           return;
         }
         next[entryDate] = getTaskList(entryTasks).filter((item) => {

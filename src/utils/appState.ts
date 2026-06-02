@@ -35,6 +35,7 @@ const normalizeTask = (task: Partial<Task> | null | undefined, fallbackId: strin
   duration: typeof task?.duration === 'number' ? task.duration : null,
   completed: Boolean(task?.completed),
   isRoutine: Boolean(task?.isRoutine) || undefined,
+  routineDays: Array.isArray(task?.routineDays) ? task.routineDays.filter((d): d is number => typeof d === 'number' && d >= 0 && d <= 6) : undefined,
   activeFromDate: typeof task?.activeFromDate === 'string' ? task.activeFromDate : undefined,
   rating: typeof task?.rating === 'number' ? task.rating : undefined,
   note: typeof task?.note === 'string' ? task.note : undefined,
@@ -48,13 +49,34 @@ const normalizeTasksByDate = (tasksByDate: Record<string, Task[]>) =>
     ]),
   );
 
-const normalizeRoutines = (routines: RoutineState | null | undefined): RoutineState => {
-  const sourceRoutines = routines ?? INITIAL_ROUTINES;
+const normalizeRoutines = (routines: any | null | undefined): RoutineState => {
+  if (Array.isArray(routines)) {
+    return routines.map((task, index) => normalizeTask(task, `routine-${index}`));
+  }
 
-  return {
-    weekday: Array.isArray(sourceRoutines.weekday) ? sourceRoutines.weekday.map((task, index) => normalizeTask(task, `weekday-routine-${index}`)) : [],
-    weekend: Array.isArray(sourceRoutines.weekend) ? sourceRoutines.weekend.map((task, index) => normalizeTask(task, `weekend-routine-${index}`)) : [],
-  };
+  // Migration from old { weekday, weekend } format
+  if (routines && typeof routines === 'object') {
+    const migrated: Task[] = [];
+    if (Array.isArray(routines.weekday)) {
+      routines.weekday.forEach((task: any, index: number) => {
+        migrated.push({
+          ...normalizeTask(task, `weekday-routine-${index}`),
+          routineDays: [1, 2, 3, 4, 5],
+        });
+      });
+    }
+    if (Array.isArray(routines.weekend)) {
+      routines.weekend.forEach((task: any, index: number) => {
+        migrated.push({
+          ...normalizeTask(task, `weekend-routine-${index}`),
+          routineDays: [0, 6],
+        });
+      });
+    }
+    return migrated;
+  }
+
+  return [];
 };
 
 export const toSerializableAppState = (snapshot: AppStateSnapshot): AppStateSnapshot => ({

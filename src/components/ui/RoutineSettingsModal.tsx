@@ -6,6 +6,17 @@ import { Icon } from '../../components/ui/Icon';
 import { QuadrantPicker } from './QuadrantPicker';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
+const formatRoutineDays = (days: number[] | undefined) => {
+  if (!days || days.length === 0) return '미선택';
+  if (days.length === 7) return '매일';
+  const isWeekday = days.length === 5 && [1,2,3,4,5].every(d => days.includes(d));
+  if (isWeekday) return '평일';
+  const isWeekend = days.length === 2 && [0,6].every(d => days.includes(d));
+  if (isWeekend) return '주말';
+  const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+  return days.sort((a,b) => a-b).map(d => dayNames[d]).join(', ');
+};
+
 export const RoutineSettingsModal = ({
   isOpen,
   routines,
@@ -31,12 +42,13 @@ export const RoutineSettingsModal = ({
   onSignOut: () => Promise<void>;
   onEnableNotifications: () => Promise<void>;
 }) => {
-  const [activeTab, setActiveTab] = useState<'main' | 'weekday' | 'weekend'>('main');
+  const [activeTab, setActiveTab] = useState<'main' | 'routines'>('main');
   const [draft, setDraft] = useState<RoutineState>(routines);
   const [title, setTitle] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [tags, setTags] = useState<Tag[]>([]);
+  const [routineDays, setRoutineDays] = useState<number[]>([]);
   const [isEnabling, setIsEnabling] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [pendingDeleteTask, setPendingDeleteTask] = useState<Task | null>(null);
@@ -66,6 +78,7 @@ export const RoutineSettingsModal = ({
     setStartTime('');
     setEndTime('');
     setTags([]);
+    setRoutineDays([]);
     setActiveTab('main');
     setPendingDeleteTask(null);
   }, [isOpen, routines]);
@@ -75,7 +88,7 @@ export const RoutineSettingsModal = ({
   }
 
   const handleAdd = (explicitTags?: Tag[]) => {
-    if (!title.trim() || !startTime || !endTime) {
+    if (!title.trim() || !startTime || !endTime || routineDays.length === 0) {
       return;
     }
     const finalTags = explicitTags ?? tags;
@@ -93,22 +106,21 @@ export const RoutineSettingsModal = ({
       duration,
       completed: false,
       isRoutine: true,
+      routineDays,
       activeFromDate: getTodayString(),
     };
-    const currentTab = activeTab === 'main' ? 'weekday' : activeTab;
-    const currentTasks = Array.isArray(draft[currentTab]) ? draft[currentTab] : [];
-    if (getMaxOverlap([...currentTasks, nextTask]) > 2) {
+    if (getMaxOverlap([...draft, nextTask]) > 2) {
       showToast('알림은 한 번에 2개까지만 가능해요!');
       return;
     }
-    const nextTasks = [...currentTasks, nextTask].sort((left, right) => timeToMinutes(left.startTime ?? '00:00') - timeToMinutes(right.startTime ?? '00:00'));
-    const nextDraft = { ...draft, [currentTab]: nextTasks };
+    const nextDraft = [...draft, nextTask].sort((left, right) => timeToMinutes(left.startTime ?? '00:00') - timeToMinutes(right.startTime ?? '00:00'));
     setDraft(nextDraft);
     onSaveRoutines(nextDraft);
     setTitle('');
     setStartTime('');
     setEndTime('');
     setTags([]);
+    setRoutineDays([]);
   };
 
   const handleTagSelect = (selectedTags: Tag[]) => {
@@ -116,8 +128,7 @@ export const RoutineSettingsModal = ({
   };
 
   const handleDelete = (id: string) => {
-    const currentTab = activeTab === 'main' ? 'weekday' : activeTab;
-    const nextDraft = { ...draft, [currentTab]: draft[currentTab].filter((task) => task.id !== id) };
+    const nextDraft = draft.filter((task) => task.id !== id);
     setDraft(nextDraft);
     onSaveRoutines(nextDraft);
     setPendingDeleteTask(null);
@@ -192,20 +203,13 @@ export const RoutineSettingsModal = ({
             </section>
 
             <section>
-              <h3 className="section-title">루틴 설정 리스트</h3>
+              <h3 className="section-title">루틴 설정</h3>
               <div className="settings-card overflow-hidden divide-y divide-stone-200 !p-0">
                 <button 
-                  onClick={() => setActiveTab('weekday')}
+                  onClick={() => setActiveTab('routines')}
                   className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-stone-50"
                 >
-                  <span className="text-sm font-medium text-stone-700">평일 루틴 설정</span>
-                  <Icon name="chevron_right" size={18} className="text-stone-400" />
-                </button>
-                <button 
-                  onClick={() => setActiveTab('weekend')}
-                  className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-stone-50"
-                >
-                  <span className="text-sm font-medium text-stone-700">주말/휴일 루틴 설정</span>
+                  <span className="text-sm font-medium text-stone-700">루틴 보관함 열기</span>
                   <Icon name="chevron_right" size={18} className="text-stone-400" />
                 </button>
               </div>
@@ -222,7 +226,7 @@ export const RoutineSettingsModal = ({
                 </button>
                 <div className="min-w-0 pr-3">
                   <h2 className="font-hand truncate text-2xl text-stone-800 sm:text-3xl pb-1">
-                    {activeTab === 'weekday' ? '평일 루틴 보관함' : '주말 루틴 보관함'}
+                    루틴 보관함
                   </h2>
                 </div>
               </div>
@@ -234,7 +238,12 @@ export const RoutineSettingsModal = ({
         <div className="flex flex-col md:grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
           <div className="flex-none md:flex-1 md:min-h-0 md:overflow-y-auto px-6 pb-6 md:border-b-0 md:border-r md:border-stone-100">
             <div className="space-y-2.5">
-              {draft[activeTab].map((task) => (
+              {draft.length === 0 && (
+                <div className="py-10 text-center text-[13px] text-stone-400">
+                  등록된 루틴이 없습니다.
+                </div>
+              )}
+              {draft.map((task) => (
                 <div
                   key={task.id}
                   className="task-card block w-full rounded-xl bg-white px-4 py-3 text-left"
@@ -245,6 +254,9 @@ export const RoutineSettingsModal = ({
                         <QuadrantBadge task={task} />
                         <span className={`truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
                           {task.title}
+                        </span>
+                        <span className="shrink-0 rounded bg-stone-100 px-1.5 py-0.5 text-[11px] font-medium text-stone-500">
+                          {formatRoutineDays(task.routineDays)}
                         </span>
                       </div>
                       <div className="mt-1.5 flex items-center gap-2 text-[12px] text-stone-400">
@@ -302,13 +314,40 @@ export const RoutineSettingsModal = ({
                     <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
                   </label>
                 </div>
+                
+                <div className="mt-6">
+                  <div className="mb-2 text-[13px] font-medium text-stone-700">반복 요일</div>
+                  <div className="flex justify-between gap-1">
+                    {[0, 1, 2, 3, 4, 5, 6].map((day) => {
+                      const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+                      const isSelected = routineDays.includes(day);
+                      return (
+                        <button
+                          key={day}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              setRoutineDays(routineDays.filter(d => d !== day));
+                            } else {
+                              setRoutineDays([...routineDays, day].sort((a,b) => a-b));
+                            }
+                          }}
+                          className={`flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full text-[13px] font-medium transition-colors ${isSelected ? 'bg-blue-500 text-white shadow-sm' : 'bg-stone-100 text-stone-500 hover:bg-stone-200'}`}
+                        >
+                          {dayNames[day]}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div className="mt-6">
                   <QuadrantPicker tags={tags} onSelect={handleTagSelect} buttonType="button" />
                 </div>
                 <button
                   type="button"
-                  onClick={handleAdd}
-                  disabled={!title.trim() || !startTime || !endTime}
+                  onClick={() => handleAdd()}
+                  disabled={!title.trim() || !startTime || !endTime || routineDays.length === 0}
                   className="btn-primary mt-8 w-full"
                 >
                   블록 추가

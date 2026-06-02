@@ -7,10 +7,7 @@ import React from 'react';
 export const CENTER = 300;
 export const RADIUS = 300;
 
-export const INITIAL_ROUTINES: RoutineState = {
-  weekday: [],
-  weekend: [],
-};
+export const INITIAL_ROUTINES: RoutineState = [];
 
 export const clampArcEnd = (startAngle: number, endAngle: number) => {
   let safeEnd = endAngle;
@@ -626,12 +623,15 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
 
 export function generateRoutinesForDate(dateStr: string, routines: RoutineState) {
   const date = new Date(`${dateStr}T00:00:00`);
-  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-  const source = isWeekend ? routines.weekend : routines.weekday;
-  const base = Array.isArray(source) ? source : [];
+  const dayOfWeek = date.getDay();
+  const base = Array.isArray(routines) ? routines : [];
 
   return base
-    .filter((task) => !task.activeFromDate || dateStr >= task.activeFromDate)
+    .filter((task) => {
+      if (task.activeFromDate && dateStr < task.activeFromDate) return false;
+      if (task.routineDays && !task.routineDays.includes(dayOfWeek)) return false;
+      return true;
+    })
     .map((task) => ({
       ...task,
       id: `routine-${dateStr}-${task.id}`,
@@ -666,10 +666,7 @@ export const addOrReplaceDateTasks = (tasksByDate: Record<string, Task[]>, date:
   return { ...tasksByDate, [date]: [...manualTasks, ...routineTasks, ...preservedRoutineTasks] };
 };
 
-export const getRoutineBucketForDate = (dateStr: string): keyof RoutineState => {
-  const date = new Date(`${dateStr}T00:00:00`);
-  return date.getDay() === 0 || date.getDay() === 6 ? 'weekend' : 'weekday';
-};
+
 
 export const getRoutineBaseId = (taskId: string, dateStr: string) => {
   const prefix = `routine-${dateStr}-`;
