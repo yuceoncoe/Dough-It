@@ -201,20 +201,33 @@ export const RoutineSettingsModal = ({
               <div className="settings-card flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-medium text-stone-700">앱 푸시 알림</div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (notificationStatus === 'enabled') {
-                        void handleDisableNotifications();
-                      } else {
-                        void handleEnableNotifications();
-                      }
-                    }}
-                    disabled={notificationStatus === 'unsupported' || isEnabling}
-                    className={`inline-flex items-center justify-center rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${notificationStatus === 'enabled' ? 'bg-stone-100 text-stone-600 hover:bg-rose-50 hover:text-rose-600' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
-                  >
-                    {isEnabling ? '설정 중...' : notificationLabel}
-                  </button>
+                  <div className="flex items-center gap-3">
+                    {isEnabling && <span className="text-[11px] font-medium text-stone-400">설정 중...</span>}
+                    {notificationStatus === 'unsupported' && <span className="text-[11px] font-medium text-stone-400">미지원</span>}
+                    {notificationStatus === 'denied' && <span className="text-[11px] font-medium text-rose-500">차단됨</span>}
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={notificationStatus === 'enabled'}
+                      onClick={() => {
+                        if (notificationStatus === 'enabled') {
+                          void handleDisableNotifications();
+                        } else {
+                          void handleEnableNotifications();
+                        }
+                      }}
+                      disabled={notificationStatus === 'unsupported' || isEnabling}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out disabled:cursor-not-allowed disabled:opacity-50 ${
+                        notificationStatus === 'enabled' ? 'bg-emerald-500' : 'bg-stone-200'
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                          notificationStatus === 'enabled' ? 'translate-x-5' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
                 {notificationMessage && <div className="text-xs text-stone-500">{notificationMessage}</div>}
               </div>
