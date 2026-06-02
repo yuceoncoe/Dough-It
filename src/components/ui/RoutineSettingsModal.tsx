@@ -235,55 +235,52 @@ export const RoutineSettingsModal = ({
               </button>
             </div>
           </div>
-        <div className="flex min-h-0 flex-1 flex-col md:grid md:grid-cols-[1.1fr_0.9fr]">
-          <div className="min-h-0 flex-1 overflow-y-auto border-b border-stone-100 px-6 pb-6 md:border-b-0 md:border-r">
-            <div className="space-y-2.5">
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex-none overflow-x-auto border-b border-stone-100 bg-stone-50/30 pb-5 pt-5 hide-scrollbar">
+            <div className="flex w-max gap-3 px-6">
               {draft.length === 0 && (
-                <div className="py-10 text-center text-[13px] text-stone-400">
+                <div className="flex w-full min-w-[200px] items-center justify-center py-6 text-center text-[13px] text-stone-400">
                   등록된 루틴이 없습니다.
                 </div>
               )}
               {draft.map((task) => (
                 <div
                   key={task.id}
-                  className="task-card block w-full rounded-xl bg-white px-4 py-3 text-left"
+                  className="task-card relative flex w-[150px] shrink-0 flex-col gap-2 rounded-[1.2rem] bg-white p-4 text-left shadow-sm ring-1 ring-black/5"
                 >
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2.5">
-                        <QuadrantBadge task={task} />
-                        <span className={`truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
-                          {task.title}
-                        </span>
-                        <span className="shrink-0 rounded bg-stone-100 px-1.5 py-0.5 text-[11px] font-medium text-stone-500">
-                          {formatRoutineDays(task.routineDays)}
-                        </span>
-                      </div>
-                      <div className="mt-1.5 flex items-center gap-2 text-[12px] text-stone-400">
-                        <Icon name="schedule" size={12} className="shrink-0" />
-                        {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
-                        {task.activeFromDate && (
-                          <span className="ml-2 text-amber-600 font-medium">
-                            ({task.activeFromDate}부터 적용)
-                          </span>
-                        )}
-                      </div>
+                  <button 
+                    onClick={() => setPendingDeleteTask(task)} 
+                    className="absolute right-2 top-2 z-10 rounded-full p-1.5 text-stone-300 transition-colors hover:bg-rose-50 hover:text-rose-500"
+                  >
+                    <Icon name="close" size={16} />
+                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <QuadrantBadge task={task} />
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
+                      {getTaskToneLabel(task)}
+                    </span>
+                  </div>
+                  <div className={`mt-0.5 line-clamp-2 min-h-[2.5rem] text-[1.03rem] font-semibold leading-snug tracking-[-0.03em] pr-4 ${task.completed ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
+                    {task.title}
+                  </div>
+                  <div className="mt-1 flex flex-col gap-2 pt-3 border-t border-stone-100/80">
+                    <div className="flex items-center gap-1.5 text-[11px] font-medium text-stone-500">
+                      <Icon name="event_repeat" size={12} className="shrink-0 text-stone-400" />
+                      <span className="truncate">{formatRoutineDays(task.routineDays)}</span>
                     </div>
-                    <div className="flex shrink-0 items-center gap-2.5">
-                      <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
-                        {getTaskToneLabel(task)}
+                    <div className="flex items-center gap-1.5 text-[11px] font-medium text-stone-500">
+                      <Icon name="schedule" size={12} className="shrink-0 text-stone-400" />
+                      <span className="truncate">
+                        {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
                       </span>
-                      <button onClick={() => setPendingDeleteTask(task)} className="rounded-full p-1 text-stone-300 transition-colors hover:bg-rose-50 hover:text-rose-500">
-                        <Icon name="delete" size={16} />
-                      </button>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="flex shrink-0 flex-col bg-white md:min-h-0 md:flex-1">
-            <div className="overflow-y-auto px-6 pb-6 pt-6 md:pt-0">
+          <div className="flex min-h-0 flex-1 flex-col bg-white overflow-y-auto">
+            <div className="px-6 pb-6 pt-6">
               <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
               <form 
                 className="mt-6 flex flex-col gap-3"
