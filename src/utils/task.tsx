@@ -425,7 +425,7 @@ export const getTaskTonePillClass = (task: Task) => {
   if (tags.includes('important')) {
     return 'bg-sky-50 text-sky-600';
   }
-  return task.isRoutine ? 'bg-stone-100 text-stone-600' : 'bg-emerald-50 text-emerald-600';
+  return 'bg-emerald-50 text-emerald-600';
 };
 
 export const getTaskIcon = (task: Task) => {
