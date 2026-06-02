@@ -365,7 +365,7 @@ export const DayScheduleView = ({
             <div className="overflow-y-auto pb-safe">
               <div className="space-y-2.5">
                 {sortedTasks.length === 0 && (
-                  <div className="task-card rounded-[1.4rem] bg-white px-4 py-6 text-center text-stone-400">
+                  <div className="task-card rounded-xl bg-white px-4 py-6 text-center text-stone-400">
                     아직 이 날짜에 등록된 일정이 없습니다.
                   </div>
                 )}
