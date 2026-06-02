@@ -237,7 +237,7 @@ export const RoutineSettingsModal = ({
           </div>
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="flex-none overflow-x-auto border-b border-stone-100 bg-stone-50/30 pb-5 pt-5 hide-scrollbar">
-            <div className="flex w-max gap-3 px-6">
+            <div className="flex w-max gap-2.5 px-6">
               {draft.length === 0 && (
                 <div className="flex w-full min-w-[200px] items-center justify-center py-6 text-center text-[13px] text-stone-400">
                   등록된 루틴이 없습니다.
@@ -246,7 +246,7 @@ export const RoutineSettingsModal = ({
               {draft.map((task) => (
                 <div
                   key={task.id}
-                  className="task-card relative flex w-[150px] shrink-0 flex-col gap-2 rounded-[1.2rem] bg-white p-4 text-left shadow-sm ring-1 ring-black/5"
+                  className="task-card relative flex w-[144px] shrink-0 flex-col gap-2 rounded-[1.2rem] bg-white p-4 text-left shadow-sm ring-1 ring-black/5"
                 >
                   <button 
                     onClick={() => setPendingDeleteTask(task)} 
