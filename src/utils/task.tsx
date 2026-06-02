@@ -408,7 +408,7 @@ export const getTaskToneLabel = (task: Task) => {
   if (tags.includes('important')) {
     return '중요';
   }
-  return task.isRoutine ? '루틴' : '일반';
+  return '일반';
 };
 
 export const getTaskTonePillClass = (task: Task) => {

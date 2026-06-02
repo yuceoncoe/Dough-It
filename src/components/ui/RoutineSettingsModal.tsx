@@ -209,7 +209,7 @@ export const RoutineSettingsModal = ({
                   onClick={() => setActiveTab('routines')}
                   className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-stone-50"
                 >
-                  <span className="text-sm font-medium text-stone-700">루틴 보관함 열기</span>
+                  <span className="text-sm font-medium text-stone-700">루틴 설정</span>
                   <Icon name="chevron_right" size={18} className="text-stone-400" />
                 </button>
               </div>
