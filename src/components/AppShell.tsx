@@ -40,6 +40,7 @@ export const AppShell = ({
     openDate,
     moveToDate,
     handleEnableNotifications,
+    handleDisableNotifications,
   } = useAppState(user, todayStr);
 
   if (isBootstrapping) {
@@ -67,6 +68,7 @@ export const AppShell = ({
         onSaveRoutines={updateRoutines}
         onSignOut={onSignOut}
         onEnableNotifications={handleEnableNotifications}
+        onDisableNotifications={handleDisableNotifications}
       />
       {pendingRatingTasks.length > 0 && (
         <TaskRatingCarousel

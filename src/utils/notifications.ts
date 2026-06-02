@@ -116,6 +116,18 @@ export const requestNotificationPermissions = async (userId: string) => {
   return true;
 };
 
+export const disableNotificationPermissions = async (userId: string) => {
+  if (!supabase) return;
+  const push = await getExistingPushSubscription();
+  if (push) {
+    await push.subscription.unsubscribe();
+  }
+  await supabase
+    .from('push_subscriptions')
+    .delete()
+    .eq('user_id', userId);
+};
+
 const syncTaskAlarmsNow = async (tasksByDate: Record<string, Task[]>, userId: string) => {
   if (!supabase) {
     return;

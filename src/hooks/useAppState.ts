@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { RoutineState, Task, RoutineScope } from '../types';
 import { addOrReplaceDateTasks, getRoutineBaseId } from '../utils/task';
-import { syncTaskAlarms, requestNotificationPermissions } from '../utils/notifications';
+import { syncTaskAlarms, requestNotificationPermissions, disableNotificationPermissions } from '../utils/notifications';
 import { timeToMinutes } from '../utils/time';
 import { AppStateSnapshot, createDefaultAppState, normalizeAppState } from '../utils/appState';
 import {
@@ -400,6 +400,19 @@ export const useAppState = (user: User, todayStr: string) => {
     }
   };
 
+  const handleDisableNotifications = async () => {
+    try {
+      setNotificationMessage(null);
+      await disableNotificationPermissions(user.id);
+      setNotificationStatus('idle');
+      setNotificationMessage('푸쉬 알림이 꺼졌습니다.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '알림 해제에 실패했습니다.';
+      setNotificationStatus('error');
+      setNotificationMessage(message);
+    }
+  };
+
   return {
     routines,
     tasksByDate,
@@ -425,5 +438,6 @@ export const useAppState = (user: User, todayStr: string) => {
     openDate,
     moveToDate,
     handleEnableNotifications,
+    handleDisableNotifications,
   };
 };

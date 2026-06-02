@@ -29,6 +29,7 @@ export const RoutineSettingsModal = ({
   onSaveRoutines,
   onSignOut,
   onEnableNotifications,
+  onDisableNotifications,
 }: {
   isOpen: boolean;
   routines: RoutineState;
@@ -41,6 +42,7 @@ export const RoutineSettingsModal = ({
   onSaveRoutines: (routines: RoutineState) => void;
   onSignOut: () => Promise<void>;
   onEnableNotifications: () => Promise<void>;
+  onDisableNotifications: () => Promise<void>;
 }) => {
   const [activeTab, setActiveTab] = useState<'main' | 'routines'>('main');
   const [draft, setDraft] = useState<RoutineState>(routines);
@@ -136,7 +138,7 @@ export const RoutineSettingsModal = ({
 
   const notificationLabel = {
     idle: '푸쉬 알림 켜기',
-    enabled: '푸쉬 알림 켜짐',
+    enabled: '알림 끄기',
     unsupported: '알림 미지원',
     denied: '알림 차단됨',
     error: '알림 설정 실패',
@@ -147,6 +149,16 @@ export const RoutineSettingsModal = ({
     setIsEnabling(true);
     try {
       await onEnableNotifications();
+    } finally {
+      setIsEnabling(false);
+    }
+  };
+
+  const handleDisableNotifications = async () => {
+    if (isEnabling || notificationStatus !== 'enabled') return;
+    setIsEnabling(true);
+    try {
+      await onDisableNotifications();
     } finally {
       setIsEnabling(false);
     }
@@ -191,9 +203,15 @@ export const RoutineSettingsModal = ({
                   <div className="text-sm font-medium text-stone-700">앱 푸시 알림</div>
                   <button
                     type="button"
-                    onClick={() => void handleEnableNotifications()}
-                    disabled={notificationStatus === 'unsupported' || notificationStatus === 'enabled' || isEnabling}
-                    className={`inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${notificationStatus === 'enabled' ? 'bg-emerald-100 text-emerald-700' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
+                    onClick={() => {
+                      if (notificationStatus === 'enabled') {
+                        void handleDisableNotifications();
+                      } else {
+                        void handleEnableNotifications();
+                      }
+                    }}
+                    disabled={notificationStatus === 'unsupported' || isEnabling}
+                    className={`inline-flex items-center justify-center rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.02em] transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${notificationStatus === 'enabled' ? 'bg-stone-100 text-stone-600 hover:bg-rose-50 hover:text-rose-600' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
                   >
                     {isEnabling ? '설정 중...' : notificationLabel}
                   </button>
