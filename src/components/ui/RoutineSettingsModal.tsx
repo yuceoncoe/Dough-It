@@ -235,8 +235,8 @@ export const RoutineSettingsModal = ({
               </button>
             </div>
           </div>
-        <div className="flex flex-col md:grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
-          <div className="flex-none md:flex-1 md:min-h-0 md:overflow-y-auto px-6 pb-6 md:border-b-0 md:border-r md:border-stone-100">
+        <div className="flex min-h-0 flex-1 flex-col md:grid md:grid-cols-[1.1fr_0.9fr]">
+          <div className="min-h-0 flex-1 overflow-y-auto border-b border-stone-100 px-6 pb-6 md:border-b-0 md:border-r">
             <div className="space-y-2.5">
               {draft.length === 0 && (
                 <div className="py-10 text-center text-[13px] text-stone-400">
@@ -282,8 +282,8 @@ export const RoutineSettingsModal = ({
               ))}
             </div>
           </div>
-          <div className="flex min-h-0 flex-col bg-white">
-            <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
+          <div className="flex shrink-0 flex-col bg-white md:min-h-0 md:flex-1">
+            <div className="overflow-y-auto px-6 pb-6 pt-6 md:pt-0">
               <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
               <form 
                 className="mt-6 flex flex-col gap-3"
@@ -304,17 +304,6 @@ export const RoutineSettingsModal = ({
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                 />
-                <div className="mt-3 flex flex-col gap-3">
-                  <label className="time-label">
-                    <div className="font-medium shrink-0">시작</div>
-                    <input type="time" className="time-field" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
-                  </label>
-                  <label className="time-label">
-                    <div className="font-medium shrink-0">종료</div>
-                    <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
-                  </label>
-                </div>
-                
                 <div className="mt-6">
                   <div className="mb-2 text-[13px] font-medium text-stone-700">반복 요일</div>
                   <div className="flex justify-between gap-1">
@@ -339,6 +328,17 @@ export const RoutineSettingsModal = ({
                       );
                     })}
                   </div>
+                </div>
+
+                <div className="mt-6 flex flex-col gap-3">
+                  <label className="time-label">
+                    <div className="shrink-0 font-medium">시작</div>
+                    <input type="time" className="time-field" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
+                  </label>
+                  <label className="time-label">
+                    <div className="shrink-0 font-medium">종료</div>
+                    <input type="time" className="time-field" value={endTime} onChange={(event) => setEndTime(event.target.value)} />
+                  </label>
                 </div>
 
                 <div className="mt-6">
