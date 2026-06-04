@@ -22,13 +22,20 @@ export const TaskReportModal = ({
 }) => {
   useBodyScrollLock(isOpen);
 
+  const [dailyTip, setDailyTip] = React.useState('');
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setDailyTip(getDailyTip(getTaskReport(tasks).counts));
+    }
+  }, [isOpen, tasks]);
+
   if (!isOpen) {
     return null;
   }
 
   const report = getTaskReport(tasks);
   const averageLabel = report.averageRating === null ? '-' : report.averageRating.toFixed(1);
-  const [dailyTip] = React.useState(() => getDailyTip(report.counts));
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
