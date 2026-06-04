@@ -4,8 +4,8 @@ import { getToneTags, getToneSelectionKey } from '../../utils/task';
 
 const QUADRANTS = [
   { key: 'urgent-important', label: '긴급+중요', activeClass: 'bg-rose-100 text-rose-900' },
-  { key: 'urgent', label: '긴급', activeClass: 'bg-yellow-100 text-yellow-900' },
   { key: 'important', label: '중요', activeClass: 'bg-sky-100 text-sky-900' },
+  { key: 'urgent', label: '긴급', activeClass: 'bg-yellow-100 text-yellow-900' },
   { key: 'normal', label: '일반', activeClass: 'bg-emerald-100 text-emerald-900' },
 ] as const;
 
