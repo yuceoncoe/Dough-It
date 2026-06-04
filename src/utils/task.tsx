@@ -35,8 +35,8 @@ const getSafeTags = (tags: Task['tags'] | undefined | null) => (
 export const QuadrantBadge = ({ task, sizeClassName = 'h-[14px] w-[14px]' }: { task: Task; sizeClassName?: string }) => {
   const tags = getSafeTags(task.tags);
   const isQ1 = tags.includes('urgent') && tags.includes('important');
-  const isQ2 = tags.includes('urgent') && !tags.includes('important');
-  const isQ3 = !tags.includes('urgent') && tags.includes('important');
+  const isQ2 = !tags.includes('urgent') && tags.includes('important');
+  const isQ3 = tags.includes('urgent') && !tags.includes('important');
   const isQ4 = !tags.includes('urgent') && !tags.includes('important');
 
   if (task.completed) {
@@ -53,8 +53,8 @@ export const QuadrantBadge = ({ task, sizeClassName = 'h-[14px] w-[14px]' }: { t
   return (
     <div className={`grid ${sizeClassName} shrink-0 grid-cols-2 grid-rows-2 gap-[2px]`}>
       <div className={`rounded-tl-[3px] ${isQ1 ? 'bg-rose-500' : 'bg-stone-200'}`} />
-      <div className={`rounded-tr-[3px] ${isQ2 ? 'bg-yellow-400' : 'bg-stone-200'}`} />
-      <div className={`rounded-bl-[3px] ${isQ3 ? 'bg-sky-500' : 'bg-stone-200'}`} />
+      <div className={`rounded-tr-[3px] ${isQ2 ? 'bg-sky-500' : 'bg-stone-200'}`} />
+      <div className={`rounded-bl-[3px] ${isQ3 ? 'bg-yellow-400' : 'bg-stone-200'}`} />
       <div className={`rounded-br-[3px] ${isQ4 ? 'bg-emerald-400' : 'bg-stone-200'}`} />
     </div>
   );
