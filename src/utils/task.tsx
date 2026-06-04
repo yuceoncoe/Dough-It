@@ -39,7 +39,9 @@ export const QuadrantBadge = ({ task, sizeClassName = 'h-[14px] w-[14px]' }: { t
   const isQ3 = tags.includes('urgent') && !tags.includes('important');
   const isQ4 = !tags.includes('urgent') && !tags.includes('important');
 
-  if (task.completed) {
+  const isDimmed = task.completed || task.rating === 0;
+
+  if (isDimmed) {
     return (
       <div className={`grid ${sizeClassName} shrink-0 grid-cols-2 grid-rows-2 gap-[2px] opacity-60`}>
         <div className={`rounded-tl-[3px] ${isQ1 ? 'bg-stone-400' : 'bg-stone-200'}`} />
@@ -591,10 +593,9 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
       ctx.save();
       ctx.filter = minuteAngle === null ? 'none' : `blur(${0.8 + progress * 5.2}px)`;
       const isDimmed = task.completed || task.rating === 0;
-      const isAbandoned = task.rating === 0;
       ctx.globalAlpha = isDimmed ? 0.42 : 0.92;
       
-      const baseColor = isAbandoned ? '#a8a29e' : getClockTaskColor(task);
+      const baseColor = getClockTaskColor(task);
       const gradient = ctx.createRadialGradient(
         CENTER,
         CENTER,
