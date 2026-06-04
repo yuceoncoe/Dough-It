@@ -1,6 +1,6 @@
 import React from 'react';
 import { Task } from '../../types';
-import { formatDateLabel } from '../../utils/task';
+import { formatDateLabel, QuadrantBadge } from '../../utils/task';
 import { getTaskReport, REPORT_QUADRANTS } from '../../utils/report';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 import { getDailyTip } from '../../utils/tips';
@@ -26,9 +26,9 @@ export const TaskReportModal = ({
 
   React.useEffect(() => {
     if (isOpen) {
-      setDailyTip(getDailyTip(getTaskReport(tasks).counts));
+      setDailyTip(getDailyTip(date, getTaskReport(tasks).counts));
     }
-  }, [isOpen, tasks]);
+  }, [isOpen, tasks, date]);
 
   if (!isOpen) {
     return null;
@@ -88,7 +88,10 @@ export const TaskReportModal = ({
           <div className="mt-3 max-h-40 space-y-2 overflow-y-auto">
             {report.completedTasks.length ? report.completedTasks.map((task) => (
               <div key={task.id} className="flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2 shadow-sm">
-                <span className="min-w-0 truncate text-sm font-medium text-stone-700">{task.title}</span>
+                <div className="flex min-w-0 items-center gap-2">
+                  <QuadrantBadge task={task} />
+                  <span className="truncate text-sm font-medium text-stone-700">{task.title}</span>
+                </div>
                 <span className="shrink-0 text-xs font-bold text-amber-500">{task.rating !== undefined ? `⭐️ ${task.rating}` : '평점 없음'}</span>
               </div>
             )) : (

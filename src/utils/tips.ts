@@ -61,16 +61,29 @@ export const TIPS = {
   ]
 };
 
-export const getDailyTip = (counts: Record<string, number>): string => {
+const hashString = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+};
+
+export const getDailyTip = (date: string, counts: Record<string, number>): string => {
+  const hashKey = `${date}-${JSON.stringify(counts)}`;
+  const hash = hashString(hashKey);
+
   const values = Object.values(counts);
   const maxCount = values.length > 0 ? Math.max(...values) : 0;
   if (maxCount === 0) {
     const list = TIPS.general;
-    return list[Math.floor(Math.random() * list.length)];
+    return list[hash % list.length];
   }
 
-  const majorityQuadrants = Object.keys(counts).filter(key => counts[key] === maxCount);
-  const pickedQuadrant = majorityQuadrants[Math.floor(Math.random() * majorityQuadrants.length)];
+  const majorityQuadrants = Object.keys(counts).filter(key => counts[key] === maxCount).sort();
+  const pickedQuadrant = majorityQuadrants[hash % majorityQuadrants.length];
   const list = TIPS[pickedQuadrant as keyof typeof TIPS];
-  return list[Math.floor(Math.random() * list.length)];
+  return list[hash % list.length];
 };
