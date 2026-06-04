@@ -51,7 +51,8 @@ export const TaskReportModal = ({
               <div className="text-[11px] font-semibold tracking-[-0.02em] opacity-80">{quadrant.label}</div>
               <div className="mt-1 flex items-baseline gap-1">
                 <span className="text-2xl font-bold tracking-[-0.05em]">{report.counts[quadrant.key]}</span>
-                <span className="text-[10px] font-medium opacity-70">처리</span>
+                <span className="text-sm font-semibold opacity-60">/ {report.totalCounts[quadrant.key]}</span>
+                <span className="ml-0.5 text-[10px] font-medium opacity-70">처리</span>
               </div>
             </div>
           ))}

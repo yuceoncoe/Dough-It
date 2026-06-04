@@ -38,8 +38,22 @@ export const getTaskReport = (tasks: Task[]) => {
     normal: 0,
   });
 
+  const totalCounts = REPORT_QUADRANTS.reduce<Record<ReportQuadrantKey, number>>((result, quadrant) => {
+    result[quadrant.key] = 0;
+    return result;
+  }, {
+    urgentImportant: 0,
+    urgent: 0,
+    important: 0,
+    normal: 0,
+  });
+
   completedTasks.forEach((task) => {
     counts[getTaskReportQuadrant(task)] += 1;
+  });
+
+  tasks.forEach((task) => {
+    totalCounts[getTaskReportQuadrant(task)] += 1;
   });
 
   const averageRating = ratedTasks.length
@@ -49,6 +63,7 @@ export const getTaskReport = (tasks: Task[]) => {
   return {
     completedTasks,
     counts,
+    totalCounts,
     completedCount: completedTasks.length,
     ratedCount: ratedTasks.length,
     averageRating,
