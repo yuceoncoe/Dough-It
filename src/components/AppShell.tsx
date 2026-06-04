@@ -81,6 +81,7 @@ export const AppShell = ({
       <main className="app-main flex-1 overflow-hidden">
         {activeTab === 'home' && (
           <DayScheduleView
+            key={`home-${todayStr}`}
             date={todayStr}
             tasks={tasksByDate[todayStr] ?? []}
             tasksByDate={tasksByDate}
@@ -95,6 +96,7 @@ export const AppShell = ({
 
         {activeTab === 'calendar' && selectedDate ? (
           <DayScheduleView
+            key={`calendar-${selectedDate}`}
             date={selectedDate}
             tasks={tasksByDate[selectedDate] ?? []}
             tasksByDate={tasksByDate}

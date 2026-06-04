@@ -326,6 +326,13 @@ export const CircleScheduler = ({
     return () => window.clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    setPendingArc(null);
+    setHasPendingArcEnd(false);
+    setActiveArcHandle(null);
+    setShowCreateModal(false);
+  }, [date]);
+
   useEffect(() => () => {
     if (transitionResetRef.current !== null) {
       window.clearTimeout(transitionResetRef.current);
