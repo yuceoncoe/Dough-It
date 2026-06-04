@@ -357,7 +357,7 @@ export const getTaskColor = (tags: Tag[]) => {
 };
 
 export const getClockTaskColor = (task: Task) => {
-  if (task.completed) {
+  if (task.completed || task.rating === 0) {
     return '#d4d4d4';
   }
   return getTaskColor(getSafeTags(task.tags));
