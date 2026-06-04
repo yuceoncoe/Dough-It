@@ -63,7 +63,7 @@ export const TaskRatingCarousel = ({
                 <button
                   type="button"
                   onClick={() => setRatingsByTaskId((current) => ({ ...current, [task.id]: 0 }))}
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-transform hover:scale-110 active:scale-95 ${ratingsByTaskId[task.id] === 0 ? 'bg-amber-100 text-amber-600' : 'bg-stone-100 text-stone-400 hover:bg-stone-200'}`}
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-transform hover:scale-110 active:scale-95 ${ratingsByTaskId[task.id] === 0 ? 'text-rose-700' : 'text-stone-200 hover:text-rose-300'}`}
                   aria-label="0점 선택"
                 >
                   <Icon name="close" size={28} className={ratingsByTaskId[task.id] === 0 ? "[font-variation-settings:'wght'_700]" : "[font-variation-settings:'wght'_400]"} />

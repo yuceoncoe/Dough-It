@@ -65,7 +65,7 @@ export const TaskActionSheet = ({
             <button
               type="button"
               onClick={() => onSetRating(task, 0)}
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-transform hover:scale-110 active:scale-95 ${task.rating === 0 ? 'bg-amber-100 text-amber-600' : 'bg-stone-100 text-stone-400 hover:bg-stone-200'}`}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-transform hover:scale-110 active:scale-95 ${task.rating === 0 ? 'text-rose-700' : 'text-stone-200 hover:text-rose-300'}`}
               aria-label="0점 평가"
             >
               <Icon name="close" size={24} className={task.rating === 0 ? "[font-variation-settings:'wght'_700]" : "[font-variation-settings:'wght'_400]"} />
