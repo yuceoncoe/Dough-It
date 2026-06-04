@@ -61,31 +61,29 @@ export const TaskActionSheet = ({
               </button>
             ) : null}
           </div>
-          <div className="mt-3 flex w-full items-center justify-between gap-2">
+          <div className="mt-3 flex w-full items-center justify-between">
             <button
               type="button"
               onClick={() => onSetRating(task, 0)}
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-transform hover:scale-110 active:scale-95 ${task.rating === 0 ? 'text-rose-700' : 'text-stone-200 hover:text-rose-300'}`}
+              className={`flex-1 flex justify-center py-2 transition-transform hover:scale-110 active:scale-95 ${task.rating === 0 ? 'text-rose-700' : 'text-stone-200 hover:text-rose-300'}`}
               aria-label="0점 평가"
             >
-              <Icon name="close" size={24} className={task.rating === 0 ? "[font-variation-settings:'wght'_700]" : "[font-variation-settings:'wght'_400]"} />
+              <Icon name="close" size={36} />
             </button>
-            <div className="flex flex-1 items-center justify-between">
-              {[1, 2, 3, 4, 5].map((score) => {
-                const isActive = task.rating !== undefined && task.rating >= score;
-                return (
-                  <button
-                    key={score}
-                    type="button"
-                    onClick={() => onSetRating(task, score)}
-                    className={`flex-1 flex justify-center py-2 transition-transform hover:scale-110 active:scale-95 ${isActive ? 'text-amber-400' : 'text-stone-200 hover:text-amber-300'}`}
-                    aria-label={`${score}점 평가`}
-                  >
-                    <Icon name="star" size={36} className={isActive ? "[font-variation-settings:'FILL'_1]" : "[font-variation-settings:'FILL'_0]"} />
-                  </button>
-                );
-              })}
-            </div>
+            {[1, 2, 3, 4, 5].map((score) => {
+              const isActive = task.rating !== undefined && task.rating >= score;
+              return (
+                <button
+                  key={score}
+                  type="button"
+                  onClick={() => onSetRating(task, score)}
+                  className={`flex-1 flex justify-center py-2 transition-transform hover:scale-110 active:scale-95 ${isActive ? 'text-amber-400' : 'text-stone-200 hover:text-amber-300'}`}
+                  aria-label={`${score}점 평가`}
+                >
+                  <Icon name="star" size={36} className={isActive ? "[font-variation-settings:'FILL'_1]" : "[font-variation-settings:'FILL'_0]"} />
+                </button>
+              );
+            })}
           </div>
         </div>
         <label className="mt-5 block">
