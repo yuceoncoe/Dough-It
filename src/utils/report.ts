@@ -9,8 +9,8 @@ export const REPORT_QUADRANTS: Array<{
   className: string;
 }> = [
   { key: 'urgentImportant', label: '긴급+중요', shortLabel: '긴+중', className: 'bg-rose-100 text-rose-700 ring-rose-200' },
-  { key: 'urgent', label: '긴급', shortLabel: '긴급', className: 'bg-yellow-100 text-yellow-700 ring-yellow-200' },
   { key: 'important', label: '중요', shortLabel: '중요', className: 'bg-sky-100 text-sky-700 ring-sky-200' },
+  { key: 'urgent', label: '긴급', shortLabel: '긴급', className: 'bg-yellow-100 text-yellow-700 ring-yellow-200' },
   { key: 'normal', label: '일반', shortLabel: '일반', className: 'bg-emerald-100 text-emerald-700 ring-emerald-200' },
 ];
 
