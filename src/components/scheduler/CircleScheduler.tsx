@@ -85,7 +85,9 @@ const ClockTaskTracks = ({
         const labelX = clampLabelCoordinate(labelPoint.x, labelWidth);
         const labelY = clampLabelCoordinate(labelPoint.y, labelHeight);
         const isDimmed = task.completed || task.rating === 0;
+        const isAbandoned = task.rating === 0;
         const textColor = isDimmed ? 'rgba(120, 113, 108, 0.72)' : 'rgba(41, 37, 36, 0.88)';
+        const strokeColor = isAbandoned ? '#e7e5e4' : getClockTaskColor(task);
 
         return (
           <g key={`${interactive ? 'main' : 'preview'}-${task.id}-label`} className="pointer-events-none">
@@ -96,7 +98,7 @@ const ClockTaskTracks = ({
               height={labelHeight}
               rx="15"
               fill="rgba(255,255,255,0.82)"
-              stroke={getClockTaskColor(task)}
+              stroke={strokeColor}
               strokeWidth="1.2"
             />
             <text
