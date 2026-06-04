@@ -3,6 +3,8 @@ import { Task } from '../../types';
 import { formatDateLabel } from '../../utils/task';
 import { getTaskReport, REPORT_QUADRANTS } from '../../utils/report';
 import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
+import { getDailyTip } from '../../utils/tips';
+import { Icon } from './Icon';
 
 
 export const TaskReportModal = ({
@@ -26,7 +28,7 @@ export const TaskReportModal = ({
 
   const report = getTaskReport(tasks);
   const averageLabel = report.averageRating === null ? '-' : report.averageRating.toFixed(1);
-
+  const [dailyTip] = React.useState(() => getDailyTip(report.counts));
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -59,7 +61,15 @@ export const TaskReportModal = ({
           </div>
         </div>
 
-
+        <div className="mt-4 rounded-2xl bg-blue-50/50 p-4 ring-1 ring-blue-100/50">
+          <div className="flex items-center gap-1.5 text-sm font-bold text-blue-700">
+            <Icon name="lightbulb" size={16} />
+            오늘의 팁
+          </div>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-blue-900/80 break-keep">
+            {dailyTip}
+          </p>
+        </div>
 
         <div className="mt-4 rounded-2xl p-4">
           <div className="flex items-center justify-between">
