@@ -46,16 +46,20 @@ export const TaskReportModal = ({
         </div>
 
         <div className="grid grid-cols-2 gap-2">
-          {REPORT_QUADRANTS.map((quadrant) => (
-            <div key={quadrant.key} className={`rounded-xl p-3 text-left ring-1 ${quadrant.className}`}>
-              <div className="text-[11px] font-semibold tracking-[-0.02em] opacity-80">{quadrant.label}</div>
-              <div className="mt-1 flex items-baseline gap-1">
-                <span className="text-2xl font-bold tracking-[-0.05em]">{report.counts[quadrant.key]}</span>
-                <span className="text-sm font-semibold opacity-60">/ {report.totalCounts[quadrant.key]}</span>
-                <span className="ml-0.5 text-[10px] font-medium opacity-70">처리</span>
+          {REPORT_QUADRANTS.map((quadrant) => {
+            const hasTasks = report.totalCounts[quadrant.key] > 0;
+            const cardClass = hasTasks ? quadrant.className : 'bg-stone-100 text-stone-400 ring-stone-200';
+            return (
+              <div key={quadrant.key} className={`rounded-xl p-3 text-left ring-1 ${cardClass}`}>
+                <div className="text-[11px] font-semibold tracking-[-0.02em] opacity-80">{quadrant.label}</div>
+                <div className="mt-1 flex items-baseline gap-1">
+                  <span className="text-2xl font-bold tracking-[-0.05em]">{report.counts[quadrant.key]}</span>
+                  <span className="text-sm font-semibold opacity-60">/ {report.totalCounts[quadrant.key]}</span>
+                  <span className="ml-0.5 text-[10px] font-medium opacity-70">처리</span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mt-4 rounded-2xl bg-stone-100 p-4">

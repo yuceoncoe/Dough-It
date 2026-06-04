@@ -267,7 +267,7 @@ export const useAppState = (user: User, todayStr: string) => {
       const next = { ...current };
       Object.entries(current).forEach(([dateStr, tasks]) => {
         if (tasks.some((t) => t.id === taskId)) {
-          next[dateStr] = tasks.map((task) => task.id === taskId ? { ...task, rating, note: note ?? task.note, completed: true } : task);
+          next[dateStr] = tasks.map((task) => task.id === taskId ? { ...task, rating, note: note ?? task.note, completed: rating === 0 ? false : true } : task);
         }
       });
       return next;

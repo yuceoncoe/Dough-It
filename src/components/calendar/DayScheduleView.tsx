@@ -238,7 +238,7 @@ export const DayScheduleView = ({
           const nextTask = {
             ...task,
             rating,
-            completed: rating !== undefined,
+            completed: rating !== undefined && rating !== 0,
           };
           updateTask(nextTask);
           setSheetTask(nextTask);
