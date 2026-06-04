@@ -66,7 +66,7 @@ export const TaskRatingCarousel = ({
                   className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-transform hover:scale-110 active:scale-95 ${ratingsByTaskId[task.id] === 0 ? 'bg-amber-100 text-amber-600' : 'bg-stone-100 text-stone-400 hover:bg-stone-200'}`}
                   aria-label="0점 선택"
                 >
-                  0점
+                  <Icon name="close" size={28} className={ratingsByTaskId[task.id] === 0 ? "[font-variation-settings:'wght'_700]" : "[font-variation-settings:'wght'_400]"} />
                 </button>
                 <div className="flex flex-1 items-center justify-between">
                   {[1, 2, 3, 4, 5].map((score) => (

@@ -68,7 +68,7 @@ export const TaskActionSheet = ({
               className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-transform hover:scale-110 active:scale-95 ${task.rating === 0 ? 'bg-amber-100 text-amber-600' : 'bg-stone-100 text-stone-400 hover:bg-stone-200'}`}
               aria-label="0점 평가"
             >
-              0점
+              <Icon name="close" size={24} className={task.rating === 0 ? "[font-variation-settings:'wght'_700]" : "[font-variation-settings:'wght'_400]"} />
             </button>
             <div className="flex flex-1 items-center justify-between">
               {[1, 2, 3, 4, 5].map((score) => {
