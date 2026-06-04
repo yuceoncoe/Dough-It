@@ -84,8 +84,8 @@ const ClockTaskTracks = ({
         const labelHeight = 30;
         const labelX = clampLabelCoordinate(labelPoint.x, labelWidth);
         const labelY = clampLabelCoordinate(labelPoint.y, labelHeight);
-        const isCompleted = task.completed;
-        const textColor = isCompleted ? 'rgba(120, 113, 108, 0.72)' : 'rgba(41, 37, 36, 0.88)';
+        const isDimmed = task.completed || task.rating === 0;
+        const textColor = isDimmed ? 'rgba(120, 113, 108, 0.72)' : 'rgba(41, 37, 36, 0.88)';
 
         return (
           <g key={`${interactive ? 'main' : 'preview'}-${task.id}-label`} className="pointer-events-none">

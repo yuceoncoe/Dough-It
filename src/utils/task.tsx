@@ -590,7 +590,8 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
 
       ctx.save();
       ctx.filter = minuteAngle === null ? 'none' : `blur(${0.8 + progress * 5.2}px)`;
-      ctx.globalAlpha = task.completed ? 0.42 : 0.92;
+      const isDimmed = task.completed || task.rating === 0;
+      ctx.globalAlpha = isDimmed ? 0.42 : 0.92;
       
       const baseColor = getClockTaskColor(task);
       const gradient = ctx.createRadialGradient(
