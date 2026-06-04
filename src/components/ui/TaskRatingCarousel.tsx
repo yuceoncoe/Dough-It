@@ -28,7 +28,7 @@ export const TaskRatingCarousel = ({
 
   const handleConfirm = (taskId: string) => {
     const rating = ratingsByTaskId[taskId];
-    if (!rating) {
+    if (rating === undefined) {
       return;
     }
     const note = notesByTaskId[taskId]?.trim();
@@ -59,17 +59,27 @@ export const TaskRatingCarousel = ({
               <h3 className="mb-2 font-hand text-2xl text-stone-800">{task.title}</h3>
               <p className="mb-6 text-sm text-stone-500">얼마나 만족스럽게 달성하셨나요?</p>
               
-              <div className="mb-4 flex w-full items-center justify-between">
-                {[1, 2, 3, 4, 5].map((score) => (
-                  <button
-                    key={score}
-                    onClick={() => setRatingsByTaskId((current) => ({ ...current, [task.id]: score }))}
-                    className={`flex-1 flex justify-center py-2 transition-transform hover:scale-110 active:scale-95 ${(ratingsByTaskId[task.id] ?? 0) >= score ? 'text-amber-400' : 'text-stone-200 hover:text-amber-300'}`}
-                    aria-label={`${score}점 선택`}
-                  >
-                    <Icon name="star" size={48} className={(ratingsByTaskId[task.id] ?? 0) >= score ? "[font-variation-settings:'FILL'_1]" : "[font-variation-settings:'FILL'_0]"} />
-                  </button>
-                ))}
+              <div className="mb-4 flex w-full items-center justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={() => setRatingsByTaskId((current) => ({ ...current, [task.id]: 0 }))}
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-transform hover:scale-110 active:scale-95 ${ratingsByTaskId[task.id] === 0 ? 'bg-amber-100 text-amber-600' : 'bg-stone-100 text-stone-400 hover:bg-stone-200'}`}
+                  aria-label="0점 선택"
+                >
+                  0점
+                </button>
+                <div className="flex flex-1 items-center justify-between">
+                  {[1, 2, 3, 4, 5].map((score) => (
+                    <button
+                      key={score}
+                      onClick={() => setRatingsByTaskId((current) => ({ ...current, [task.id]: score }))}
+                      className={`flex-1 flex justify-center py-2 transition-transform hover:scale-110 active:scale-95 ${(ratingsByTaskId[task.id] ?? -1) >= score ? 'text-amber-400' : 'text-stone-200 hover:text-amber-300'}`}
+                      aria-label={`${score}점 선택`}
+                    >
+                      <Icon name="star" size={42} className={(ratingsByTaskId[task.id] ?? -1) >= score ? "[font-variation-settings:'FILL'_1]" : "[font-variation-settings:'FILL'_0]"} />
+                    </button>
+                  ))}
+                </div>
               </div>
               <label className="w-full text-left">
                 <span className="text-sm font-semibold tracking-[-0.02em] text-stone-700">메모</span>
@@ -88,7 +98,7 @@ export const TaskRatingCarousel = ({
               <button
                 type="button"
                 onClick={() => handleConfirm(task.id)}
-                disabled={!ratingsByTaskId[task.id]}
+                disabled={ratingsByTaskId[task.id] === undefined}
                 className="btn-primary mt-5 w-full"
               >
                 확인
