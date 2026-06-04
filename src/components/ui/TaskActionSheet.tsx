@@ -68,7 +68,7 @@ export const TaskActionSheet = ({
               className={`flex-1 flex justify-center py-2 transition-transform hover:scale-110 active:scale-95 ${task.rating === 0 ? 'text-rose-700' : 'text-stone-200 hover:text-rose-300'}`}
               aria-label="0점 평가"
             >
-              <Icon name="close" size={36} />
+              <Icon name="close" size={30} className="[font-variation-settings:'wght'_600]" />
             </button>
             {[1, 2, 3, 4, 5].map((score) => {
               const isActive = task.rating !== undefined && task.rating >= score;

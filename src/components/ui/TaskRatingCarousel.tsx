@@ -66,7 +66,7 @@ export const TaskRatingCarousel = ({
                   className={`flex-1 flex justify-center py-2 transition-transform hover:scale-110 active:scale-95 ${ratingsByTaskId[task.id] === 0 ? 'text-rose-700' : 'text-stone-200 hover:text-rose-300'}`}
                   aria-label="0점 선택"
                 >
-                  <Icon name="close" size={42} />
+                  <Icon name="close" size={36} className="[font-variation-settings:'wght'_600]" />
                 </button>
                 {[1, 2, 3, 4, 5].map((score) => (
                   <button
