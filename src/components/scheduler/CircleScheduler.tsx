@@ -80,6 +80,9 @@ const ClockTaskTracks = ({
     .sort((a, b) => {
       const aAngle = ((a.startAngle % 360) + 360) % 360;
       const bAngle = ((b.startAngle % 360) + 360) % 360;
+      if (Math.abs(aAngle - bAngle) < 0.1) {
+        return a.laneIndex - b.laneIndex;
+      }
       return aAngle - bAngle;
     })
     .map(t => t.task.id);
