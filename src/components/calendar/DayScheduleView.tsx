@@ -95,7 +95,7 @@ export const DayScheduleView = ({
 
   const sortedTasks = tasks
     .filter((task) => {
-      if (task.isRoutine) return activeFilters.routine;
+      if (task.isRoutine && !activeFilters.routine) return false;
       
       const isImportant = task.tags?.includes('important');
       const isUrgent = task.tags?.includes('urgent');
