@@ -416,7 +416,7 @@ export const DayScheduleView = ({
                           <span className={`block truncate text-[15px] font-semibold tracking-[-0.03em] ${task.completed || task.rating === 0 ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
                             {task.title}
                           </span>
-                          <div className="mt-1 flex items-center gap-2 text-[12px] text-stone-400">
+                          <div className="mt-0.5 flex items-center gap-2 text-[12px] text-stone-400">
                             <Icon name="schedule" size={12} className="shrink-0" />
                             {task.startTime ? `${task.startTime} - ${minutesToTime(timeToMinutes(task.startTime) + (task.duration ?? 0))}` : '시간 미지정'}
                           </div>
