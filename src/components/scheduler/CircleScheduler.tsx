@@ -105,7 +105,7 @@ const ClockTaskTracks = ({
               y={labelY + 1}
               textAnchor="middle"
               dominantBaseline="middle"
-              className="text-[18px] font-semibold"
+              className="text-[20px] font-semibold"
               fill={textColor}
             >
               {labelText}
