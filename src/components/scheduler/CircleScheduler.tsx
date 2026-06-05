@@ -114,6 +114,7 @@ const ClockTaskTracks = ({
         const animationIndex = sortedTaskIds.indexOf(task.id);
         const interval = trackTasks.length > 0 ? Math.min(80, 400 / trackTasks.length) : 80;
         const delay = animationIndex * interval;
+        const arcLength = laneCenterRadius * (safeEndAngle - startAngle) * (Math.PI / 180);
 
         return (
           <g 
@@ -143,6 +144,12 @@ const ClockTaskTracks = ({
                 stroke={`url(#grad-${interactive ? 'main' : 'preview'}-${task.id})`}
                 strokeWidth={laneStrokeWidth}
                 strokeLinecap="butt"
+                className="animate-draw-arc"
+                style={{
+                  strokeDasharray: arcLength,
+                  '--arc-length': `${arcLength}px`,
+                  animationDelay: `${delay}ms`,
+                } as React.CSSProperties}
               />
             </g>
             <g>
