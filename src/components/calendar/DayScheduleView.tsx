@@ -430,7 +430,7 @@ export const DayScheduleView = ({
                           checked={activeFilters[filter.key as keyof typeof activeFilters]}
                           onChange={(e) => setActiveFilters(prev => ({ ...prev, [filter.key]: e.target.checked }))}
                         />
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <span className="text-[14px] font-medium text-stone-700">{filter.label}</span>
                           {filter.colorClass && (
                             <span className={`h-2.5 w-2.5 rounded-full ${filter.colorClass}`} />
