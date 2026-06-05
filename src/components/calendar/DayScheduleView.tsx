@@ -415,10 +415,10 @@ export const DayScheduleView = ({
                     {[
                       { key: 'routine', label: '루틴' },
                       { key: 'divider', isDivider: true },
-                      { key: 'general', label: '일반' },
-                      { key: 'important', label: '중요' },
-                      { key: 'urgent', label: '긴급' },
-                      { key: 'urgentImportant', label: '긴급+중요' }
+                      { key: 'general', label: '일반', colorClass: 'bg-emerald-400' },
+                      { key: 'important', label: '중요', colorClass: 'bg-sky-500' },
+                      { key: 'urgent', label: '긴급', colorClass: 'bg-yellow-400' },
+                      { key: 'urgentImportant', label: '긴급+중요', colorClass: 'bg-rose-500' }
                     ].map((filter) => 
                       filter.isDivider ? (
                         <div key={filter.key} className="mx-2 my-1 border-t border-stone-100" />
@@ -426,11 +426,16 @@ export const DayScheduleView = ({
                       <label key={filter.key} className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-stone-50">
                         <input 
                           type="checkbox" 
-                          className="h-[18px] w-[18px] cursor-pointer accent-stone-800"
+                          className="h-[18px] w-[18px] cursor-pointer accent-stone-800 shrink-0"
                           checked={activeFilters[filter.key as keyof typeof activeFilters]}
                           onChange={(e) => setActiveFilters(prev => ({ ...prev, [filter.key]: e.target.checked }))}
                         />
-                        <span className="text-[14px] font-medium text-stone-700">{filter.label}</span>
+                        <div className="flex items-center gap-2">
+                          {filter.colorClass && (
+                            <span className={`h-2.5 w-2.5 rounded-full ${filter.colorClass}`} />
+                          )}
+                          <span className="text-[14px] font-medium text-stone-700">{filter.label}</span>
+                        </div>
                       </label>
                     ))}
                   </div>
