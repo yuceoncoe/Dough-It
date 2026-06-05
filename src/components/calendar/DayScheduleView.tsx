@@ -416,10 +416,10 @@ export const DayScheduleView = ({
                     {[
                       { key: 'routine', label: '루틴' },
                       { key: 'divider', isDivider: true },
-                      { key: 'general', label: '일반', colorClass: 'bg-emerald-400' },
-                      { key: 'important', label: '중요', colorClass: 'bg-sky-500' },
-                      { key: 'urgent', label: '긴급', colorClass: 'bg-yellow-400' },
-                      { key: 'urgentImportant', label: '긴급+중요', colorClass: 'bg-rose-500' }
+                      { key: 'general', label: '일반', tags: [] },
+                      { key: 'important', label: '중요', tags: ['important'] },
+                      { key: 'urgent', label: '긴급', tags: ['urgent'] },
+                      { key: 'urgentImportant', label: '긴급+중요', tags: ['urgent', 'important'] }
                     ].map((filter) => 
                       filter.isDivider ? (
                         <div key={filter.key} className="mx-2 my-1 border-t border-stone-100" />
@@ -431,10 +431,10 @@ export const DayScheduleView = ({
                           checked={activeFilters[filter.key as keyof typeof activeFilters]}
                           onChange={(e) => setActiveFilters(prev => ({ ...prev, [filter.key]: e.target.checked }))}
                         />
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1.5">
                           <span className="text-[14px] font-medium text-stone-700">{filter.label}</span>
-                          {filter.colorClass && (
-                            <span className={`h-2.5 w-2.5 rounded-full ${filter.colorClass}`} />
+                          {filter.tags && (
+                            <QuadrantBadge task={{ tags: filter.tags as Tag[] } as Task} sizeClassName="h-[12px] w-[12px]" />
                           )}
                         </div>
                       </label>
