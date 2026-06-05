@@ -76,6 +76,14 @@ const ClockTaskTracks = ({
   minuteAngle,
   animationKey,
 }: ClockTaskTracksProps) => {
+  const sortedTaskIds = [...trackTasks]
+    .sort((a, b) => {
+      const aAngle = ((a.startAngle % 360) + 360) % 360;
+      const bAngle = ((b.startAngle % 360) + 360) % 360;
+      return aAngle - bAngle;
+    })
+    .map(t => t.task.id);
+
   return (
     <g key={animationKey} className="pointer-events-none">
       {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
@@ -100,8 +108,9 @@ const ClockTaskTracks = ({
         const alpha = isDimmed ? 0.42 : 0.92;
 
         const innerOffset = (innerRadius / outerRadius) * 100;
-        const normalizedAngle = ((startAngle % 360) + 360) % 360;
-        const delay = (normalizedAngle / 360) * 450;
+        const animationIndex = sortedTaskIds.indexOf(task.id);
+        const interval = trackTasks.length > 0 ? Math.min(80, 400 / trackTasks.length) : 80;
+        const delay = animationIndex * interval;
 
         return (
           <g 
