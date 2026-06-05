@@ -100,7 +100,8 @@ const ClockTaskTracks = ({
         const alpha = isDimmed ? 0.42 : 0.92;
 
         const innerOffset = (innerRadius / outerRadius) * 100;
-        const delay = (normalizeClockAngle(startAngle) / 360) * 450;
+        const normalizedAngle = ((startAngle % 360) + 360) % 360;
+        const delay = (normalizedAngle / 360) * 450;
 
         return (
           <g 
