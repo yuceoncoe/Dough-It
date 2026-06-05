@@ -94,7 +94,7 @@ export const TaskReportModal = ({
                 key={task.id} 
                 onClick={() => onTaskClick?.(task)}
                 role={onTaskClick ? 'button' : undefined}
-                className={`flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-[9px] shadow-sm ${onTaskClick ? 'cursor-pointer hover:bg-stone-50 active:bg-stone-100 transition-colors' : ''}`}
+                className={`flex items-center justify-between gap-3 rounded-lg bg-white px-3 py-[9px] shadow-sm ${onTaskClick ? 'cursor-pointer hover:bg-stone-50 active:bg-stone-100 transition-colors' : ''}`}
               >
                 <div className="flex min-w-0 items-center gap-2">
                   <QuadrantBadge task={task} />
