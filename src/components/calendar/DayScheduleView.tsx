@@ -502,16 +502,20 @@ export const DayScheduleView = ({
                             </span>
                           ) : null}
                           {task.rating !== undefined && (
-                            <span className="flex items-center whitespace-nowrap text-xs font-bold">
+                            <span className="flex w-[28px] items-center justify-end whitespace-nowrap text-xs font-bold">
                               {task.rating === 0 ? (
                                 <>
-                                  <Icon name="close" size={13} className="mr-0.5 text-rose-500 [font-variation-settings:'wght'_700]" />
-                                  <span className="text-rose-500">0</span>
+                                  <span className="flex w-[16px] justify-center mr-0.5">
+                                    <Icon name="close" size={13} className="text-rose-500 [font-variation-settings:'wght'_700]" />
+                                  </span>
+                                  <span className="w-[10px] text-right text-rose-500 tabular-nums">0</span>
                                 </>
                               ) : (
                                 <>
-                                  <Icon name="star" size={15} className="mr-0.5 text-amber-400 [font-variation-settings:'FILL'_1]" />
-                                  <span className="text-amber-500">{task.rating}</span>
+                                  <span className="flex w-[16px] justify-center mr-0.5">
+                                    <Icon name="star" size={15} className="text-amber-400 [font-variation-settings:'FILL'_1]" />
+                                  </span>
+                                  <span className="w-[10px] text-right text-amber-500 tabular-nums">{task.rating}</span>
                                 </>
                               )}
                             </span>
