@@ -26,7 +26,7 @@ export const getTaskReportQuadrant = (task: Task): ReportQuadrantKey => {
 };
 
 export const getTaskReport = (tasks: Task[]) => {
-  const completedTasks = tasks.filter((task) => task.completed);
+  const completedTasks = tasks.filter((task) => task.completed && task.rating !== 0);
   const ratedTasks = completedTasks.filter((task) => task.rating !== undefined);
   const counts = REPORT_QUADRANTS.reduce<Record<ReportQuadrantKey, number>>((result, quadrant) => {
     result[quadrant.key] = 0;
