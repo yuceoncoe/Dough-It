@@ -414,11 +414,15 @@ export const DayScheduleView = ({
                   <div className="absolute right-0 top-full mt-1 w-48 rounded-2xl border border-stone-100 bg-white p-2 shadow-[0_8px_30px_rgb(0,0,0,0.12)] z-[100]">
                     {[
                       { key: 'routine', label: '루틴' },
+                      { key: 'divider', isDivider: true },
                       { key: 'general', label: '일반' },
                       { key: 'important', label: '중요' },
                       { key: 'urgent', label: '긴급' },
                       { key: 'urgentImportant', label: '긴급+중요' }
-                    ].map((filter) => (
+                    ].map((filter) => 
+                      filter.isDivider ? (
+                        <div key={filter.key} className="mx-2 my-1 border-t border-stone-100" />
+                      ) : (
                       <label key={filter.key} className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-stone-50">
                         <input 
                           type="checkbox" 
