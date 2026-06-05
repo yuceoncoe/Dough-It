@@ -32,7 +32,7 @@ const getSafeTags = (tags: Task['tags'] | undefined | null) => (
   Array.isArray(tags) ? tags : []
 );
 
-export const QuadrantBadge = ({ task, sizeClassName = 'h-[14px] w-[14px]' }: { task: Task; sizeClassName?: string }) => {
+export const QuadrantBadge = ({ task, sizeClassName = 'h-[16px] w-[16px]' }: { task: Task; sizeClassName?: string }) => {
   const tags = getSafeTags(task.tags);
   const isQ1 = tags.includes('urgent') && tags.includes('important');
   const isQ2 = !tags.includes('urgent') && tags.includes('important');

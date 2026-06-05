@@ -416,10 +416,10 @@ export const DayScheduleView = ({
                     {[
                       { key: 'routine', label: '루틴' },
                       { key: 'divider', isDivider: true },
-                      { key: 'general', label: '일반', tags: [] },
+                      { key: 'urgentImportant', label: '긴급+중요', tags: ['urgent', 'important'] },
                       { key: 'important', label: '중요', tags: ['important'] },
                       { key: 'urgent', label: '긴급', tags: ['urgent'] },
-                      { key: 'urgentImportant', label: '긴급+중요', tags: ['urgent', 'important'] }
+                      { key: 'general', label: '일반', tags: [] }
                     ].map((filter) => 
                       filter.isDivider ? (
                         <div key={filter.key} className="mx-2 my-1 border-t border-stone-100" />
@@ -434,7 +434,7 @@ export const DayScheduleView = ({
                         <div className="flex items-center gap-1.5">
                           <span className="text-[14px] font-medium text-stone-700">{filter.label}</span>
                           {filter.tags && (
-                            <QuadrantBadge task={{ tags: filter.tags as Tag[] } as Task} sizeClassName="h-[12px] w-[12px]" />
+                            <QuadrantBadge task={{ tags: filter.tags as Tag[] } as Task} sizeClassName="h-[14px] w-[14px]" />
                           )}
                         </div>
                       </label>
