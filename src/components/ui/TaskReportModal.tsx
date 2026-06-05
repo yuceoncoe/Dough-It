@@ -88,7 +88,7 @@ export const TaskReportModal = ({
             <span className="text-sm font-semibold text-stone-700">일정 모아보기</span>
             <span className="text-sm font-bold text-stone-900">{report.listTasks.length}개</span>
           </div>
-          <div className="mt-3 max-h-40 space-y-2 overflow-y-auto">
+          <div className="mt-2 max-h-40 space-y-2 overflow-y-auto px-1 py-1 -mx-1 -mb-1">
             {report.listTasks.length ? report.listTasks.map((task) => (
               <div 
                 key={task.id} 
