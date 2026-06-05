@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Task, Tag } from '../../types';
 import { minutesToAngle, angleToMinutes, minutesToTime } from '../../utils/time';
-import { isCurrentMinuteInsideTask, getCenterTaskProgress, getClockTaskColor, getRequiredTrackLaneCount, assignTasksToTrackLanes, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, CENTER, RADIUS, OUTER_BACKGROUND_RADIUS, TRACK_INNER_RADIUS, getTrackLaneCenterRadius, getDirectionalTextVisuals, OUTER_HOUR_LABELS, CURRENT_HAND_RADIUS, clampArcEnd, hexToRgba } from '../../utils/task';
-import { polarToCartesian, describeArc } from '../../utils/geometry';
+import { isCurrentMinuteInsideTask, getCenterTaskProgress, getClockTaskColor, getRequiredTrackLaneCount, assignTasksToTrackLanes, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, CENTER, RADIUS, OUTER_BACKGROUND_RADIUS, TRACK_INNER_RADIUS, getTrackLaneCenterRadius, getDirectionalTextVisuals, OUTER_HOUR_LABELS, CURRENT_HAND_RADIUS, clampArcEnd, hexToRgba, getTrackLaneFillRadii, getBlurProgress } from '../../utils/task';
+import { polarToCartesian, describeArc, describeOpenArc } from '../../utils/geometry';
 import TaskCreationModal from '../ui/TaskCreationModal';
 import CanvasClockSurface from './CanvasClockSurface';
 
@@ -45,6 +45,8 @@ interface ClockTaskTracksProps {
   laneCount: number;
   interactive: boolean;
   getClockTaskColor: (task: Task) => string;
+  minuteAngle: number | null;
+  animationKey: string;
 }
 
 interface ClockPendingArcProps {
@@ -71,11 +73,16 @@ const ClockTaskTracks = ({
   laneCount,
   interactive,
   getClockTaskColor,
+  minuteAngle,
+  animationKey,
 }: ClockTaskTracksProps) => {
   return (
-    <g className="pointer-events-none">
+    <g key={animationKey} className="pointer-events-none">
       {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
         const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
+        const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex, laneCount);
+        const laneStrokeWidth = outerRadius - innerRadius;
+
         const safeEndAngle = clampArcEnd(startAngle, endAngle);
         const midAngle = startAngle + (safeEndAngle - startAngle) / 2;
         const labelPoint = polarToCartesian(CENTER, CENTER, laneCenterRadius, midAngle);
@@ -87,29 +94,66 @@ const ClockTaskTracks = ({
         const isDimmed = task.completed || task.rating === 0;
         const textColor = isDimmed ? 'rgba(120, 113, 108, 0.72)' : 'rgba(41, 37, 36, 0.88)';
         const strokeColor = getClockTaskColor(task);
+        
+        const progress = minuteAngle === null ? 0 : getBlurProgress(labelPoint, minuteAngle);
+        const blurAmount = minuteAngle === null ? 0 : (0.8 + progress * 5.2);
+        const alpha = isDimmed ? 0.42 : 0.92;
+
+        const innerOffset = (innerRadius / outerRadius) * 100;
+        const delay = (normalizeClockAngle(startAngle) / 360) * 450;
 
         return (
-          <g key={`${interactive ? 'main' : 'preview'}-${task.id}-label`} className="pointer-events-none">
-            <rect
-              x={labelX - labelWidth / 2}
-              y={labelY - labelHeight / 2}
-              width={labelWidth}
-              height={labelHeight}
-              rx="15"
-              fill="rgba(255,255,255,0.82)"
-              stroke={strokeColor}
-              strokeWidth="1.2"
-            />
-            <text
-              x={labelX}
-              y={labelY + 1}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              className="text-[22px] font-semibold"
-              fill={textColor}
-            >
-              {labelText}
-            </text>
+          <g 
+            key={`${interactive ? 'main' : 'preview'}-${task.id}`} 
+            className="animate-clock-spin-in-item origin-center pointer-events-none" 
+            style={{ 
+              animationDelay: `${delay}ms`, 
+              transformOrigin: `${CENTER}px ${CENTER}px`,
+            }}
+          >
+            <defs>
+              <radialGradient 
+                id={`grad-${interactive ? 'main' : 'preview'}-${task.id}`}
+                gradientUnits="userSpaceOnUse"
+                cx={CENTER}
+                cy={CENTER}
+                r={outerRadius}
+              >
+                 <stop offset={`${innerOffset}%`} stopColor={hexToRgba(strokeColor, 0.15)} />
+                 <stop offset="100%" stopColor={hexToRgba(strokeColor, 0.8)} />
+              </radialGradient>
+            </defs>
+            <g style={{ filter: blurAmount > 0 ? `blur(${blurAmount}px)` : 'none', opacity: alpha }}>
+              <path
+                d={describeOpenArc(CENTER, CENTER, laneCenterRadius, startAngle, endAngle)}
+                fill="none"
+                stroke={`url(#grad-${interactive ? 'main' : 'preview'}-${task.id})`}
+                strokeWidth={laneStrokeWidth}
+                strokeLinecap="butt"
+              />
+            </g>
+            <g>
+              <rect
+                x={labelX - labelWidth / 2}
+                y={labelY - labelHeight / 2}
+                width={labelWidth}
+                height={labelHeight}
+                rx="15"
+                fill="rgba(255,255,255,0.82)"
+                stroke={strokeColor}
+                strokeWidth="1.2"
+              />
+              <text
+                x={labelX}
+                y={labelY + 1}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="text-[22px] font-semibold"
+                fill={textColor}
+              >
+                {labelText}
+              </text>
+            </g>
           </g>
         );
       })}
@@ -562,12 +606,14 @@ export const CircleScheduler = ({
         />
       ) : null}
 
-      <g key={`tracks-${animationKey}`} className="animate-clock-spin-in" style={{ transformOrigin: `${CENTER}px ${CENTER}px` }}>
+      <g>
         <ClockTaskTracks
           trackTasks={trackTasks}
           laneCount={laneCount}
           interactive={interactive}
           getClockTaskColor={getClockTaskColor}
+          minuteAngle={canvasMinuteAngle}
+          animationKey={animationKey}
         />
       </g>
 
@@ -658,9 +704,6 @@ export const CircleScheduler = ({
       <div ref={squareRef} className="relative aspect-square w-full max-w-[850px]">
         <div className="relative h-full w-full">
           <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} layer="background" />
-          <div key={`canvas-main-${animationKey}`} className="absolute inset-0 animate-clock-spin-in origin-center pointer-events-none">
-            <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} layer="tasks" />
-          </div>
 
           <svg
             ref={svgRef}
@@ -695,9 +738,6 @@ export const CircleScheduler = ({
             >
               <div className="relative h-full w-full">
                 <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} layer="background" />
-                <div key={`canvas-preview-${animationKey}`} className="absolute inset-0 animate-clock-spin-in origin-center pointer-events-none">
-                  <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} layer="tasks" />
-                </div>
                 <svg
                   viewBox={`${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_SIZE} ${SVG_VIEWBOX_SIZE}`}
                   className="absolute inset-0 h-full w-full select-none pointer-events-none"

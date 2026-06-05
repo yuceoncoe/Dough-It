@@ -708,6 +708,10 @@ canvas {
   animation: clock-spin-in 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.animate-clock-spin-in-item {
+  animation: clock-spin-in 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @keyframes slide-up {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
