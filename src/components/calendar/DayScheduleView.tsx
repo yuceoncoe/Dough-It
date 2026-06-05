@@ -370,7 +370,7 @@ export const DayScheduleView = ({
               <div>
                 <h2 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-stone-900">일정 목록</h2>
               </div>
-              <button onClick={() => setShowRoutines((current) => !current)} className="inline-flex h-9 min-w-[100px] items-center justify-center rounded-full bg-white px-4 py-2 text-[10px] font-medium text-stone-500 shadow-sm">
+              <button onClick={() => setShowRoutines((current) => !current)} className="inline-flex h-9 min-w-[100px] items-center justify-center rounded-full bg-white px-4 py-2 text-[9px] font-medium text-stone-500 shadow-sm">
                 {showRoutines ? '루틴숨기기' : '루틴보기'}
               </button>
             </div>

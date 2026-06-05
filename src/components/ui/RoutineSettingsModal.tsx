@@ -185,9 +185,9 @@ export const RoutineSettingsModal = ({
                   <button
                     type="button"
                     onClick={() => void onSignOut()}
-                    className="flex items-center gap-1.5 rounded-lg bg-stone-100 px-2 py-1 text-xs font-medium text-stone-600 transition-colors hover:bg-stone-200 hover:text-stone-900"
+                    className="flex items-center gap-1.5 rounded-lg bg-stone-100 px-2 py-1 text-[10px] font-medium text-stone-600 transition-colors hover:bg-stone-200 hover:text-stone-900"
                   >
-                    <Icon name="logout" size={14} />
+                    <Icon name="logout" size={12} />
                     로그아웃
                   </button>
                 </div>
