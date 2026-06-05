@@ -692,3 +692,8 @@ canvas {
 .animate-jelly {
   animation: jelly-bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
 }
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
