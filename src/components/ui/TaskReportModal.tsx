@@ -13,6 +13,7 @@ export const TaskReportModal = ({
   tasks,
   tasksByDate,
   onClose,
+  onTaskClick,
 }: {
   isOpen: boolean;
   date: string;
