@@ -540,6 +540,7 @@ export const CircleScheduler = ({
     };
   };
   const pendingSelectionRange = pendingArc ? getPendingSelectionRange(pendingArc) : null;
+  const animationKey = `${date}-${tasks.map(t => t.id).join('-')}`;
 
   const renderClockSvgLayers = (interactive: boolean) => (
     <>
@@ -561,12 +562,14 @@ export const CircleScheduler = ({
         />
       ) : null}
 
-      <ClockTaskTracks
-        trackTasks={trackTasks}
-        laneCount={laneCount}
-        interactive={interactive}
-        getClockTaskColor={getClockTaskColor}
-      />
+      <g key={`tracks-${animationKey}`} className="animate-clock-spin-in" style={{ transformOrigin: `${CENTER}px ${CENTER}px` }}>
+        <ClockTaskTracks
+          trackTasks={trackTasks}
+          laneCount={laneCount}
+          interactive={interactive}
+          getClockTaskColor={getClockTaskColor}
+        />
+      </g>
 
       <ClockHourLabels
         showCurrentTime={showCurrentTime}
@@ -654,7 +657,9 @@ export const CircleScheduler = ({
 
       <div ref={squareRef} className="relative aspect-square w-full max-w-[850px]">
         <div className="relative h-full w-full">
-          <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} />
+          <div key={`canvas-main-${animationKey}`} className="absolute inset-0 animate-clock-spin-in origin-center pointer-events-none">
+            <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} />
+          </div>
 
           <svg
             ref={svgRef}
@@ -688,7 +693,9 @@ export const CircleScheduler = ({
               }}
             >
               <div className="relative h-full w-full">
-                <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} />
+                <div key={`canvas-preview-${animationKey}`} className="absolute inset-0 animate-clock-spin-in origin-center pointer-events-none">
+                  <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} />
+                </div>
                 <svg
                   viewBox={`${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_SIZE} ${SVG_VIEWBOX_SIZE}`}
                   className="absolute inset-0 h-full w-full select-none pointer-events-none"
