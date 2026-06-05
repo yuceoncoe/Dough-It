@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Task, Tag, RoutineScope, RoutineAction } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
 import { getTaskColor, getTaskTonePillClass, getTaskToneLabel } from '../../utils/task';
@@ -41,7 +41,25 @@ export const DayScheduleView = ({
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [tags, setTags] = useState<Tag[]>([]);
-  const [showRoutines, setShowRoutines] = useState(true);
+  const [activeFilters, setActiveFilters] = useState({
+    routine: true,
+    general: true,
+    important: true,
+    urgent: true,
+    urgentImportant: true,
+  });
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setFilterDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [sheetTask, setSheetTask] = useState<Task | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
@@ -76,7 +94,18 @@ export const DayScheduleView = ({
   };
 
   const sortedTasks = tasks
-    .filter((task) => showRoutines || !task.isRoutine)
+    .filter((task) => {
+      if (task.isRoutine) return activeFilters.routine;
+      
+      const isImportant = task.tags?.includes('important');
+      const isUrgent = task.tags?.includes('urgent');
+
+      if (isImportant && isUrgent) return activeFilters.urgentImportant;
+      if (isImportant) return activeFilters.important;
+      if (isUrgent) return activeFilters.urgent;
+      
+      return activeFilters.general;
+    })
     .sort((left, right) => {
       if (!!left.startTime !== !!right.startTime) {
         return left.startTime ? -1 : 1;
@@ -366,13 +395,43 @@ export const DayScheduleView = ({
 
         <div className="flex min-h-0 flex-col overflow-visible">
           <div className="flex min-h-0 flex-1 flex-col">
-            <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="mb-4 flex items-center justify-between gap-3 relative">
               <div>
                 <h2 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-stone-900">일정 목록</h2>
               </div>
-              <button onClick={() => setShowRoutines((current) => !current)} className="inline-flex h-9 items-center justify-center gap-1.5 px-2 py-2 text-[8px] font-medium text-stone-500 transition-colors hover:text-stone-700">
-                {showRoutines ? '루틴숨기기' : '루틴보기'}
-              </button>
+              <div className="relative" ref={filterRef}>
+                <button 
+                  onClick={() => setFilterDropdownOpen(!filterDropdownOpen)} 
+                  className="relative flex h-9 w-9 items-center justify-center rounded-full text-stone-500 transition-colors hover:bg-stone-200/50"
+                  aria-label="필터"
+                >
+                  <Icon name="filter_list" size={20} />
+                  {(!activeFilters.routine || !activeFilters.general || !activeFilters.important || !activeFilters.urgent || !activeFilters.urgentImportant) && (
+                    <span className="absolute right-1 top-1.5 h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+                  )}
+                </button>
+                {filterDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-48 rounded-2xl border border-stone-100 bg-white p-2 shadow-[0_8px_30px_rgb(0,0,0,0.12)] z-[100]">
+                    {[
+                      { key: 'routine', label: '루틴' },
+                      { key: 'general', label: '일반' },
+                      { key: 'important', label: '중요' },
+                      { key: 'urgent', label: '긴급' },
+                      { key: 'urgentImportant', label: '긴급+중요' }
+                    ].map((filter) => (
+                      <label key={filter.key} className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-stone-50">
+                        <input 
+                          type="checkbox" 
+                          className="h-[18px] w-[18px] cursor-pointer accent-stone-800"
+                          checked={activeFilters[filter.key as keyof typeof activeFilters]}
+                          onChange={(e) => setActiveFilters(prev => ({ ...prev, [filter.key]: e.target.checked }))}
+                        />
+                        <span className="text-[14px] font-medium text-stone-700">{filter.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="overflow-y-auto pb-safe">
