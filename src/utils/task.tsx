@@ -481,14 +481,15 @@ export const getBlurProgress = (point: { x: number; y: number }, minuteAngle: nu
   return Math.min(1, easedDirectional * 0.72 + projected * 0.28);
 };
 
-export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAngle: number | null) => {
+export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], minuteAngle: number | null, layer: 'background' | 'tasks' | 'all' = 'all') => {
   const laneCount = getRequiredTrackLaneCount(tasks);
   const trackTasks = assignTasksToTrackLanes(tasks, laneCount);
 
   ctx.clearRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
 
-  ctx.fillStyle = '#f0f0f4';
-  ctx.fillRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
+  if (layer === 'background' || layer === 'all') {
+    ctx.fillStyle = '#f0f0f4';
+    ctx.fillRect(SVG_VIEWBOX_MIN, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE, SVG_VIEWBOX_SIZE);
 
   ctx.save();
   ctx.beginPath();
@@ -571,18 +572,20 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
     ctx.restore();
   });
 
-  Array.from({ length: laneCount - 1 }, (_, laneIndex) => laneIndex).forEach((laneIndex) => {
-    const separatorRadius = getTrackSeparatorRadius(laneIndex, laneCount);
-    ctx.save();
-    ctx.strokeStyle = 'rgba(20, 20, 20, 0.06)';
-    ctx.lineWidth = 0.9;
-    ctx.beginPath();
-    ctx.arc(CENTER, CENTER, separatorRadius, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-  });
+    Array.from({ length: laneCount - 1 }, (_, laneIndex) => laneIndex).forEach((laneIndex) => {
+      const separatorRadius = getTrackSeparatorRadius(laneIndex, laneCount);
+      ctx.save();
+      ctx.strokeStyle = 'rgba(20, 20, 20, 0.06)';
+      ctx.lineWidth = 0.9;
+      ctx.beginPath();
+      ctx.arc(CENTER, CENTER, separatorRadius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
 
-  trackTasks.forEach(({ task, startAngle, endAngle, laneIndex }) => {
+  if (layer === 'tasks' || layer === 'all') {
+    trackTasks.forEach(({ task, startAngle, endAngle, laneIndex }) => {
       const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
       const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex, laneCount);
       const laneStrokeWidth = outerRadius - innerRadius;
@@ -622,6 +625,7 @@ export const renderClockScene = (ctx: CanvasRenderingContext2D, tasks: Task[], m
       ctx.stroke();
       ctx.restore();
     });
+  }
 };
 
 export function generateRoutinesForDate(dateStr: string, routines: RoutineState) {

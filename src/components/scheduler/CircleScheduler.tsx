@@ -657,8 +657,9 @@ export const CircleScheduler = ({
 
       <div ref={squareRef} className="relative aspect-square w-full max-w-[850px]">
         <div className="relative h-full w-full">
+          <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} layer="background" />
           <div key={`canvas-main-${animationKey}`} className="absolute inset-0 animate-clock-spin-in origin-center pointer-events-none">
-            <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} />
+            <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} layer="tasks" />
           </div>
 
           <svg
@@ -693,8 +694,9 @@ export const CircleScheduler = ({
               }}
             >
               <div className="relative h-full w-full">
+                <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} layer="background" />
                 <div key={`canvas-preview-${animationKey}`} className="absolute inset-0 animate-clock-spin-in origin-center pointer-events-none">
-                  <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} />
+                  <CanvasClockSurface tasks={tasks} minuteAngle={canvasMinuteAngle} layer="tasks" />
                 </div>
                 <svg
                   viewBox={`${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_MIN} ${SVG_VIEWBOX_SIZE} ${SVG_VIEWBOX_SIZE}`}

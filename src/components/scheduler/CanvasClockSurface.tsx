@@ -5,9 +5,11 @@ import { renderClockScene, SVG_VIEWBOX_MIN, SVG_VIEWBOX_SIZE } from '../../utils
 export const CanvasClockSurface = ({
   tasks,
   minuteAngle,
+  layer = 'all',
 }: {
   tasks: Task[];
   minuteAngle: number | null;
+  layer?: 'background' | 'tasks' | 'all';
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -43,7 +45,7 @@ export const CanvasClockSurface = ({
       }
 
       offscreenCtx.setTransform(scale, 0, 0, scale, offset, offset);
-      renderClockScene(offscreenCtx, tasks, minuteAngle);
+      renderClockScene(offscreenCtx, tasks, minuteAngle, layer);
 
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
