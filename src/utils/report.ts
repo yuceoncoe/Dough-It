@@ -60,8 +60,11 @@ export const getTaskReport = (tasks: Task[]) => {
     ? ratedTasks.reduce((sum, task) => sum + (task.rating ?? 0), 0) / ratedTasks.length
     : null;
 
+  const listTasks = tasks.filter((task) => task.completed || task.rating === 0);
+
   return {
     completedTasks,
+    listTasks,
     counts,
     totalCounts,
     completedCount: completedTasks.length,

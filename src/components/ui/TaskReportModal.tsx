@@ -88,16 +88,18 @@ export const TaskReportModal = ({
         <div className="mt-4 rounded-2xl bg-stone-100 p-4">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-stone-700">처리한 일정</span>
-            <span className="text-sm font-bold text-stone-900">{report.completedCount}개</span>
+            <span className="text-sm font-bold text-stone-900">{report.listTasks.length}개</span>
           </div>
           <div className="mt-3 max-h-40 space-y-2 overflow-y-auto">
-            {report.completedTasks.length ? report.completedTasks.map((task) => (
+            {report.listTasks.length ? report.listTasks.map((task) => (
               <div key={task.id} className="flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2 shadow-sm">
                 <div className="flex min-w-0 items-center gap-2">
                   <QuadrantBadge task={task} />
                   <span className="truncate text-sm font-medium text-stone-700">{task.title}</span>
                 </div>
-                <span className="shrink-0 text-xs font-bold text-amber-500">{task.rating !== undefined ? `⭐️ ${task.rating}` : '평점 없음'}</span>
+                <span className={`shrink-0 text-xs font-bold ${task.rating === 0 ? 'text-rose-500' : 'text-amber-500'}`}>
+                  {task.rating === 0 ? '❌ 0' : task.rating !== undefined ? `⭐️ ${task.rating}` : '평점 없음'}
+                </span>
               </div>
             )) : (
               <div className="rounded-xl bg-white px-3 py-4 text-center text-sm text-stone-400 shadow-sm">
