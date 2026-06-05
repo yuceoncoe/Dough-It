@@ -295,7 +295,7 @@ const ClockCurrentTimeHand = ({
         y1={startPoint.y}
         x2={endPoint.x}
         y2={endPoint.y}
-        stroke="#ef4444"
+        stroke="#3b82f6"
         strokeWidth={2}
         strokeLinecap="round"
         pointerEvents="none"
@@ -319,7 +319,7 @@ const ClockCurrentTimeHand = ({
       <text
         x={textPoint.x}
         y={textPoint.y}
-        fill="#ef4444"
+        fill="#3b82f6"
         fontSize={14}
         fontWeight={600}
         fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
