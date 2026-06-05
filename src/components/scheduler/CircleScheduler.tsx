@@ -112,7 +112,7 @@ const ClockTaskTracks = ({
 
         const innerOffset = (innerRadius / outerRadius) * 100;
         const animationIndex = sortedTaskIds.indexOf(task.id);
-        const interval = trackTasks.length > 0 ? Math.min(50, 300 / trackTasks.length) : 50;
+        const interval = trackTasks.length > 0 ? Math.min(80, 400 / trackTasks.length) : 80;
         const delay = animationIndex * interval;
 
         return (
