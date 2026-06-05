@@ -247,6 +247,7 @@ export const DayScheduleView = ({
     <section className="flex h-full flex-col bg-[#f0f0f4]">
       <TaskActionSheet
         task={sheetTask}
+        isPastDate={isPastDate}
         onClose={() => setSheetTask(null)}
         onEdit={(task) => {
           if (task.isRoutine) {

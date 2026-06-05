@@ -7,6 +7,7 @@ import { useBodyScrollLock } from '../../utils/useBodyScrollLock';
 
 export const TaskActionSheet = ({
   task,
+  isPastDate,
   onClose,
   onEdit,
   onDelete,
@@ -14,6 +15,7 @@ export const TaskActionSheet = ({
   onUpdateNote,
 }: {
   task: Task | null;
+  isPastDate?: boolean;
   onClose: () => void;
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
@@ -51,7 +53,7 @@ export const TaskActionSheet = ({
         <div className="mt-5">
           <div className="flex items-center justify-between gap-3">
             <span className="text-sm font-semibold tracking-[-0.02em] text-stone-700">별점</span>
-            {task.rating !== undefined ? (
+            {task.rating !== undefined && !isPastDate ? (
               <button
                 type="button"
                 onClick={() => onSetRating(task, undefined)}
