@@ -44,20 +44,20 @@ export const QuadrantBadge = ({ task, sizeClassName = 'h-[14px] w-[14px]' }: { t
   if (isDimmed) {
     return (
       <div className={`grid ${sizeClassName} shrink-0 grid-cols-2 grid-rows-2 gap-[2px] opacity-60`}>
-        <div className={`rounded-tl-[3px] ${isQ1 ? 'bg-stone-400' : 'bg-stone-200'}`} />
-        <div className={`rounded-tr-[3px] ${isQ2 ? 'bg-stone-400' : 'bg-stone-200'}`} />
-        <div className={`rounded-bl-[3px] ${isQ3 ? 'bg-stone-400' : 'bg-stone-200'}`} />
-        <div className={`rounded-br-[3px] ${isQ4 ? 'bg-stone-400' : 'bg-stone-200'}`} />
+        <div className={`rounded-tl-[2px] ${isQ1 ? 'bg-stone-400' : 'bg-stone-200'}`} />
+        <div className={`rounded-tr-[2px] ${isQ2 ? 'bg-stone-400' : 'bg-stone-200'}`} />
+        <div className={`rounded-bl-[2px] ${isQ3 ? 'bg-stone-400' : 'bg-stone-200'}`} />
+        <div className={`rounded-br-[2px] ${isQ4 ? 'bg-stone-400' : 'bg-stone-200'}`} />
       </div>
     );
   }
 
   return (
     <div className={`grid ${sizeClassName} shrink-0 grid-cols-2 grid-rows-2 gap-[2px]`}>
-      <div className={`rounded-tl-[3px] ${isQ1 ? 'bg-rose-500' : 'bg-stone-200'}`} />
-      <div className={`rounded-tr-[3px] ${isQ2 ? 'bg-sky-500' : 'bg-stone-200'}`} />
-      <div className={`rounded-bl-[3px] ${isQ3 ? 'bg-yellow-400' : 'bg-stone-200'}`} />
-      <div className={`rounded-br-[3px] ${isQ4 ? 'bg-emerald-400' : 'bg-stone-200'}`} />
+      <div className={`rounded-tl-[2px] ${isQ1 ? 'bg-rose-500' : 'bg-stone-200'}`} />
+      <div className={`rounded-tr-[2px] ${isQ2 ? 'bg-sky-500' : 'bg-stone-200'}`} />
+      <div className={`rounded-bl-[2px] ${isQ3 ? 'bg-yellow-400' : 'bg-stone-200'}`} />
+      <div className={`rounded-br-[2px] ${isQ4 ? 'bg-emerald-400' : 'bg-stone-200'}`} />
     </div>
   );
 };
