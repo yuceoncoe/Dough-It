@@ -87,7 +87,7 @@ export const TaskReportModal = ({
 
         <div className="mt-4 rounded-2xl bg-stone-100 p-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-stone-700">처리한 일정</span>
+            <span className="text-sm font-semibold text-stone-700">종료된 일정</span>
             <span className="text-sm font-bold text-stone-900">{report.listTasks.length}개</span>
           </div>
           <div className="mt-3 max-h-40 space-y-2 overflow-y-auto">
@@ -103,7 +103,7 @@ export const TaskReportModal = ({
               </div>
             )) : (
               <div className="rounded-xl bg-white px-3 py-4 text-center text-sm text-stone-400 shadow-sm">
-                아직 완료 처리된 일정이 없습니다.
+                아직 종료된 일정이 없습니다.
               </div>
             )}
           </div>
