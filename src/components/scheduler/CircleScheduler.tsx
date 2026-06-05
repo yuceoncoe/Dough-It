@@ -281,17 +281,55 @@ const ClockCurrentTimeHand = ({
 }: ClockCurrentTimeHandProps) => {
   if (!showCurrentTime || minuteAngle === null) return null;
 
+  const minutes = angleToMinutes(minuteAngle);
+  const timeText = minutesToTime(minutes);
+
+  const startPoint = polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle);
+  const endPoint = polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, minuteAngle);
+  const textPoint = polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS + 22, minuteAngle);
+
   return (
-    <line
-      x1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).x}
-      y1={polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle).y}
-      x2={polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, minuteAngle).x}
-      y2={polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, minuteAngle).y}
-      stroke="#3b82f6"
-      strokeWidth={4}
-      strokeLinecap="round"
-      pointerEvents="none"
-    />
+    <g>
+      <line
+        x1={startPoint.x}
+        y1={startPoint.y}
+        x2={endPoint.x}
+        y2={endPoint.y}
+        stroke="#ef4444"
+        strokeWidth={2}
+        strokeLinecap="round"
+        pointerEvents="none"
+      />
+      <text
+        x={textPoint.x}
+        y={textPoint.y}
+        fill="white"
+        fontSize={14}
+        fontWeight={600}
+        fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+        textAnchor="middle"
+        alignmentBaseline="middle"
+        pointerEvents="none"
+        stroke="white"
+        strokeWidth={4}
+        strokeLinejoin="round"
+      >
+        {timeText}
+      </text>
+      <text
+        x={textPoint.x}
+        y={textPoint.y}
+        fill="#ef4444"
+        fontSize={14}
+        fontWeight={600}
+        fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+        textAnchor="middle"
+        alignmentBaseline="middle"
+        pointerEvents="none"
+      >
+        {timeText}
+      </text>
+    </g>
   );
 };
 
