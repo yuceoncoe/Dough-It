@@ -104,7 +104,7 @@ export const TaskReportModal = ({
                   {task.rating === 0 ? (
                     <>
                       <Icon name="close" size={13} className="mr-0.5 [font-variation-settings:'wght'_700]" />
-                      0
+                      -
                     </>
                   ) : task.rating !== undefined ? (
                     <>
