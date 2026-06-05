@@ -64,11 +64,8 @@ export const TaskReportModal = ({
         </div>
 
         <div className="mt-2 rounded-2xl bg-stone-100 p-4">
-          <div className="flex items-end justify-between gap-3">
-            <div>
-              <div className="text-sm font-semibold text-stone-600">전체 총점 평균</div>
-              <div className="mt-1 text-xs text-stone-400">평점을 남긴 완료 일정 기준</div>
-            </div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-sm font-semibold text-stone-600">전체 총점 평균</div>
             <div className="text-right">
               <span className="text-3xl font-bold tracking-[-0.05em] text-stone-900">{averageLabel}</span>
               <span className="ml-1 text-sm font-semibold text-stone-400">/ 5</span>
@@ -97,7 +94,7 @@ export const TaskReportModal = ({
                 key={task.id} 
                 onClick={() => onTaskClick?.(task)}
                 role={onTaskClick ? 'button' : undefined}
-                className={`flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2 shadow-sm ${onTaskClick ? 'cursor-pointer hover:bg-stone-50 active:bg-stone-100 transition-colors' : ''}`}
+                className={`flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-[9px] shadow-sm ${onTaskClick ? 'cursor-pointer hover:bg-stone-50 active:bg-stone-100 transition-colors' : ''}`}
               >
                 <div className="flex min-w-0 items-center gap-2">
                   <QuadrantBadge task={task} />
