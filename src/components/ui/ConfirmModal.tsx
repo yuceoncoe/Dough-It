@@ -28,15 +28,17 @@ export const ConfirmModal = ({
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-shell max-w-[320px] p-6" onClick={(event) => event.stopPropagation()}>
-        {title && <h2 className="font-hand text-2xl text-stone-800 mb-2">{title}</h2>}
-        <p className={`text-stone-700 ${title ? 'mt-2 text-sm' : 'text-base font-medium'}`}>
-          {message}
-        </p>
-        <div className="mt-6 flex gap-3">
+      <div className="modal-shell max-w-[280px] !p-0 overflow-hidden" onClick={(event) => event.stopPropagation()}>
+        <div className="p-6 text-center">
+          {title && <h2 className="font-hand text-xl text-stone-800 mb-2">{title}</h2>}
+          <p className={`text-stone-800 ${title ? 'mt-1 text-sm' : 'text-base font-medium'}`}>
+            {message}
+          </p>
+        </div>
+        <div className="flex border-t border-stone-200/80">
           <button 
             onClick={onClose} 
-            className="btn-outline flex-1"
+            className="flex-1 py-3.5 text-[16px] font-medium text-blue-500 active:bg-stone-100 transition-colors border-r border-stone-200/80"
           >
             {cancelLabel}
           </button>
@@ -45,11 +47,9 @@ export const ConfirmModal = ({
               onConfirm();
               onClose();
             }} 
-            className={
-              isDestructive 
-                ? "btn-danger flex-1" 
-                : "btn-primary flex-1"
-            }
+            className={`flex-1 py-3.5 text-[16px] font-semibold transition-colors active:bg-stone-100 ${
+              isDestructive ? 'text-rose-500' : 'text-blue-500'
+            }`}
           >
             {confirmLabel}
           </button>
