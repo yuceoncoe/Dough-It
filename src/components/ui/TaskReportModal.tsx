@@ -49,9 +49,9 @@ export const TaskReportModal = ({
         <div className="grid grid-cols-2 gap-2">
           {REPORT_QUADRANTS.map((quadrant) => {
             const hasTasks = report.totalCounts[quadrant.key] > 0;
-            const cardClass = hasTasks ? quadrant.className : 'bg-stone-100 text-stone-400 ring-stone-200';
+            const cardClass = hasTasks ? quadrant.className : 'bg-stone-100 text-stone-400';
             return (
-              <div key={quadrant.key} className={`rounded-xl p-3 text-left ring-1 ${cardClass}`}>
+              <div key={quadrant.key} className={`rounded-xl p-3 text-left ${cardClass}`}>
                 <div className="text-[11px] font-semibold tracking-[-0.02em] opacity-80">{quadrant.label}</div>
                 <div className="mt-1 flex items-baseline gap-1">
                   <span className="text-2xl font-bold tracking-[-0.05em]">{report.counts[quadrant.key]}</span>
@@ -73,7 +73,7 @@ export const TaskReportModal = ({
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl bg-blue-50/50 p-4 ring-1 ring-blue-100/50">
+        <div className="mt-4 rounded-2xl bg-blue-50/50 p-4">
           <div className="flex items-center gap-1.5 text-sm font-bold text-blue-700">
             <Icon name="lightbulb" size={16} />
             오늘의 팁
