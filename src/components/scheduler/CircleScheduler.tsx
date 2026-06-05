@@ -237,8 +237,6 @@ const ClockCenterProgress = ({
   clampedActiveTaskProgress,
   activeTaskColor,
 }: ClockCenterProgressProps) => {
-  if (centerAction) return null;
-
   return (
     <g className="center-progress-surface pointer-events-none">
       <circle className="center-progress-surface__track" cx={CENTER} cy={CENTER} r={TRACK_INNER_RADIUS} filter="url(#center-lens-shadow)" />
