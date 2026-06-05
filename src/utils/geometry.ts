@@ -17,13 +17,13 @@ export const describeArc = (x: number, y: number, radius: number, startAngle: nu
     end = start + 359.99;
   }
 
-  const startPoint = polarToCartesian(x, y, radius, end);
-  const endPoint = polarToCartesian(x, y, radius, start);
+  const startPoint = polarToCartesian(x, y, radius, start);
+  const endPoint = polarToCartesian(x, y, radius, end);
   const largeArcFlag = end - start <= 180 ? '0' : '1';
 
   return [
     'M', startPoint.x, startPoint.y,
-    'A', radius, radius, 0, largeArcFlag, 0, endPoint.x, endPoint.y,
+    'A', radius, radius, 0, largeArcFlag, 1, endPoint.x, endPoint.y,
     'L', x, y,
     'L', startPoint.x, startPoint.y,
   ].join(' ');
@@ -46,12 +46,12 @@ export const describeOpenArc = (
     end = start + 359.99;
   }
 
-  const startPoint = polarToCartesian(x, y, radius, end);
-  const endPoint = polarToCartesian(x, y, radius, start);
+  const startPoint = polarToCartesian(x, y, radius, start);
+  const endPoint = polarToCartesian(x, y, radius, end);
   const largeArcFlag = end - start <= 180 ? '0' : '1';
 
   return [
     'M', startPoint.x, startPoint.y,
-    'A', radius, radius, 0, largeArcFlag, 0, endPoint.x, endPoint.y,
+    'A', radius, radius, 0, largeArcFlag, 1, endPoint.x, endPoint.y,
   ].join(' ');
 };
