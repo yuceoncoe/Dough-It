@@ -505,17 +505,13 @@ export const DayScheduleView = ({
                             <span className="flex w-[28px] items-center justify-end whitespace-nowrap text-xs font-bold">
                               {task.rating === 0 ? (
                                 <>
-                                  <span className="flex w-[16px] justify-center mr-0.5">
-                                    <Icon name="close" size={13} className="text-rose-500 [font-variation-settings:'wght'_700]" />
-                                  </span>
-                                  <span className="w-[10px] text-right text-rose-500 tabular-nums">0</span>
+                                  <Icon name="close" size={13} className="mr-0.5 text-rose-500 [font-variation-settings:'wght'_700]" />
+                                  <span className="w-[9px] text-right text-rose-500 tabular-nums">0</span>
                                 </>
                               ) : (
                                 <>
-                                  <span className="flex w-[16px] justify-center mr-0.5">
-                                    <Icon name="star" size={15} className="text-amber-400 [font-variation-settings:'FILL'_1]" />
-                                  </span>
-                                  <span className="w-[10px] text-right text-amber-500 tabular-nums">{task.rating}</span>
+                                  <Icon name="star" size={15} className="mr-0.5 text-amber-400 [font-variation-settings:'FILL'_1]" />
+                                  <span className="w-[9px] text-right text-amber-500 tabular-nums">{task.rating}</span>
                                 </>
                               )}
                             </span>
