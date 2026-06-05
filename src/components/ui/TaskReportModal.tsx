@@ -19,6 +19,7 @@ export const TaskReportModal = ({
   tasks: Task[];
   tasksByDate: Record<string, Task[]>;
   onClose: () => void;
+  onTaskClick?: (task: Task) => void;
 }) => {
   useBodyScrollLock(isOpen);
 
@@ -87,12 +88,17 @@ export const TaskReportModal = ({
 
         <div className="mt-4 rounded-2xl bg-stone-100 p-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-stone-700">종료된 일정</span>
+            <span className="text-sm font-semibold text-stone-700">일정 모아보기</span>
             <span className="text-sm font-bold text-stone-900">{report.listTasks.length}개</span>
           </div>
           <div className="mt-3 max-h-40 space-y-2 overflow-y-auto">
             {report.listTasks.length ? report.listTasks.map((task) => (
-              <div key={task.id} className="flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2 shadow-sm">
+              <div 
+                key={task.id} 
+                onClick={() => onTaskClick?.(task)}
+                role={onTaskClick ? 'button' : undefined}
+                className={`flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2 shadow-sm ${onTaskClick ? 'cursor-pointer hover:bg-stone-50 active:bg-stone-100 transition-colors' : ''}`}
+              >
                 <div className="flex min-w-0 items-center gap-2">
                   <QuadrantBadge task={task} />
                   <span className="truncate text-sm font-medium text-stone-700">{task.title}</span>
@@ -115,7 +121,7 @@ export const TaskReportModal = ({
               </div>
             )) : (
               <div className="rounded-xl bg-white px-3 py-4 text-center text-sm text-stone-400 shadow-sm">
-                종료된 일정이 없습니다.
+                일정이 없습니다.
               </div>
             )}
           </div>

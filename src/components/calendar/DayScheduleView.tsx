@@ -288,6 +288,7 @@ export const DayScheduleView = ({
         tasks={tasks}
         tasksByDate={tasksByDate}
         onClose={() => setReportOpen(false)}
+        onTaskClick={(task) => setSheetTask(task)}
       />
       <ConfirmModal
         isOpen={pendingDeleteTask !== null}
