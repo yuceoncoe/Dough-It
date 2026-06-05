@@ -8,6 +8,7 @@ import RoutineActionModal from '../ui/RoutineActionModal';
 import DayTaskEditorModal from '../ui/DayTaskEditorModal';
 import CircleScheduler from '../scheduler/CircleScheduler';
 import TaskReportModal from '../ui/TaskReportModal';
+import ConfirmModal from '../ui/ConfirmModal';
 import { Icon } from '../../components/ui/Icon';
 import { QuadrantBadge, getMaxOverlap } from '../../utils/task';
 import { getTaskReport } from '../../utils/report';
@@ -25,6 +26,7 @@ export const DayScheduleView = ({
   onApplyRoutineEdit,
   onApplyRoutineDelete,
 }: {
+  key?: React.Key;
   date: string;
   tasks: Task[];
   tasksByDate: Record<string, Task[]>;
@@ -46,6 +48,7 @@ export const DayScheduleView = ({
   const [pendingRoutineAction, setPendingRoutineAction] = useState<{ action: RoutineAction; task: Task } | null>(null);
   const [routineEditScope, setRoutineEditScope] = useState<RoutineScope>('single');
   const [reportOpen, setReportOpen] = useState(false);
+  const [pendingDeleteTask, setPendingDeleteTask] = useState<Task | null>(null);
   const [now, setNow] = useState(() => new Date());
 
   const {
@@ -61,7 +64,7 @@ export const DayScheduleView = ({
   const isToday = date === getTodayString();
   const isPastDate = date < getTodayString();
   const report = getTaskReport(tasks);
-  const hasOpenOverlay = Boolean(sheetTask || editorOpen || pendingRoutineAction || reportOpen);
+  const hasOpenOverlay = Boolean(sheetTask || editorOpen || pendingRoutineAction || reportOpen || pendingDeleteTask);
   useBodyScrollLock(hasOpenOverlay);
 
   const showToast = (message: string) => {
@@ -158,9 +161,7 @@ export const DayScheduleView = ({
       setPendingRoutineAction({ action: 'delete', task });
       return;
     }
-    if (window.confirm(`'${task.title}' 일정을 정말 삭제하시겠습니까?`)) {
-      deleteTask(task.id);
-    }
+    setPendingDeleteTask(task);
   };
 
   const startEditing = (task: Task, scope: RoutineScope = 'single') => {
@@ -258,6 +259,18 @@ export const DayScheduleView = ({
         tasks={tasks}
         tasksByDate={tasksByDate}
         onClose={() => setReportOpen(false)}
+      />
+      <ConfirmModal
+        isOpen={pendingDeleteTask !== null}
+        message={`'${pendingDeleteTask?.title}' 일정을 정말 삭제하시겠습니까?`}
+        isDestructive={true}
+        confirmLabel="삭제"
+        onConfirm={() => {
+          if (pendingDeleteTask) {
+            deleteTask(pendingDeleteTask.id);
+          }
+        }}
+        onClose={() => setPendingDeleteTask(null)}
       />
       <RoutineActionModal
         isOpen={pendingRoutineAction !== null}
