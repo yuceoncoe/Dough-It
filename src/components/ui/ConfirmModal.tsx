@@ -28,7 +28,7 @@ export const ConfirmModal = ({
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-shell max-w-[280px] !p-0 overflow-hidden" onClick={(event) => event.stopPropagation()}>
+      <div className="modal-shell max-w-[320px] !p-0 overflow-hidden" onClick={(event) => event.stopPropagation()}>
         <div className="p-6 text-center">
           {title && <h2 className="font-hand text-xl text-stone-800 mb-2">{title}</h2>}
           <p className={`text-stone-800 ${title ? 'mt-1 text-sm' : 'text-base font-medium'}`}>
@@ -38,7 +38,7 @@ export const ConfirmModal = ({
         <div className="flex border-t border-stone-200/80">
           <button 
             onClick={onClose} 
-            className="flex-1 py-3.5 text-[16px] font-medium text-blue-500 active:bg-stone-100 transition-colors border-r border-stone-200/80"
+            className="flex-1 py-3.5 text-[16px] font-medium text-stone-500 active:bg-stone-100 transition-colors border-r border-stone-200/80"
           >
             {cancelLabel}
           </button>
