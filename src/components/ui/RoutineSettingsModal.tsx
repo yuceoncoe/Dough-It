@@ -396,24 +396,26 @@ export const RoutineSettingsModal = ({
           event.stopPropagation();
           setPendingDeleteTask(null);
         }}>
-          <div className="action-sheet max-w-md" onClick={(event) => event.stopPropagation()}>
-            <h2 className="font-hand text-2xl text-stone-800">루틴 삭제</h2>
-            <p className="mt-3 text-sm leading-6 text-stone-500">
-              <span className="font-semibold text-stone-700">{pendingDeleteTask.title}</span>
-              {' '}루틴 일정을 삭제할까요?
-            </p>
-            <div className="mt-6 grid grid-cols-2 gap-3">
+          <div className="modal-shell max-w-[320px] !p-0 overflow-hidden" onClick={(event) => event.stopPropagation()}>
+            <div className="p-6 text-center">
+              <h2 className="font-hand text-xl text-stone-800 mb-2">루틴 삭제</h2>
+              <p className="mt-1 text-sm text-stone-800">
+                <span className="font-semibold">{pendingDeleteTask.title}</span>
+                {' '}루틴 일정을 삭제할까요?
+              </p>
+            </div>
+            <div className="flex border-t border-stone-200/80">
               <button
                 type="button"
                 onClick={() => setPendingDeleteTask(null)}
-                className="btn-outline"
+                className="flex-1 py-3.5 text-[16px] font-medium text-stone-500 active:bg-stone-100 transition-colors border-r border-stone-200/80"
               >
                 취소
               </button>
               <button
                 type="button"
                 onClick={() => handleDelete(pendingDeleteTask.id)}
-                className="btn-primary"
+                className="flex-1 py-3.5 text-[16px] font-semibold text-rose-500 active:bg-stone-100 transition-colors"
               >
                 삭제
               </button>
