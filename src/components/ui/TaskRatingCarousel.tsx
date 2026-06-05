@@ -107,7 +107,7 @@ export const TaskRatingCarousel = ({
         
         <div className="mt-2 text-center">
           <button onClick={onClose} className="text-sm text-white/60 underline hover:text-white">
-            나중에 평가하기
+            평가 건너뛰기 (미완료 처리)
           </button>
         </div>
       </div>

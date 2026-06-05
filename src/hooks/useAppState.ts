@@ -275,7 +275,16 @@ export const useAppState = (user: User, todayStr: string) => {
   };
 
   const handleCloseRating = () => {
-    setSkippedRatingTaskIds((current) => new Set([...current, ...pendingRatingTasks.map((task) => task.id)]));
+    setTasksByDate((current) => {
+      const next = { ...current };
+      const pendingIds = new Set(pendingRatingTasks.map((t) => t.id));
+      Object.entries(current).forEach(([dateStr, tasks]) => {
+        if (tasks.some((t) => pendingIds.has(t.id))) {
+          next[dateStr] = tasks.map((task) => pendingIds.has(task.id) ? { ...task, rating: 0, completed: false } : task);
+        }
+      });
+      return next;
+    });
     setPendingRatingTasks([]);
   };
 
