@@ -433,8 +433,18 @@ export const DayScheduleView = ({
                             </span>
                           ) : null}
                           {task.rating !== undefined && (
-                            <span className="flex items-center whitespace-nowrap text-xs font-bold text-amber-500">
-                              {task.rating === 0 ? <Icon name="close" size={14} className="text-rose-700" /> : `⭐️ ${task.rating}`}
+                            <span className="flex items-center whitespace-nowrap text-xs font-bold">
+                              {task.rating === 0 ? (
+                                <>
+                                  <Icon name="close" size={13} className="mr-0.5 text-rose-500 [font-variation-settings:'wght'_700]" />
+                                  <span className="text-rose-500">0</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Icon name="star" size={15} className="mr-0.5 text-amber-400 [font-variation-settings:'FILL'_1]" />
+                                  <span className="text-amber-500">{task.rating}</span>
+                                </>
+                              )}
                             </span>
                           )}
                         </div>

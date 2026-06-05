@@ -100,11 +100,14 @@ export const TaskReportModal = ({
                 <span className={`flex shrink-0 items-center text-xs font-bold ${task.rating === 0 ? 'text-rose-500' : 'text-amber-500'}`}>
                   {task.rating === 0 ? (
                     <>
-                      <Icon name="close" size={12} className="mr-0.5 [font-variation-settings:'wght'_700]" />
+                      <Icon name="close" size={13} className="mr-0.5 [font-variation-settings:'wght'_700]" />
                       0
                     </>
                   ) : task.rating !== undefined ? (
-                    `⭐️ ${task.rating}`
+                    <>
+                      <Icon name="star" size={15} className="mr-0.5 text-amber-400 [font-variation-settings:'FILL'_1]" />
+                      {task.rating}
+                    </>
                   ) : (
                     '평점 없음'
                   )}
