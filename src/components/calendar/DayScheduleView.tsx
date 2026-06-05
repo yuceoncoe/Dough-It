@@ -506,7 +506,7 @@ export const DayScheduleView = ({
                               {task.rating === 0 ? (
                                 <>
                                   <Icon name="close" size={13} className="mr-0.5 text-rose-500 [font-variation-settings:'wght'_700]" />
-                                  <span className="text-rose-500">-</span>
+                                  <span className="text-rose-500">0</span>
                                 </>
                               ) : (
                                 <>
