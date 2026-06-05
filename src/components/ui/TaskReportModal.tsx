@@ -43,8 +43,7 @@ export const TaskReportModal = ({
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-shell max-w-[28rem] max-h-[88dvh] overflow-y-auto p-6" onClick={(event) => event.stopPropagation()}>
         <div className="mb-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Day Report</p>
-          <h3 className="mt-1 font-hand text-2xl text-stone-900">{formatDateLabel(date)} 보고서</h3>
+          <h3 className="font-hand text-xl text-stone-900">{formatDateLabel(date)} 보고서</h3>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
@@ -64,7 +63,7 @@ export const TaskReportModal = ({
           })}
         </div>
 
-        <div className="mt-4 rounded-2xl bg-stone-100 p-4">
+        <div className="mt-2 rounded-2xl bg-stone-100 p-4">
           <div className="flex items-end justify-between gap-3">
             <div>
               <div className="text-sm font-semibold text-stone-600">전체 총점 평균</div>
