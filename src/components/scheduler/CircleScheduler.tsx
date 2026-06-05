@@ -139,14 +139,14 @@ const ClockTaskTracks = ({
             </defs>
             <g style={{ filter: blurAmount > 0 ? `blur(${blurAmount}px)` : 'none', opacity: alpha }}>
               <path
-                d={describeOpenArc(CENTER, CENTER, laneCenterRadius, startAngle, safeEndAngle + 25)}
+                d={describeOpenArc(CENTER, CENTER, laneCenterRadius, startAngle, safeEndAngle)}
                 fill="none"
                 stroke={`url(#grad-${interactive ? 'main' : 'preview'}-${task.id})`}
                 strokeWidth={laneStrokeWidth}
                 strokeLinecap="butt"
                 className="animate-draw-arc"
                 style={{
-                  strokeDasharray: '4000px',
+                  strokeDasharray: arcLength,
                   '--arc-length': `${arcLength}px`,
                   animationDelay: `${delay}ms`,
                 } as React.CSSProperties}
