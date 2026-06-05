@@ -53,7 +53,7 @@ export const TaskRatingCarousel = ({
           <div className="mt-1 text-xs text-white/70">{tasks.length - unratedTasks.length} / {tasks.length} 완료</div>
         </div>
 
-        <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden">
+        <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 py-8 -mx-4 [&::-webkit-scrollbar]:hidden">
           {unratedTasks.map((task) => (
             <div key={task.id} className="flex min-w-full snap-center flex-col items-center rounded-3xl bg-white p-6 text-center shadow-xl">
               <h3 className="mb-2 font-hand text-2xl text-stone-800">{task.title}</h3>
