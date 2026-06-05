@@ -47,7 +47,7 @@ export const ConfirmModal = ({
             }} 
             className={
               isDestructive 
-                ? "flex h-[46px] items-center justify-center rounded-2xl bg-rose-500 text-[15px] font-semibold text-white transition-colors hover:bg-rose-600 active:bg-rose-700 flex-1" 
+                ? "btn-danger flex-1" 
                 : "btn-primary flex-1"
             }
           >

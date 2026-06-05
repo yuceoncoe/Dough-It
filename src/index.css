@@ -252,6 +252,26 @@ canvas {
   opacity: 0.5;
 }
 
+.btn-danger {
+  border-radius: 0.75rem;
+  border: 0;
+  background: #f43f5e;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  transition: background-color 160ms ease;
+}
+
+.btn-danger:hover {
+  background: #e11d48;
+}
+
+.btn-danger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .btn-outline {
   border-radius: 0.75rem;
   border: 1px solid #e7e5e4;
