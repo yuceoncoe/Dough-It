@@ -115,7 +115,7 @@ export const TaskReportModal = ({
               </div>
             )) : (
               <div className="rounded-xl bg-white px-3 py-4 text-center text-sm text-stone-400 shadow-sm">
-                아직 종료된 일정이 없습니다.
+                종료된 일정이 없습니다.
               </div>
             )}
           </div>
