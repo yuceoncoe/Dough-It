@@ -371,7 +371,6 @@ export const DayScheduleView = ({
                 <h2 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-stone-900">일정 목록</h2>
               </div>
               <button onClick={() => setShowRoutines((current) => !current)} className="inline-flex h-9 items-center justify-center gap-1.5 px-2 py-2 text-[8px] font-medium text-stone-500 transition-colors hover:text-stone-700">
-                <Icon name={showRoutines ? 'visibility_off' : 'visibility'} size={12} className="shrink-0" />
                 {showRoutines ? '루틴숨기기' : '루틴보기'}
               </button>
             </div>
