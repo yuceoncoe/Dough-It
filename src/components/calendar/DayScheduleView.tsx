@@ -413,7 +413,7 @@ export const DayScheduleView = ({
                           <QuadrantBadge task={task} sizeClassName="h-[32px] w-[32px]" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <span className={`block truncate text-[1.03rem] font-semibold tracking-[-0.03em] ${task.completed || task.rating === 0 ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
+                          <span className={`block truncate text-[15px] font-semibold tracking-[-0.03em] ${task.completed || task.rating === 0 ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
                             {task.title}
                           </span>
                           <div className="mt-1 flex items-center gap-2 text-[12px] text-stone-400">
