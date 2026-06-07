@@ -661,7 +661,7 @@ export const addOrReplaceDateTasks = (tasksByDate: Record<string, Task[]>, date:
 
   const routineTasks = activeRoutineTasks.map((task) => {
     const existing = existingRoutineById.get(task.id);
-    return existing ? { ...task, completed: existing.completed, rating: existing.rating, note: existing.note } : task;
+    return existing ? existing : task;
   });
 
   const preservedRoutineTasks = existingTasks.filter((task) => {
