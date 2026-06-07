@@ -288,12 +288,8 @@ const ClockCurrentTimeHand = ({
 }: ClockCurrentTimeHandProps) => {
   if (!showCurrentTime || minuteAngle === null) return null;
 
-  const minutes = angleToMinutes(minuteAngle);
-  const timeText = minutesToTime(minutes);
-
   const startPoint = polarToCartesian(CENTER, CENTER, TRACK_INNER_RADIUS, minuteAngle);
   const endPoint = polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS, minuteAngle);
-  const textPoint = polarToCartesian(CENTER, CENTER, OUTER_BACKGROUND_RADIUS + 22, minuteAngle);
 
   return (
     <g>
@@ -307,35 +303,6 @@ const ClockCurrentTimeHand = ({
         strokeLinecap="round"
         pointerEvents="none"
       />
-      <text
-        x={textPoint.x}
-        y={textPoint.y}
-        fill="white"
-        fontSize={14}
-        fontWeight={600}
-        fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
-        textAnchor="middle"
-        alignmentBaseline="middle"
-        pointerEvents="none"
-        stroke="white"
-        strokeWidth={4}
-        strokeLinejoin="round"
-      >
-        {timeText}
-      </text>
-      <text
-        x={textPoint.x}
-        y={textPoint.y}
-        fill="#3b82f6"
-        fontSize={14}
-        fontWeight={600}
-        fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
-        textAnchor="middle"
-        alignmentBaseline="middle"
-        pointerEvents="none"
-      >
-        {timeText}
-      </text>
     </g>
   );
 };
