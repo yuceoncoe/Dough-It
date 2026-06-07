@@ -76,6 +76,7 @@ select,
 textarea {
   font: inherit;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 svg,
@@ -335,7 +336,7 @@ canvas {
   border: 1px solid rgba(17, 24, 39, 0.07);
   background: #ffffff;
   padding: 0.75rem 1rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
   line-height: 1.25rem;
   color: #44403c;
   outline: none;
