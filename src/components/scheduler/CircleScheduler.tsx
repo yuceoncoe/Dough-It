@@ -75,7 +75,8 @@ const ClockTaskTracks = ({
   getClockTaskColor,
   minuteAngle,
   animationKey,
-}: ClockTaskTracksProps) => {
+  renderPart = 'both',
+}: ClockTaskTracksProps & { renderPart?: 'arcs' | 'labels' | 'both' }) => {
   const sortedTaskIds = [...trackTasks]
     .sort((a, b) => {
       const aAngle = ((a.startAngle % 360) + 360) % 360;
@@ -88,7 +89,7 @@ const ClockTaskTracks = ({
     .map(t => t.task.id);
 
   return (
-    <g key={animationKey} className="pointer-events-none">
+    <g key={`${animationKey}-${renderPart}`} className="pointer-events-none">
       {trackTasks.map(({ task, startAngle, endAngle, laneIndex }) => {
         const laneCenterRadius = getTrackLaneCenterRadius(laneIndex, laneCount);
         const { innerRadius, outerRadius } = getTrackLaneFillRadii(laneIndex, laneCount);
@@ -125,55 +126,61 @@ const ClockTaskTracks = ({
               transformOrigin: `${CENTER}px ${CENTER}px`,
             }}
           >
-            <defs>
-              <radialGradient 
-                id={`grad-${interactive ? 'main' : 'preview'}-${task.id}`}
-                gradientUnits="userSpaceOnUse"
-                cx={CENTER}
-                cy={CENTER}
-                r={outerRadius}
-              >
-                 <stop offset={`${innerOffset}%`} stopColor={hexToRgba(strokeColor, 0.15)} />
-                 <stop offset="100%" stopColor={hexToRgba(strokeColor, 0.8)} />
-              </radialGradient>
-            </defs>
-            <g style={{ filter: blurAmount > 0 ? `blur(${blurAmount}px)` : 'none', opacity: alpha }}>
-              <path
-                d={describeOpenArc(CENTER, CENTER, laneCenterRadius, startAngle, safeEndAngle)}
-                fill="none"
-                stroke={`url(#grad-${interactive ? 'main' : 'preview'}-${task.id})`}
-                strokeWidth={laneStrokeWidth}
-                strokeLinecap="butt"
-                className="animate-draw-arc"
-                style={{
-                  strokeDasharray: arcLength,
-                  '--arc-length': `${arcLength}px`,
-                  animationDelay: `${delay}ms`,
-                } as React.CSSProperties}
-              />
-            </g>
-            <g>
-              <rect
-                x={labelX - labelWidth / 2}
-                y={labelY - labelHeight / 2}
-                width={labelWidth}
-                height={labelHeight}
-                rx="15"
-                fill="rgba(255,255,255,0.82)"
-                stroke={strokeColor}
-                strokeWidth="1.2"
-              />
-              <text
-                x={labelX}
-                y={labelY + 1}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="text-[22px] font-semibold"
-                fill={textColor}
-              >
-                {labelText}
-              </text>
-            </g>
+            {(renderPart === 'arcs' || renderPart === 'both') && (
+              <>
+                <defs>
+                  <radialGradient 
+                    id={`grad-${interactive ? 'main' : 'preview'}-${task.id}`}
+                    gradientUnits="userSpaceOnUse"
+                    cx={CENTER}
+                    cy={CENTER}
+                    r={outerRadius}
+                  >
+                     <stop offset={`${innerOffset}%`} stopColor={hexToRgba(strokeColor, 0.15)} />
+                     <stop offset="100%" stopColor={hexToRgba(strokeColor, 0.8)} />
+                  </radialGradient>
+                </defs>
+                <g style={{ filter: blurAmount > 0 ? `blur(${blurAmount}px)` : 'none', opacity: alpha }}>
+                  <path
+                    d={describeOpenArc(CENTER, CENTER, laneCenterRadius, startAngle, safeEndAngle)}
+                    fill="none"
+                    stroke={`url(#grad-${interactive ? 'main' : 'preview'}-${task.id})`}
+                    strokeWidth={laneStrokeWidth}
+                    strokeLinecap="butt"
+                    className="animate-draw-arc"
+                    style={{
+                      strokeDasharray: arcLength,
+                      '--arc-length': `${arcLength}px`,
+                      animationDelay: `${delay}ms`,
+                    } as React.CSSProperties}
+                  />
+                </g>
+              </>
+            )}
+            {(renderPart === 'labels' || renderPart === 'both') && (
+              <g>
+                <rect
+                  x={labelX - labelWidth / 2}
+                  y={labelY - labelHeight / 2}
+                  width={labelWidth}
+                  height={labelHeight}
+                  rx="15"
+                  fill="rgba(255,255,255,0.82)"
+                  stroke={strokeColor}
+                  strokeWidth="1.2"
+                />
+                <text
+                  x={labelX}
+                  y={labelY + 1}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className="text-[22px] font-semibold"
+                  fill={textColor}
+                >
+                  {labelText}
+                </text>
+              </g>
+            )}
           </g>
         );
       })}
@@ -672,6 +679,7 @@ export const CircleScheduler = ({
           getClockTaskColor={getClockTaskColor}
           minuteAngle={canvasMinuteAngle}
           animationKey={animationKey}
+          renderPart="arcs"
         />
       </g>
 
@@ -699,6 +707,18 @@ export const CircleScheduler = ({
         clampedActiveTaskProgress={clampedActiveTaskProgress}
         activeTaskColor={activeTaskColor}
       />
+
+      <g>
+        <ClockTaskTracks
+          trackTasks={trackTasks}
+          laneCount={laneCount}
+          interactive={interactive}
+          getClockTaskColor={getClockTaskColor}
+          minuteAngle={canvasMinuteAngle}
+          animationKey={animationKey}
+          renderPart="labels"
+        />
+      </g>
     </>
   );
 
