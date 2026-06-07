@@ -24,7 +24,7 @@ export const RoutineActionModal = ({
   const isDelete = action === 'delete';
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop z-[70]" onClick={onClose}>
       <div className="modal-shell max-w-[320px] !p-0 overflow-hidden" onClick={(event) => event.stopPropagation()}>
         <div className="p-6 text-center">
           <h2 className="font-hand text-xl text-stone-800 mb-2">{isDelete ? '루틴 삭제 범위' : '루틴 수정 범위'}</h2>
