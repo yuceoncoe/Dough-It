@@ -260,7 +260,7 @@ export const useAppState = (user: User, todayStr: string) => {
       document.removeEventListener('visibilitychange', checkEndedTasks);
       window.removeEventListener('focus', checkEndedTasks);
     };
-  }, [tasksByDate, todayStr, skippedRatingTaskIds]);
+  }, [tasksByDate, todayStr, skippedRatingTaskIds, isBootstrapping]);
 
   const handleRateTask = (taskId: string, rating: number, note?: string) => {
     setTasksByDate((current) => {
