@@ -39,8 +39,6 @@ export const TaskRatingCarousel = ({
   const unratedTasks = tasks.filter(t => !ratedTaskIds.has(t.id));
 
   if (unratedTasks.length === 0) {
-    // We must use setTimeout to avoid state updates during render
-    setTimeout(onClose, 0);
     return null;
   }
 
