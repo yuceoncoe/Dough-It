@@ -345,11 +345,7 @@ export const DayScheduleView = ({
             return;
           }
           if (action === 'delete') {
-            if (scope === 'future') {
-              onApplyRoutineDelete(date, task, 'future');
-            } else {
-              deleteTask(task.id);
-            }
+            onApplyRoutineDelete(date, task, scope);
           }
         }}
       />
