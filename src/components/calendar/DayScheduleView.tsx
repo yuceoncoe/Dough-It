@@ -398,14 +398,11 @@ export const DayScheduleView = ({
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <button
-            onClick={() => {
-              resetForm();
-              setEditorOpen(true);
-            }}
+            onClick={() => setBacklogOpen(true)}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
-            aria-label="빠른 일정 추가"
+            aria-label="보관함 열기"
           >
-            <Icon name="add" size={18} />
+            <Icon name="inbox" size={18} />
           </button>
           <button onClick={onOpenSettings} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
             <Icon name="settings" size={18} />
@@ -570,12 +567,15 @@ export const DayScheduleView = ({
         </div>
       )}
       <button
-        onClick={() => setBacklogOpen(true)}
+        onClick={() => {
+          resetForm();
+          setEditorOpen(true);
+        }}
         className="fixed z-40 flex h-14 w-14 items-center justify-center rounded-full bg-stone-800 text-white shadow-xl transition-transform hover:scale-105 active:scale-95 right-4 md:right-8"
         style={{ bottom: 'calc(var(--bottom-nav-height) + 1.25rem)' }}
-        aria-label="보관함 열기"
+        aria-label="일정 추가"
       >
-        <Icon name="edit" size={24} />
+        <Icon name="add" size={24} />
       </button>
     </section>
   );
