@@ -39,7 +39,7 @@ export const BacklogModal: React.FC<BacklogModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stone-200 bg-white px-5 py-4 sm:px-6 sm:py-5">
           <div className="flex items-center gap-2">
-            <Icon name="inbox" size={24} className="text-stone-700" />
+            <Icon name="inventory_2" size={24} className="text-stone-700" />
             <h2 className="text-[1.15rem] font-bold tracking-[-0.03em] text-stone-900">할일 보관함</h2>
           </div>
           <button
@@ -77,7 +77,7 @@ export const BacklogModal: React.FC<BacklogModalProps> = ({
         <div className="flex-1 overflow-y-auto px-5 py-4 pb-safe">
           {(backlogTasks || []).length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-stone-400 mt-10">
-              <Icon name="inbox" size={48} className="mb-3 opacity-20" />
+              <Icon name="inventory_2" size={48} className="mb-3 opacity-20" />
               <p className="text-sm">보관함이 비어있습니다.</p>
               <p className="mt-1 text-xs text-stone-300">생각나는 할 일을 메모해두세요.</p>
             </div>

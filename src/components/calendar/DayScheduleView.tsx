@@ -402,7 +402,7 @@ export const DayScheduleView = ({
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-stone-600 shadow-sm transition-colors hover:bg-stone-50"
             aria-label="보관함 열기"
           >
-            <Icon name="inbox" size={18} />
+            <Icon name="inventory_2" size={18} />
           </button>
           <button onClick={onOpenSettings} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-stone-600 shadow-sm transition-colors hover:bg-stone-50">
             <Icon name="settings" size={18} />
