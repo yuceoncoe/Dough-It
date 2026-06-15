@@ -59,7 +59,7 @@ export const BacklogModal: React.FC<BacklogModalProps> = ({
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               placeholder="나중에 할 일 제목을 입력하세요"
-              className="flex-1 rounded-xl bg-stone-100 px-4 py-2.5 text-[15px] outline-none transition-colors focus:bg-stone-200"
+              className="min-w-0 flex-1 rounded-xl bg-stone-100 px-4 py-2.5 text-[15px] outline-none transition-colors focus:bg-stone-200"
               autoFocus
             />
             <button
