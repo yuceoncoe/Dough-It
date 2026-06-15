@@ -2,6 +2,7 @@ create table if not exists public.user_app_state (
   user_id uuid primary key references auth.users (id) on delete cascade,
   routines jsonb not null default '{"weekday":[],"weekend":[]}'::jsonb,
   tasks_by_date jsonb not null default '{}'::jsonb,
+  backlog_tasks jsonb not null default '[]'::jsonb,
   skipped_rating_task_ids jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())

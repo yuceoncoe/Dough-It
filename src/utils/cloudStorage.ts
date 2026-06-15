@@ -90,7 +90,7 @@ export const loadRemoteAppState = async (userId: string, todayStr: string): Prom
 
   const { data, error } = await supabase
     .from('user_app_state')
-    .select('routines, tasks_by_date, skipped_rating_task_ids, updated_at')
+    .select('routines, tasks_by_date, backlog_tasks, skipped_rating_task_ids, updated_at')
     .eq('user_id', userId)
     .maybeSingle();
 
@@ -109,6 +109,7 @@ export const loadRemoteAppState = async (userId: string, todayStr: string): Prom
     snapshot: normalizeAppState({
       routines: data.routines,
       tasksByDate: data.tasks_by_date ?? {},
+      backlogTasks: data.backlog_tasks ?? [],
       skippedRatingTaskIds: data.skipped_rating_task_ids ?? [],
     }, todayStr),
     remoteUpdatedAt: data.updated_at ?? null,
@@ -128,6 +129,7 @@ export const persistRemoteAppState = async (userId: string, snapshot: AppStateSn
       user_id: userId,
       routines: serializableSnapshot.routines,
       tasks_by_date: serializableSnapshot.tasksByDate,
+      backlog_tasks: serializableSnapshot.backlogTasks,
       skipped_rating_task_ids: serializableSnapshot.skippedRatingTaskIds,
       updated_at: updatedAt,
     }, { onConflict: 'user_id' });

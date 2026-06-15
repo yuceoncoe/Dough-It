@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Task, Tag, RoutineScope, RoutineAction } from '../../types';
+import { Task, Tag, RoutineScope, RoutineAction, BacklogTask } from '../../types';
 import { timeToMinutes, minutesToTime } from '../../utils/time';
 import { getTaskColor, getTaskTonePillClass, getTaskToneLabel } from '../../utils/task';
 import { formatDateLabel, getTodayString } from '../../utils/task';
@@ -9,6 +9,7 @@ import DayTaskEditorModal from '../ui/DayTaskEditorModal';
 import CircleScheduler from '../scheduler/CircleScheduler';
 import TaskReportModal from '../ui/TaskReportModal';
 import ConfirmModal from '../ui/ConfirmModal';
+import BacklogModal from '../ui/BacklogModal';
 import { Icon } from '../../components/ui/Icon';
 import { QuadrantBadge, getMaxOverlap } from '../../utils/task';
 import { getTaskReport } from '../../utils/report';
@@ -36,6 +37,9 @@ export const DayScheduleView = ({
   onTasksChange: (tasks: Task[]) => void;
   onApplyRoutineEdit: (date: string, task: Task, updates: Pick<Task, 'title' | 'tags' | 'startTime' | 'duration'>, scope: RoutineScope) => void;
   onApplyRoutineDelete: (date: string, task: Task, scope: RoutineScope) => void;
+  backlogTasks: BacklogTask[];
+  onAddBacklogTask: (title: string) => void;
+  onRemoveBacklogTask: (id: string) => void;
 }) => {
   const [title, setTitle] = useState('');
   const [startTime, setStartTime] = useState('');
@@ -67,6 +71,8 @@ export const DayScheduleView = ({
   const [routineEditScope, setRoutineEditScope] = useState<RoutineScope>('single');
   const [reportOpen, setReportOpen] = useState(false);
   const [pendingDeleteTask, setPendingDeleteTask] = useState<Task | null>(null);
+  const [backlogOpen, setBacklogOpen] = useState(false);
+  const [movingBacklogTaskId, setMovingBacklogTaskId] = useState<string | null>(null);
   const [now, setNow] = useState(() => new Date());
 
   const {
@@ -82,7 +88,7 @@ export const DayScheduleView = ({
   const isToday = date === getTodayString();
   const isPastDate = date < getTodayString();
   const report = getTaskReport(tasks);
-  const hasOpenOverlay = Boolean(sheetTask || editorOpen || pendingRoutineAction || reportOpen || pendingDeleteTask);
+  const hasOpenOverlay = Boolean(sheetTask || editorOpen || pendingRoutineAction || reportOpen || pendingDeleteTask || backlogOpen);
   useBodyScrollLock(hasOpenOverlay);
 
   const showToast = (message: string) => {
@@ -151,6 +157,7 @@ export const DayScheduleView = ({
     setTags([]);
     setEditingId(null);
     setRoutineEditScope('single');
+    setMovingBacklogTaskId(null);
   };
 
   const closeEditor = () => {
@@ -203,6 +210,18 @@ export const DayScheduleView = ({
     setEditorOpen(true);
   };
 
+  const startAddingFromBacklog = (task: BacklogTask) => {
+    setMovingBacklogTaskId(task.id);
+    setTitle(task.title);
+    setTags([]);
+    setStartTime('');
+    setEndTime('');
+    setEditingId(null);
+    setRoutineEditScope('single');
+    setEditorOpen(true);
+    setBacklogOpen(false);
+  };
+
   const submitForm = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!title.trim() || !startTime || !endTime) {
@@ -238,6 +257,9 @@ export const DayScheduleView = ({
     } else {
       const added = addTask(title.trim(), tags, startTime, duration);
       if (!added) return;
+      if (movingBacklogTaskId) {
+        onRemoveBacklogTask(movingBacklogTaskId);
+      }
     }
     resetForm();
     setEditorOpen(false);
@@ -341,6 +363,14 @@ export const DayScheduleView = ({
         onEndTimeChange={setEndTime}
         onSetTags={setTags}
         onSubmit={submitForm}
+      />
+      <BacklogModal
+        isOpen={backlogOpen}
+        backlogTasks={backlogTasks}
+        onClose={() => setBacklogOpen(false)}
+        onAddTask={onAddBacklogTask}
+        onRemoveTask={onRemoveBacklogTask}
+        onAddToSchedule={startAddingFromBacklog}
       />
 
       <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-stone-200/0 bg-[#f0f0f4]/95 px-4 pb-3 pt-4 backdrop-blur md:px-6">
@@ -536,6 +566,13 @@ export const DayScheduleView = ({
           {toastMessage}
         </div>
       )}
+      <button
+        onClick={() => setBacklogOpen(true)}
+        className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-stone-800 text-white shadow-xl transition-transform hover:scale-105 active:scale-95 md:bottom-8 md:right-8"
+        aria-label="보관함 열기"
+      >
+        <Icon name="inbox" size={24} />
+      </button>
     </section>
   );
 };

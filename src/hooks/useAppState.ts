@@ -66,6 +66,7 @@ export const useAppState = (user: User, todayStr: string) => {
   const initialState = useMemo(() => createDefaultAppState(todayStr), [todayStr]);
   const [routines, setRoutines] = useState<RoutineState>(initialState.routines);
   const [tasksByDate, setTasksByDate] = useState<Record<string, Task[]>>(initialState.tasksByDate);
+  const [backlogTasks, setBacklogTasks] = useState<Task[]>(initialState.backlogTasks);
   const [activeTab, setActiveTab] = useState<'home' | 'calendar'>('home');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -121,12 +122,14 @@ export const useAppState = (user: User, todayStr: string) => {
       remoteUpdatedAtRef.current = cachedState.remoteUpdatedAt;
       setRoutines(cachedState.snapshot.routines);
       setTasksByDate(cachedState.snapshot.tasksByDate);
+      setBacklogTasks(cachedState.snapshot.backlogTasks);
       setSkippedRatingTaskIds(new Set(cachedState.snapshot.skippedRatingTaskIds));
     } else if (isActive) {
       remoteUpdatedAtRef.current = null;
       const defaultState = createDefaultAppState(todayStr);
       setRoutines(defaultState.routines);
       setTasksByDate(defaultState.tasksByDate);
+      setBacklogTasks(defaultState.backlogTasks);
       setSkippedRatingTaskIds(new Set(defaultState.skippedRatingTaskIds));
     }
 
@@ -151,6 +154,7 @@ export const useAppState = (user: User, todayStr: string) => {
         remoteUpdatedAtRef.current = remoteState.remoteUpdatedAt;
         setRoutines(normalizedState.routines);
         setTasksByDate(normalizedState.tasksByDate);
+        setBacklogTasks(normalizedState.backlogTasks);
         setSkippedRatingTaskIds(new Set(normalizedState.skippedRatingTaskIds));
         persistCachedAppState(user.id, normalizedState, remoteState.remoteUpdatedAt);
       } catch (error) {
@@ -188,6 +192,7 @@ export const useAppState = (user: User, todayStr: string) => {
     const snapshot: AppStateSnapshot = {
       routines,
       tasksByDate,
+      backlogTasks,
       skippedRatingTaskIds: Array.from(skippedRatingTaskIds),
     };
 
@@ -220,7 +225,7 @@ export const useAppState = (user: User, todayStr: string) => {
     }, 500);
 
     return () => window.clearTimeout(timeoutId);
-  }, [routines, tasksByDate, skippedRatingTaskIds, user.id]);
+  }, [routines, tasksByDate, backlogTasks, skippedRatingTaskIds, user.id]);
 
   // Ended tasks checking logic
   useEffect(() => {
@@ -422,9 +427,19 @@ export const useAppState = (user: User, todayStr: string) => {
     }
   };
 
+  const addBacklogTask = (title: string) => {
+    const newTask = { id: `backlog-${Date.now()}`, title };
+    setBacklogTasks((current) => [...current, newTask]);
+  };
+
+  const removeBacklogTask = (id: string) => {
+    setBacklogTasks((current) => current.filter((task) => task.id !== id));
+  };
+
   return {
     routines,
     tasksByDate,
+    backlogTasks,
     activeTab,
     setActiveTab,
     selectedDate,
@@ -446,6 +461,8 @@ export const useAppState = (user: User, todayStr: string) => {
     applyRoutineDelete,
     openDate,
     moveToDate,
+    addBacklogTask,
+    removeBacklogTask,
     handleEnableNotifications,
     handleDisableNotifications,
   };

@@ -19,6 +19,7 @@ export const AppShell = ({
   const {
     routines,
     tasksByDate,
+    backlogTasks,
     activeTab,
     setActiveTab,
     selectedDate,
@@ -39,6 +40,8 @@ export const AppShell = ({
     applyRoutineDelete,
     openDate,
     moveToDate,
+    addBacklogTask,
+    removeBacklogTask,
     handleEnableNotifications,
     handleDisableNotifications,
   } = useAppState(user, todayStr);
@@ -91,6 +94,9 @@ export const AppShell = ({
             onTasksChange={(nextTasks) => updateTasksForDate(todayStr, nextTasks)}
             onApplyRoutineEdit={applyRoutineEdit}
             onApplyRoutineDelete={applyRoutineDelete}
+            backlogTasks={backlogTasks}
+            onAddBacklogTask={addBacklogTask}
+            onRemoveBacklogTask={removeBacklogTask}
           />
         )}
 
@@ -106,6 +112,9 @@ export const AppShell = ({
             onTasksChange={(nextTasks) => updateTasksForDate(selectedDate, nextTasks)}
             onApplyRoutineEdit={applyRoutineEdit}
             onApplyRoutineDelete={applyRoutineDelete}
+            backlogTasks={backlogTasks}
+            onAddBacklogTask={addBacklogTask}
+            onRemoveBacklogTask={removeBacklogTask}
           />
         ) : null}
 

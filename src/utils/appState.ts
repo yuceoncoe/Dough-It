@@ -1,9 +1,10 @@
-import { RoutineState, Task, Tag } from '../types';
+import { RoutineState, Task, Tag, BacklogTask } from '../types';
 import { INITIAL_ROUTINES, addOrReplaceDateTasks, seedTasksForToday } from './task';
 
 export interface AppStateSnapshot {
   routines: RoutineState;
   tasksByDate: Record<string, Task[]>;
+  backlogTasks: BacklogTask[];
   skippedRatingTaskIds: string[];
 }
 
@@ -13,6 +14,7 @@ const ONE_TIME_PAST_CLEANUP_MARKER = `__circle_day_past_cleanup_before_${ONE_TIM
 export const createDefaultAppState = (todayStr: string): AppStateSnapshot => ({
   routines: INITIAL_ROUTINES,
   tasksByDate: seedTasksForToday(todayStr, INITIAL_ROUTINES),
+  backlogTasks: [],
   skippedRatingTaskIds: [],
 });
 
@@ -79,9 +81,22 @@ const normalizeRoutines = (routines: any | null | undefined): RoutineState => {
   return [];
 };
 
+const normalizeBacklogTasks = (backlogTasks: any | null | undefined): BacklogTask[] => {
+  if (Array.isArray(backlogTasks)) {
+    return backlogTasks
+      .filter((task) => typeof task === 'object' && task !== null)
+      .map((task, index) => ({
+        id: typeof task.id === 'string' && task.id ? task.id : `backlog-${index}`,
+        title: typeof task.title === 'string' ? task.title : '',
+      }));
+  }
+  return [];
+};
+
 export const toSerializableAppState = (snapshot: AppStateSnapshot): AppStateSnapshot => ({
   routines: normalizeRoutines(snapshot.routines),
   tasksByDate: normalizeTasksByDate(snapshot.tasksByDate ?? {}),
+  backlogTasks: normalizeBacklogTasks(snapshot.backlogTasks),
   skippedRatingTaskIds: Array.isArray(snapshot.skippedRatingTaskIds)
     ? snapshot.skippedRatingTaskIds.filter((id): id is string => typeof id === 'string')
     : [],
@@ -101,6 +116,7 @@ export const normalizeAppState = (snapshot: AppStateSnapshot, todayStr: string):
   return {
     routines,
     tasksByDate,
+    backlogTasks: serializableSnapshot.backlogTasks,
     skippedRatingTaskIds: hasCompletedPastCleanup
       ? skippedRatingTaskIds
       : [...skippedRatingTaskIds, ONE_TIME_PAST_CLEANUP_MARKER],

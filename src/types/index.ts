@@ -18,3 +18,7 @@ export type RoutineState = Task[];
 export type RoutineScope = 'single' | 'future';
 export type RoutineAction = 'edit' | 'delete';
 
+export interface BacklogTask {
+  id: string;
+  title: string;
+}
