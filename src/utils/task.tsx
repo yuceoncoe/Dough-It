@@ -637,6 +637,7 @@ export function generateRoutinesForDate(dateStr: string, routines: RoutineState)
     .filter((task) => {
       if (task.activeFromDate && dateStr < task.activeFromDate) return false;
       if (task.routineDays && !task.routineDays.includes(dayOfWeek)) return false;
+      if (task.excludedDates?.includes(dateStr)) return false;
       return true;
     })
     .map((task) => ({

@@ -348,7 +348,21 @@ export const useAppState = (user: User, todayStr: string) => {
   };
 
   const applyRoutineDelete = (date: string, task: Task, scope: RoutineScope) => {
+    const baseId = getRoutineBaseId(task.id, date);
+
     if (scope === 'single') {
+      if (baseId) {
+        setRoutines((current) => {
+          const routinesArray = getTaskList(current);
+          return routinesArray.map((item) => {
+            if (item.id === baseId) {
+              return { ...item, excludedDates: [...(item.excludedDates || []), date] };
+            }
+            return item;
+          });
+        });
+      }
+
       setTasksByDate((current) => ({
         ...current,
         [date]: getTaskList(current[date]).filter((item) => item.id !== task.id),
@@ -356,7 +370,6 @@ export const useAppState = (user: User, todayStr: string) => {
       return;
     }
 
-    const baseId = getRoutineBaseId(task.id, date);
     if (!baseId) {
       return;
     }

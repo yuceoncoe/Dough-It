@@ -9,6 +9,7 @@ export interface Task {
   isRoutine?: boolean;
   routineDays?: number[]; // 0: Sunday, ..., 6: Saturday
   activeFromDate?: string;
+  excludedDates?: string[];
   rating?: number; // 1 to 5 scale
   note?: string;
 }

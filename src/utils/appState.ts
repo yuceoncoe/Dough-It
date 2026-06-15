@@ -39,6 +39,7 @@ const normalizeTask = (task: Partial<Task> | null | undefined, fallbackId: strin
   isRoutine: Boolean(task?.isRoutine) || undefined,
   routineDays: Array.isArray(task?.routineDays) ? task.routineDays.filter((d): d is number => typeof d === 'number' && d >= 0 && d <= 6) : undefined,
   activeFromDate: typeof task?.activeFromDate === 'string' ? task.activeFromDate : undefined,
+  excludedDates: Array.isArray(task?.excludedDates) ? task.excludedDates.filter((d): d is string => typeof d === 'string') : undefined,
   rating: typeof task?.rating === 'number' ? task.rating : undefined,
   note: typeof task?.note === 'string' ? task.note : undefined,
 });
