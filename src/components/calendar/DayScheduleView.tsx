@@ -575,7 +575,7 @@ export const DayScheduleView = ({
         style={{ bottom: 'calc(var(--bottom-nav-height) + 1.25rem)' }}
         aria-label="보관함 열기"
       >
-        <Icon name="inbox" size={24} />
+        <Icon name="edit" size={24} />
       </button>
     </section>
   );
