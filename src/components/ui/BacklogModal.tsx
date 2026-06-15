@@ -75,7 +75,7 @@ export const BacklogModal: React.FC<BacklogModalProps> = ({
 
         {/* List */}
         <div className="flex-1 overflow-y-auto p-4 pb-safe">
-          {backlogTasks.length === 0 ? (
+          {(backlogTasks || []).length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-stone-400 mt-10">
               <Icon name="inbox" size={48} className="mb-3 opacity-20" />
               <p className="text-sm">보관함이 비어있습니다.</p>
@@ -83,7 +83,7 @@ export const BacklogModal: React.FC<BacklogModalProps> = ({
             </div>
           ) : (
             <ul className="space-y-2">
-              {backlogTasks.map((task) => (
+              {(backlogTasks || []).map((task) => (
                 <li
                   key={task.id}
                   className="group flex items-center justify-between gap-3 rounded-xl bg-white p-3.5 shadow-sm transition-shadow hover:shadow-md"

@@ -26,6 +26,9 @@ export const DayScheduleView = ({
   onTasksChange,
   onApplyRoutineEdit,
   onApplyRoutineDelete,
+  backlogTasks,
+  onAddBacklogTask,
+  onRemoveBacklogTask,
 }: {
   key?: React.Key;
   date: string;
