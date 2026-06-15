@@ -33,11 +33,11 @@ export const BacklogModal: React.FC<BacklogModalProps> = ({
   };
 
   return (
-    <div className="modal-backdrop z-50 flex-col justify-end sm:justify-center p-0 sm:p-4">
+    <div className="modal-backdrop z-50 flex-col justify-end sm:justify-center p-0 sm:px-5 sm:py-4">
       <div className="flex h-[80vh] w-full flex-col rounded-t-3xl bg-[#f8f9fa] shadow-2xl sm:h-auto sm:max-h-[85vh] sm:max-w-md sm:rounded-3xl animate-slide-up sm:animate-jelly overflow-hidden relative">
         
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-stone-200 bg-white px-5 py-4">
+        <div className="flex items-center justify-between border-b border-stone-200 bg-white px-5 py-4 sm:px-6 sm:py-5">
           <div className="flex items-center gap-2">
             <Icon name="inbox" size={24} className="text-stone-700" />
             <h2 className="text-[1.15rem] font-bold tracking-[-0.03em] text-stone-900">할일 보관함</h2>
@@ -52,7 +52,7 @@ export const BacklogModal: React.FC<BacklogModalProps> = ({
         </div>
 
         {/* Input Form */}
-        <form onSubmit={handleSubmit} className="border-b border-stone-200 bg-white p-4">
+        <form onSubmit={handleSubmit} className="border-b border-stone-200 bg-white px-5 py-4">
           <div className="flex items-center gap-2">
             <input
               type="text"
@@ -74,7 +74,7 @@ export const BacklogModal: React.FC<BacklogModalProps> = ({
         </form>
 
         {/* List */}
-        <div className="flex-1 overflow-y-auto p-4 pb-safe">
+        <div className="flex-1 overflow-y-auto px-5 py-4 pb-safe">
           {(backlogTasks || []).length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-stone-400 mt-10">
               <Icon name="inbox" size={48} className="mb-3 opacity-20" />
