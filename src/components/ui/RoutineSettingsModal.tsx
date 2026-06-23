@@ -54,8 +54,10 @@ export const RoutineSettingsModal = ({
   const [isEnabling, setIsEnabling] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [pendingDeleteTask, setPendingDeleteTask] = useState<Task | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
   const wasOpenRef = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
   useBodyScrollLock(isOpen);
 
   const showToast = (message: string) => {
@@ -83,11 +85,33 @@ export const RoutineSettingsModal = ({
     setRoutineDays([]);
     setActiveTab('main');
     setPendingDeleteTask(null);
+    setEditingId(null);
   }, [isOpen, routines]);
 
   if (!isOpen) {
     return null;
   }
+
+  const startEditing = (task: Task) => {
+    setEditingId(task.id);
+    setTitle(task.title);
+    setTags(Array.isArray(task.tags) ? task.tags : []);
+    setStartTime(task.startTime ?? '');
+    setEndTime(task.startTime && task.duration ? minutesToTime(timeToMinutes(task.startTime) + task.duration) : '');
+    setRoutineDays(task.routineDays ?? []);
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const cancelEditing = () => {
+    setTitle('');
+    setStartTime('');
+    setEndTime('');
+    setTags([]);
+    setRoutineDays([]);
+    setEditingId(null);
+  };
 
   const handleAdd = (explicitTags?: Tag[]) => {
     if (!title.trim() || !startTime || !endTime || routineDays.length === 0) {
@@ -100,29 +124,46 @@ export const RoutineSettingsModal = ({
       showToast('종료 시간이 시작 시간보다 더 뒤여야 해요.');
       return;
     }
-    const nextTask: Task = {
-      id: `routine-editor-${Date.now()}`,
-      title: title.trim(),
-      tags: finalTags,
-      startTime,
-      duration,
-      completed: false,
-      isRoutine: true,
-      routineDays,
-      activeFromDate: getTodayString(),
-    };
-    if (getMaxOverlap([...draft, nextTask]) > 2) {
-      showToast('알림은 한 번에 2개까지만 가능해요!');
-      return;
+
+    let nextDraft: RoutineState;
+    if (editingId) {
+      const current = draft.find(t => t.id === editingId);
+      if (!current) return;
+      const updatedTask = {
+        ...current,
+        title: title.trim(),
+        tags: finalTags,
+        startTime,
+        duration,
+        routineDays,
+      };
+      if (getMaxOverlap(draft.map(t => t.id === editingId ? updatedTask : t)) > 2) {
+        showToast('알림은 한 번에 2개까지만 가능해요!');
+        return;
+      }
+      nextDraft = draft.map(t => t.id === editingId ? updatedTask : t).sort((left, right) => timeToMinutes(left.startTime ?? '00:00') - timeToMinutes(right.startTime ?? '00:00'));
+    } else {
+      const nextTask: Task = {
+        id: `routine-editor-${Date.now()}`,
+        title: title.trim(),
+        tags: finalTags,
+        startTime,
+        duration,
+        completed: false,
+        isRoutine: true,
+        routineDays,
+        activeFromDate: getTodayString(),
+      };
+      if (getMaxOverlap([...draft, nextTask]) > 2) {
+        showToast('알림은 한 번에 2개까지만 가능해요!');
+        return;
+      }
+      nextDraft = [...draft, nextTask].sort((left, right) => timeToMinutes(left.startTime ?? '00:00') - timeToMinutes(right.startTime ?? '00:00'));
     }
-    const nextDraft = [...draft, nextTask].sort((left, right) => timeToMinutes(left.startTime ?? '00:00') - timeToMinutes(right.startTime ?? '00:00'));
+    
     setDraft(nextDraft);
     onSaveRoutines(nextDraft);
-    setTitle('');
-    setStartTime('');
-    setEndTime('');
-    setTags([]);
-    setRoutineDays([]);
+    cancelEditing();
   };
 
   const handleTagSelect = (selectedTags: Tag[]) => {
@@ -275,16 +316,20 @@ export const RoutineSettingsModal = ({
                 </div>
               )}
               {draft.map((task) => (
-                <div
+                <button
                   key={task.id}
-                  className="task-card relative flex w-[144px] shrink-0 flex-col gap-2 rounded-[1.2rem] bg-white p-4 text-left shadow-sm ring-1 ring-black/5"
+                  onClick={() => startEditing(task)}
+                  className={`task-card relative flex w-[144px] shrink-0 flex-col gap-2 rounded-[1.2rem] p-4 text-left shadow-sm ring-1 ring-black/5 transition-all ${editingId === task.id ? 'bg-blue-50 ring-blue-500/30 shadow-md scale-[1.02]' : 'bg-white hover:bg-stone-50 hover:shadow-md hover:scale-[1.02]'}`}
                 >
-                  <button 
-                    onClick={() => setPendingDeleteTask(task)} 
-                    className="absolute right-2 top-2 z-10 rounded-full p-1.5 text-stone-300 transition-colors hover:bg-rose-50 hover:text-rose-500"
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPendingDeleteTask(task);
+                    }}
+                    className="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full text-stone-300 transition-colors hover:bg-rose-50 hover:text-rose-500"
                   >
                     <Icon name="close" size={16} />
-                  </button>
+                  </div>
                   <div className="flex items-center gap-1.5">
                     <QuadrantBadge task={task} />
                     <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-[-0.02em] ${getTaskTonePillClass(task)}`}>
@@ -306,14 +351,15 @@ export const RoutineSettingsModal = ({
                       </span>
                     </div>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
           <div className="flex min-h-0 flex-1 flex-col bg-white overflow-y-auto">
             <div className="px-6 pb-6 pt-6">
-              <h3 className="font-hand text-2xl text-stone-700">루틴 블록 추가</h3>
+              <h3 className="font-hand text-2xl text-stone-700">{editingId ? '루틴 블록 수정' : '루틴 블록 추가'}</h3>
               <form 
+                ref={formRef}
                 className="mt-6 flex flex-col gap-3"
                 autoComplete="off"
                 onSubmit={(e) => {
@@ -372,14 +418,21 @@ export const RoutineSettingsModal = ({
                 <div className="mt-6">
                   <QuadrantPicker tags={tags} onSelect={handleTagSelect} buttonType="button" />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleAdd()}
-                  disabled={!title.trim() || !startTime || !endTime || routineDays.length === 0}
-                  className="btn-primary mt-8 w-full"
-                >
-                  블록 추가
-                </button>
+                <div className="mt-8 flex gap-3">
+                  {editingId && (
+                    <button type="button" onClick={cancelEditing} className="flex-1 btn-outline">
+                      취소
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleAdd()}
+                    disabled={!title.trim() || !startTime || !endTime || routineDays.length === 0}
+                    className={`flex-1 btn-primary ${!editingId ? 'w-full' : ''}`}
+                  >
+                    {editingId ? '루틴 수정' : '블록 추가'}
+                  </button>
+                </div>
               </form>
             </div>
           </div>
